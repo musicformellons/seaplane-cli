@@ -1,15 +1,20 @@
 //! The `/formations` endpoint APIs which allows working with [`Formation`]s,
 //! [`Flight`]s, and the underlying containers
 
+pub mod error;
 mod models;
+pub mod response;
+mod validate;
 pub use models::*;
+pub use response::*;
+pub use validate::*;
 
 use crate::{
     api::{
-        compute::{error::map_api_error, COMPUTE_API_URL},
+        compute::{error::map_api_error, v2::error::ComputeRequest, COMPUTE_API_URL},
         ApiRequest, RequestBuilder,
     },
-    error::{Result, SeaplaneError},
+    error::Result,
 };
 
 const COMPUTE_API_ROUTE: &str = "v2beta/formations";
@@ -18,16 +23,17 @@ const COMPUTE_API_ROUTE: &str = "v2beta/formations";
 /// request against the `/formations` APIs
 #[derive(Debug)]
 pub struct FormationsRequestBuilder {
-    builder: RequestBuilder<String>,
+    builder: RequestBuilder<FormationId>,
 }
 
-impl From<RequestBuilder<String>> for FormationsRequestBuilder {
-    fn from(builder: RequestBuilder<String>) -> Self { Self { builder } }
+impl From<RequestBuilder<FormationId>> for FormationsRequestBuilder {
+    fn from(builder: RequestBuilder<FormationId>) -> Self { Self { builder } }
 }
 
 impl Default for FormationsRequestBuilder {
     fn default() -> Self { Self::new() }
 }
+
 impl FormationsRequestBuilder {
     pub fn new() -> Self { RequestBuilder::new(COMPUTE_API_URL, COMPUTE_API_ROUTE).into() }
 
@@ -56,19 +62,22 @@ impl FormationsRequestBuilder {
     #[doc(hidden)]
     pub fn base_url<U: AsRef<str>>(self, url: U) -> Self { self.builder.base_url(url).into() }
 
-    /// The name of the Formation to query as part of the request.
+    /// The Object ID of the Formation to query as part of the request.
+    ///
+    /// **NOTE:** The Object ID is in the form of `frm-agc6amh7z527vijkv2cutplwaa` and is unique
+    /// per Formation instance
     #[must_use]
-    pub fn name<S: Into<String>>(self, name: S) -> Self { self.builder.target(name.into()).into() }
+    pub fn formation_id(self, oid: FormationId) -> Self { self.builder.target(oid).into() }
 }
 
 /// For making requests against the `/formations` APIs.
 #[derive(Debug)]
 pub struct FormationsRequest {
-    request: ApiRequest<String>,
+    request: ApiRequest<FormationId>,
 }
 
-impl From<ApiRequest<String>> for FormationsRequest {
-    fn from(request: ApiRequest<String>) -> Self { Self { request } }
+impl From<ApiRequest<FormationId>> for FormationsRequest {
+    fn from(request: ApiRequest<FormationId>) -> Self { Self { request } }
 }
 
 impl FormationsRequest {
@@ -77,7 +86,7 @@ impl FormationsRequest {
 
     /// Create a new Formation and returns the IDs of the created Formation.
     ///
-    /// Uses `POST /formations/NAME`
+    /// Uses `POST /formations`
     ///
     /// # Examples
     ///
@@ -85,11 +94,11 @@ impl FormationsRequest {
     /// # use seaplane::api::compute::v2::{FormationsRequest, Formation, Flight};
     /// let req = FormationsRequest::builder()
     ///     .token("abc123")
-    ///     .name("foo")
     ///     .build()
     ///     .unwrap();
     ///
     /// let formation = Formation::builder()
+    ///     .name("exmample-formation")
     ///     .add_flight(
     ///         Flight::builder()
     ///             .name("myflight")
@@ -102,29 +111,22 @@ impl FormationsRequest {
     /// let resp = req.create(&formation).unwrap();
     /// dbg!(resp);
     /// ```
-    pub fn create(&self, formation: &Formation) -> Result<()> {
-        if self.request.target.is_none() {
-            return Err(SeaplaneError::MissingFormationName);
-        }
-        let url = self
-            .request
-            .endpoint_url
-            // We have to add "formations" because that's how URL's join() method works
-            .join(&format!("formations/{}", self.name()))?;
+    pub fn create(&self, formation: &Formation) -> Result<CreateFormationResponse> {
         let req = self
             .request
             .client
-            .post(url)
+            .post(self.request.endpoint_url.clone())
             .bearer_auth(&self.request.token)
             .json(formation);
         let resp = req.send()?;
-        map_api_error(resp)?;
-        Ok(())
+        map_api_error(resp)?
+            .json::<CreateFormationResponse>()
+            .map_err(Into::into)
     }
 
     /// Deletes a formation
     ///
-    /// Uses `DELETE /formations/NAME`
+    /// Uses `DELETE /formations/ID`
     ///
     /// # Examples
     ///
@@ -132,20 +134,20 @@ impl FormationsRequest {
     /// # use seaplane::api::compute::v2::{FormationsRequest};
     /// let req = FormationsRequest::builder()
     ///     .token("abc123")
-    ///     .name("foo")
+    ///     .formation_id("frm-agc6amh7z527vijkv2cutplwaa".parse().unwrap())
     ///     .build()
     ///     .unwrap();
     ///
     /// assert!(req.delete().is_ok());
     /// ```
-    pub fn delete(&self) -> Result<String> {
+    pub fn delete(&self) -> Result<DeleteFormationResponse> {
         if self.request.target.is_none() {
-            return Err(SeaplaneError::MissingFormationName);
+            return Err(ComputeRequest::MissingFormationId.into());
         }
         let url = self
             .request
             .endpoint_url
-            .join(&format!("formations/{}", self.name()))?;
+            .join(&format!("formations/{}", self.oid()))?;
         let resp = self
             .request
             .client
@@ -153,43 +155,8 @@ impl FormationsRequest {
             .bearer_auth(&self.request.token)
             .send()?;
 
-        map_api_error(resp)?.text().map_err(Into::into)
-    }
-
-    /// Query the status of a Formation
-    ///
-    /// Uses `GET /formations/NAME/status`
-    ///
-    /// # Examples
-    ///
-    /// ```no_run
-    /// # use seaplane::api::compute::v2::{FormationsRequest};
-    /// let req = FormationsRequest::builder()
-    ///     .token("abc123")
-    ///     .name("foo")
-    ///     .build()
-    ///     .unwrap();
-    ///
-    /// dbg!(req.status().unwrap());
-    /// ```
-    pub fn status(&self) -> Result<FormationStatus> {
-        if self.request.target.is_none() {
-            return Err(SeaplaneError::MissingFormationName);
-        }
-        let url = self
-            .request
-            .endpoint_url
-            .join(&format!("formations/{}/status", self.name()))?;
-        let resp = self
-            .request
-            .client
-            .get(url)
-            .bearer_auth(&self.request.token)
-            .send()?;
-
-        map_api_error(resp)?
-            .json::<FormationStatus>()
-            .map_err(Into::into)
+        map_api_error(resp)?;
+        Ok(())
     }
 
     // @TODO: a paging iterator may be more appropriate here in the future
@@ -206,10 +173,10 @@ impl FormationsRequest {
     ///     .build()
     ///     .unwrap();
     ///
-    /// let resp = req.list().unwrap();
+    /// let resp = req.get_all().unwrap();
     /// dbg!(resp);
     /// ```
-    pub fn list(&self) -> Result<Vec<Formation>> {
+    pub fn get_all(&self) -> Result<GetFormationsResponse> {
         let client = reqwest::blocking::Client::new();
         let resp = client
             .get(self.request.endpoint_url.clone())
@@ -217,13 +184,13 @@ impl FormationsRequest {
             .send()?;
 
         map_api_error(resp)?
-            .json::<Vec<Formation>>()
+            .json::<GetFormationsResponse>()
             .map_err(Into::into)
     }
 
-    /// Returns a single Formations
+    /// Returns a single Formation's metadata
     ///
-    /// Uses `GET /formations/NAME`
+    /// Uses `GET /formations/ID`
     ///
     /// # Examples
     ///
@@ -231,21 +198,21 @@ impl FormationsRequest {
     /// # use seaplane::api::compute::v2::{FormationsRequest};
     /// let req = FormationsRequest::builder()
     ///     .token("abc123_token")
-    ///     .name("stubb")
+    ///     .formation_id("frm-agc6amh7z527vijkv2cutplwaa".parse().unwrap())
     ///     .build()
     ///     .unwrap();
     ///
     /// let resp = req.get().unwrap();
     /// dbg!(resp);
     /// ```
-    pub fn get(&self) -> Result<Formation> {
+    pub fn get(&self) -> Result<GetFormationResponse> {
         if self.request.target.is_none() {
-            return Err(SeaplaneError::MissingFormationName);
+            return Err(ComputeRequest::MissingFormationId.into());
         }
         let url = self
             .request
             .endpoint_url
-            .join(&format!("formations/{}", self.name()))?;
+            .join(&format!("formations/{}", self.oid()))?;
         let resp = self
             .request
             .client
@@ -253,10 +220,16 @@ impl FormationsRequest {
             .bearer_auth(&self.request.token)
             .send()?;
 
-        map_api_error(resp)?.json::<Formation>().map_err(Into::into)
+        map_api_error(resp)?
+            .json::<GetFormationResponse>()
+            .map_err(Into::into)
     }
 
-    // Internal, only used when can only be a valid name.
+    // Internal; gets the OID of the target formation
+    //
+    // # Panics
+    //
+    // If FormationId isn't `Some`
     #[inline]
-    fn name(&self) -> &str { self.request.target.as_deref().unwrap() }
+    fn oid(&self) -> &FormationId { self.request.target.as_ref().unwrap() }
 }

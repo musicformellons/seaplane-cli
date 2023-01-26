@@ -35,5 +35,6 @@ pub mod error;
 /// re-exported crate trait instead of one from your own dependencies list.
 pub mod rexports {
     pub use container_image_ref;
+    pub use seaplane_oid;
     pub use strum;
 }

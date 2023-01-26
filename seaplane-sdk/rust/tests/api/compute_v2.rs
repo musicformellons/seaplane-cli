@@ -1,6 +1,5 @@
 use httpmock::{prelude::*, Method, Then, When};
-use seaplane::api::compute::v2::{Flight, FlightHealthStatus, Formation, FormationsRequest};
-use serde_json::json;
+use seaplane::api::compute::v2::{response::*, Flight, Formation, FormationsRequest};
 
 use super::MOCK_SERVER;
 
@@ -18,17 +17,19 @@ fn then(then: Then, resp_body: serde_json::Value) -> Then {
         .json_body(resp_body)
 }
 
-fn build_req() -> FormationsRequest {
-    FormationsRequest::builder()
+fn build_req(incl_id: bool) -> FormationsRequest {
+    let mut bdr = FormationsRequest::builder()
         .token("abc123")
-        .base_url(MOCK_SERVER.base_url())
-        .name("stubb")
-        .build()
-        .unwrap()
+        .base_url(MOCK_SERVER.base_url());
+    if incl_id {
+        bdr = bdr.formation_id("frm-agc6amh7z527vijkv2cutplwaa".parse().unwrap());
+    }
+    bdr.build().unwrap()
 }
 
 fn build_formation() -> Formation {
     Formation::builder()
+        .name("stubb")
         .add_flight(
             Flight::builder()
                 .name("pequod")
@@ -50,24 +51,35 @@ fn build_formation() -> Formation {
 
 // GET /formations
 #[test]
-fn list_formations() {
-    let resp_json = r#"[{
-        "name": "example-formation",
-        "flights": [{
-            "name": "example-flight",
-            "image": "registry.cplane.cloud/seaplane-demo/nginxdemos/hello:latest"
+fn get_all_formations() {
+    let resp_json = r#"{
+        "objects":[{
+          "name": "example-formation",
+          "url": "https://example-formation.tenant.on.cplane.cloud",
+          "oid": "frm-agc6amh7z527vijkv2cutplwaa",
+          "flights": [{
+              "name": "example-flight",
+              "oid": "flt-agc6amh7z527vijkv2cutplwaa",
+              "image": "registry.cplane.cloud/seaplane-demo/nginxdemos/hello:latest",
+              "status": "healthy"
+          }],
+          "gateway-flight": "example-flight"
         }],
-        "gateway-flight": "example-flight"
-    }]"#;
-    let resp_t: Vec<Formation> = serde_json::from_str(resp_json).unwrap();
+        "meta":{
+            "total":1,
+            "next":null,
+            "prev":null
+        }
+    }"#;
+    let resp_t: GetFormationsResponse = serde_json::from_str(resp_json).unwrap();
 
     let mock = MOCK_SERVER.mock(|w, t| {
         when(w, GET, "/v2beta/formations");
         then(t, serde_json::to_value(resp_t.clone()).unwrap());
     });
 
-    let req = build_req();
-    let resp = req.list().unwrap();
+    let req = build_req(false);
+    let resp = req.get_all().unwrap();
 
     // Ensure the endpoint was hit
     mock.assert();
@@ -75,85 +87,72 @@ fn list_formations() {
     assert_eq!(resp, resp_t);
 }
 
-// GET /formations/NAME
+// GET /formations/OID
 #[test]
 fn get_formation() {
-    let resp_json = r#"{
-        "name": "example-formation",
-        "flights": [{
-            "name": "example-flight",
-            "image": "registry.cplane.cloud/seaplane-demo/nginxdemos/hello:latest"
-        }],
-        "gateway-flight": "example-flight"
-    }"#;
-    let resp_t: Formation = serde_json::from_str(resp_json).unwrap();
+    let mut frm = build_formation();
+    frm.oid = Some("frm-agc6amh7z527vijkv2cutplwaa".parse().unwrap());
+    frm.url = Some(
+        "https://example-formation.tenant.on.cplane.cloud"
+            .parse()
+            .unwrap(),
+    );
+    let resp_body = serde_json::to_value(&frm).unwrap();
 
     let mock = MOCK_SERVER.mock(|w, t| {
-        when(w, GET, "/v2beta/formations/stubb").header("content-type", "application/json");
-        then(t, serde_json::to_value(resp_t.clone()).unwrap());
+        when(w, GET, "/v2beta/formations/frm-agc6amh7z527vijkv2cutplwaa")
+            .header("content-type", "application/json");
+        then(t, resp_body);
     });
 
-    let req = build_req();
+    let req = build_req(true);
     let resp = req.get().unwrap();
 
     // Ensure the endpoint was hit
     mock.assert();
 
-    assert_eq!(resp, resp_t);
+    assert_eq!(resp, frm);
 }
 
-// GET /formations/NAME/status
-#[test]
-fn get_formation_status() {
-    let resp_json = json!({
-        "name": "example-formation",
-        "flights": [{
-            "name": "example-flight",
-            "health": "healthy".parse::<FlightHealthStatus>().unwrap()
-        }],
-    });
-    let mock = MOCK_SERVER.mock(|w, t| {
-        when(w, GET, "/v2beta/formations/stubb/status").header("content-type", "application/json");
-        then(t, resp_json.clone());
-    });
-
-    let req = build_req();
-    let resp = req.status().unwrap();
-
-    // Ensure the endpoint was hit
-    mock.assert();
-
-    assert_eq!(resp, serde_json::from_value(resp_json).unwrap());
-}
-
-// POST /formations/NAME
+// POST /formations
 #[test]
 fn create_formation() {
+    let mut frm = build_formation();
+    frm.oid = Some("frm-agc6amh7z527vijkv2cutplwaa".parse().unwrap());
+    frm.url = Some(
+        "https://example-formation.tenant.on.cplane.cloud"
+            .parse()
+            .unwrap(),
+    );
+    let resp_body = serde_json::to_value(frm).unwrap();
+
     let mock = MOCK_SERVER.mock(|w, then| {
-        when(w, POST, "/v2beta/formations/stubb")
+        when(w, POST, "/v2beta/formations")
             .header("content-type", "application/json")
             .json_body_obj(&build_formation());
         then.status(201)
             .header("content-type", "application/json")
-            .header("Location", "https://stubb.tenant.on.cplane.cloud");
+            .header("Location", "https://stubb.tenant.on.cplane.cloud")
+            .json_body(resp_body);
     });
 
-    let req = build_req();
+    let req = build_req(false);
     assert!(req.create(&build_formation()).is_ok());
 
     // Ensure the endpoint was hit
     mock.assert();
 }
 
-// DELETE /formations/NAME
+// DELETE /formations/ID
 #[test]
 fn delete_formation() {
     let mock = MOCK_SERVER.mock(|w, t| {
-        when(w, DELETE, "/v2beta/formations/stubb").header("content-type", "application/json");
+        when(w, DELETE, "/v2beta/formations/frm-agc6amh7z527vijkv2cutplwaa")
+            .header("content-type", "application/json");
         t.status(200);
     });
 
-    let req = build_req();
+    let req = build_req(true);
     assert!(req.delete().is_ok());
 
     // Ensure the endpoint was hit

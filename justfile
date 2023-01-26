@@ -178,13 +178,13 @@ test-rust: test-sdk-rust (_test-rust-crate CLI_MANIFEST) (_test-rust-api-crate C
 test-cli: (_doc-rust-crate CLI_MANIFEST) (_test-rust-crate CLI_MANIFEST) (_test-rust-api-crate CLI_MANIFEST) test-ui
 
 # Run basic integration and unit tests for the Rust SDK
-test-sdk-rust: _test-rust-crate _test-rust-api-crate (_test-rust-api-crate SDK_RUST_MANIFEST ',compute_api_v2,unstable') _doc-rust-crate
+test-sdk-rust: _test-rust-crate _test-rust-api-crate (_test-rust-api-crate SDK_RUST_MANIFEST ',compute_api_v2,unstable') _test-rust-doc-crate _doc-rust-crate
 
 # Run basic integration and unit tests for the library container-image-ref
-test-libs-container-image-ref: (_test-rust-crate IMAGE_REF_MANIFEST)
+test-libs-container-image-ref: (_test-rust-crate IMAGE_REF_MANIFEST) (_test-rust-doc-crate IMAGE_REF_MANIFEST)
 
 # Run basic integration and unit tests for the OID library
-test-libs-oid: (_test-rust-crate OID_MANIFEST '' '-D warnings')
+test-libs-oid: (_test-rust-crate OID_MANIFEST '' '-D warnings') (_test-rust-doc-crate OID_MANIFEST)
 
 # Run basic integration and unit tests for the Python SDK
 test-sdk-python: _python-setup
@@ -238,8 +238,10 @@ _test-rust-api-crate MANIFEST=SDK_RUST_MANIFEST EXTRA_FEATURES='' $RUSTFLAGS='-D
     {{ TEST_RUNNER }} --features unstable,api_tests{{ EXTRA_FEATURES }} --manifest-path {{ MANIFEST }} {{ ARG_SEP }} --test-threads=1
 
 # Run documentation tests
-_test-rust-doc-crate MANIFEST=SDK_RUST_MANIFEST:
-    cargo test --doc --manifest-path {{ MANIFEST }}
+_test-rust-doc-crate MANIFEST=SDK_RUST_MANIFEST FEATURES='':
+    cargo test --doc --manifest-path {{ MANIFEST }} {{ FEATURES }}
+    cargo test --doc --manifest-path {{ MANIFEST }} --no-default-features
+    cargo test --doc --manifest-path {{ MANIFEST }} --all-features
 
 #
 # Small Helpers

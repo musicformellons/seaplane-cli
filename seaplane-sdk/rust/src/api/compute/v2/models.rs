@@ -1,23 +1,54 @@
 use serde::{Deserialize, Serialize};
 use strum::{Display, EnumString};
+use url::Url;
 
 #[cfg(doc)]
 use crate::api::compute::v2::FormationsRequest;
 use crate::{
+    api::compute::v2::validate_formation_name,
     error::{Result, SeaplaneError},
-    rexports::container_image_ref::ImageReference,
+    rexports::{
+        container_image_ref::ImageReference,
+        seaplane_oid::{OidPrefix, TypedOid},
+    },
 };
 
+#[doc(hidden)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+pub struct Frm;
+impl OidPrefix for Frm {}
+
+/// A Formation Object ID, ex. `frm-agc6amh7z527vijkv2cutplwaa`
+pub type FormationId = TypedOid<Frm>;
+
+#[doc(hidden)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+pub struct Flt;
+impl OidPrefix for Flt {}
+
+/// A Flight Object ID, ex. `flt-agc6amh7z527vijkv2cutplwaa`
+pub type FlightId = TypedOid<Flt>;
+
 /// Whether a Flight is Health or Unhealthy as determined by the runtime
-#[derive(Debug, Copy, Clone, PartialEq, Eq, EnumString, Display, Serialize)]
-#[serde(rename_all = "lowercase")]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, EnumString, Display, Default)]
 #[strum(ascii_case_insensitive, serialize_all = "lowercase")]
-pub enum FlightHealthStatus {
+pub enum FlightStatus {
+    /// The Flight is healthy
     Healthy,
+
+    /// The Flight is unhealthy
     Unhealthy,
+
+    /// The Flight is starting and has not yet reported a health status
+    #[default]
+    Starting,
 }
 
-impl_deser_from_str!(FlightHealthStatus);
+impl FlightStatus {
+    pub fn is_starting(&self) -> bool { self == &FlightStatus::Starting }
+}
+
+impl_serde_str!(FlightStatus);
 
 #[cfg(test)]
 mod flight_health_status_tests {
@@ -25,106 +56,25 @@ mod flight_health_status_tests {
 
     #[test]
     fn deser() {
-        assert_eq!(FlightHealthStatus::Healthy, "healthy".parse().unwrap());
-        assert_eq!(FlightHealthStatus::Healthy, "Healthy".parse().unwrap());
-        assert_eq!(FlightHealthStatus::Healthy, "HEALTHY".parse().unwrap());
+        assert_eq!(FlightStatus::Healthy, "healthy".parse().unwrap());
+        assert_eq!(FlightStatus::Healthy, "Healthy".parse().unwrap());
+        assert_eq!(FlightStatus::Healthy, "HEALTHY".parse().unwrap());
 
-        assert_eq!(FlightHealthStatus::Unhealthy, "unhealthy".parse().unwrap());
-        assert_eq!(FlightHealthStatus::Unhealthy, "Unhealthy".parse().unwrap());
-        assert_eq!(FlightHealthStatus::Unhealthy, "UNHEALTHY".parse().unwrap());
+        assert_eq!(FlightStatus::Unhealthy, "unhealthy".parse().unwrap());
+        assert_eq!(FlightStatus::Unhealthy, "Unhealthy".parse().unwrap());
+        assert_eq!(FlightStatus::Unhealthy, "UNHEALTHY".parse().unwrap());
+
+        assert_eq!(FlightStatus::Starting, "starting".parse().unwrap());
+        assert_eq!(FlightStatus::Starting, "Starting".parse().unwrap());
+        assert_eq!(FlightStatus::Starting, "STARTING".parse().unwrap());
     }
 
     #[test]
     fn ser() {
-        assert_eq!(FlightHealthStatus::Healthy.to_string(), "healthy".to_string());
-        assert_eq!(FlightHealthStatus::Unhealthy.to_string(), "unhealthy".to_string());
+        assert_eq!(FlightStatus::Healthy.to_string(), "healthy".to_string());
+        assert_eq!(FlightStatus::Unhealthy.to_string(), "unhealthy".to_string());
+        assert_eq!(FlightStatus::Starting.to_string(), "starting".to_string());
     }
-}
-
-/// The status of a Flight
-#[derive(Debug, Serialize, Deserialize, Clone, Eq, PartialEq)]
-#[non_exhaustive]
-pub struct FlightStatus {
-    pub name: String,
-    pub health: FlightHealthStatus,
-}
-
-#[cfg(test)]
-mod flight_status_tests {
-    use super::*;
-
-    #[test]
-    fn deser() {
-        let json = r#"{
-            "name": "example-flight",
-            "health": "healthy"
-        }"#;
-        let model =
-            FlightStatus { name: "example-flight".into(), health: FlightHealthStatus::Healthy };
-
-        assert_eq!(model, serde_json::from_str(json).unwrap());
-    }
-
-    #[test]
-    fn ser() {
-        let json = r#"{"name":"example-flight","health":"healthy"}"#;
-        let model =
-            FlightStatus { name: "example-flight".into(), health: FlightHealthStatus::Healthy };
-
-        assert_eq!(json, serde_json::to_string(&model).unwrap());
-    }
-}
-
-/// The status of a given Formation and it's associated Flights
-#[derive(Debug, Serialize, Deserialize, Clone, Eq, PartialEq)]
-#[non_exhaustive]
-pub struct FormationStatus {
-    pub name: String,
-    pub flights: Vec<FlightStatus>,
-}
-
-#[cfg(test)]
-mod formation_status_tests {
-    use super::*;
-
-    #[test]
-    fn deser() {
-        let json = r#"{
-            "name": "example-formation",
-            "flights": [{"name":"example-flight","health":"healthy"}]
-        }"#;
-        let model = FormationStatus {
-            name: "example-formation".into(),
-            flights: vec![FlightStatus {
-                name: "example-flight".into(),
-                health: FlightHealthStatus::Healthy,
-            }],
-        };
-
-        assert_eq!(model, serde_json::from_str(json).unwrap());
-    }
-
-    #[test]
-    fn ser() {
-        let json = r#"{"name":"example-formation","flights":[{"name":"example-flight","health":"healthy"}]}"#;
-        let model = FormationStatus {
-            name: "example-formation".into(),
-            flights: vec![FlightStatus {
-                name: "example-flight".into(),
-                health: FlightHealthStatus::Healthy,
-            }],
-        };
-
-        assert_eq!(json, serde_json::to_string(&model).unwrap());
-    }
-}
-
-/// Response from `GET /formations/NAME` which contains metadata about the Formation itself.
-#[derive(Debug, Serialize, Deserialize, Clone, Eq, PartialEq)]
-#[non_exhaustive]
-pub struct FormationMetadata {
-    /// The URL where the Formation is exposed at
-    pub url: String,
 }
 
 /// A builder for creating a [`Formation`] which is the primary way to describe a
@@ -137,6 +87,16 @@ pub struct FormationBuilder {
 }
 
 impl FormationBuilder {
+    /// The human readable [`Formation`] name, which must be unique within the Formation and URL
+    /// safe. See [`validate_formation_name`] for more information.
+    ///
+    /// **NOTE:** The name will be validated on the call to [`FormationBuilder::build`]
+    #[must_use]
+    pub fn name(mut self, name: impl Into<String>) -> Self {
+        self.name = name.into();
+        self
+    }
+
     /// Add a [`Flight`] to the makeup of this Formation Configuration.
     ///
     /// **NOTE:** This method can be called multiple times. All values will be utilized.
@@ -156,17 +116,9 @@ impl FormationBuilder {
     pub fn clear_flights(&mut self) { self.flights.clear(); }
 
     /// Performs validation checks, and builds the instance of [`Formation`]
-    pub fn build(mut self) -> Result<Formation> {
+    pub fn build(self) -> Result<Formation> {
         if self.flights.is_empty() {
             return Err(SeaplaneError::EmptyFlights);
-        }
-
-        if self.gateway_flight.is_none() {
-            if self.flights.len() == 1 {
-                self.gateway_flight = Some(self.flights.get(0).unwrap().name.clone());
-            } else {
-                return Err(SeaplaneError::NoGatewayFlight);
-            }
         }
 
         // Ensure gateway_flight was defined
@@ -179,10 +131,14 @@ impl FormationBuilder {
             return Err(SeaplaneError::InvalidGatewayFlight);
         }
 
+        validate_formation_name(&self.name)?;
+
         Ok(Formation {
-            flights: self.flights,
             name: self.name,
-            gateway_flight: self.gateway_flight.unwrap(),
+            oid: None,
+            url: None,
+            flights: self.flights,
+            gateway_flight: self.gateway_flight,
         })
     }
 }
@@ -191,9 +147,23 @@ impl FormationBuilder {
 #[derive(Debug, Serialize, Deserialize, Clone, Eq, PartialEq)]
 #[serde(rename_all = "kebab-case")]
 pub struct Formation {
-    name: String,
-    flights: Vec<Flight>,
-    gateway_flight: String,
+    /// The human friendly name of the Formation
+    pub name: String,
+
+    /// The Object ID of the Formation that will be assigned by the Compute API upon launch
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub oid: Option<FormationId>,
+
+    /// The public URL this Formation is exposed on
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub url: Option<Url>,
+
+    /// The Flights that make up this Formation
+    pub flights: Vec<Flight>,
+
+    /// The Flight who will receive all the public HTTP(s) traffic that arrives on the public
+    /// Formation URL
+    pub gateway_flight: Option<String>,
 }
 
 impl Formation {
@@ -232,16 +202,30 @@ mod formation_tests {
     fn deser() {
         let json = r#"{
             "name": "example-formation",
-            "flights": [{"name":"example-flight","image":"foo.com/bar:latest"}],
+            "oid": "frm-agc6amh7z527vijkv2cutplwaa",
+            "url": "https://example-formation.tenant.on.cplane.cloud",
+            "flights": [{
+                "name":"example-flight",
+                "oid":"flt-agc6amh7z527vijkv2cutplwaa",
+                "image":"foo.com/bar:latest"
+            }],
             "gateway-flight": "example-flight"
         }"#;
         let model = Formation {
             name: "example-formation".into(),
+            oid: Some("frm-agc6amh7z527vijkv2cutplwaa".parse().unwrap()),
+            url: Some(
+                "https://example-formation.tenant.on.cplane.cloud"
+                    .parse()
+                    .unwrap(),
+            ),
             flights: vec![Flight {
                 name: "example-flight".into(),
+                oid: Some("flt-agc6amh7z527vijkv2cutplwaa".parse().unwrap()),
                 image: "foo.com/bar:latest".parse::<ImageReference>().unwrap(),
+                status: FlightStatus::Starting,
             }],
-            gateway_flight: "example-flight".into(),
+            gateway_flight: Some("example-flight".into()),
         };
 
         assert_eq!(model, serde_json::from_str(json).unwrap());
@@ -249,14 +233,37 @@ mod formation_tests {
 
     #[test]
     fn ser() {
-        let json = r#"{"name":"example-formation","flights":[{"name":"example-flight","image":"foo.com/bar:latest"}],"gateway-flight":"example-flight"}"#;
+        let json = r#"{"name":"example-formation","oid":"frm-agc6amh7z527vijkv2cutplwaa","flights":[{"name":"example-flight","oid":"flt-agc6amh7z527vijkv2cutplwaa","image":"foo.com/bar:latest"}],"gateway-flight":"example-flight"}"#;
         let model = Formation {
             name: "example-formation".into(),
+            oid: Some("frm-agc6amh7z527vijkv2cutplwaa".parse().unwrap()),
+            url: None,
             flights: vec![Flight {
                 name: "example-flight".into(),
+                oid: Some("flt-agc6amh7z527vijkv2cutplwaa".parse().unwrap()),
                 image: "foo.com/bar:latest".parse::<ImageReference>().unwrap(),
+                status: FlightStatus::Starting,
             }],
-            gateway_flight: "example-flight".into(),
+            gateway_flight: Some("example-flight".into()),
+        };
+
+        assert_eq!(json.to_string(), serde_json::to_string(&model).unwrap());
+    }
+
+    #[test]
+    fn ser_no_oid() {
+        let json = r#"{"name":"example-formation","flights":[{"name":"example-flight","image":"foo.com/bar:latest","status":"healthy"}],"gateway-flight":"example-flight"}"#;
+        let model = Formation {
+            name: "example-formation".into(),
+            url: None,
+            oid: None,
+            flights: vec![Flight {
+                name: "example-flight".into(),
+                oid: None,
+                image: "foo.com/bar:latest".parse::<ImageReference>().unwrap(),
+                status: FlightStatus::Healthy,
+            }],
+            gateway_flight: Some("example-flight".into()),
         };
 
         assert_eq!(json.to_string(), serde_json::to_string(&model).unwrap());
@@ -318,7 +325,12 @@ impl FlightBuilder {
             return Err(SeaplaneError::MissingFlightImageReference);
         }
 
-        Ok(Flight { name: self.name.unwrap(), image: self.image.unwrap() })
+        Ok(Flight {
+            name: self.name.unwrap(),
+            oid: None,
+            image: self.image.unwrap(),
+            status: FlightStatus::default(),
+        })
     }
 }
 
@@ -329,12 +341,21 @@ impl FlightBuilder {
 /// balances traffic between them.
 #[derive(Debug, Serialize, Deserialize, Clone, Eq, PartialEq)]
 #[non_exhaustive]
+#[serde(rename_all = "kebab-case")]
 pub struct Flight {
     /// Returns the human readable name of the [`Flight`], which is unique with a Formation
     pub name: String,
 
+    /// The Object ID of the Flight
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub oid: Option<FlightId>,
+
     /// The container image reference
     pub image: ImageReference,
+
+    /// The status of this Flight
+    #[serde(default, skip_serializing_if = "FlightStatus::is_starting")]
+    pub status: FlightStatus,
 }
 
 impl Flight {
@@ -381,15 +402,15 @@ mod flight_tests {
     #[test]
     fn deser() {
         let json = r#"{
-            "name": "example-formation",
-            "flights": [{"name":"example-flight","health":"healthy"}]
+            "name":"example-flight",
+            "oid":"flt-agc6amh7z527vijkv2cutplwaa",
+            "image":"foo.com/bar:latest"
         }"#;
-        let model = FormationStatus {
-            name: "example-formation".into(),
-            flights: vec![FlightStatus {
-                name: "example-flight".into(),
-                health: FlightHealthStatus::Healthy,
-            }],
+        let model = Flight {
+            name: "example-flight".into(),
+            oid: Some("flt-agc6amh7z527vijkv2cutplwaa".parse().unwrap()),
+            image: "foo.com/bar:latest".parse::<ImageReference>().unwrap(),
+            status: FlightStatus::Starting,
         };
 
         assert_eq!(model, serde_json::from_str(json).unwrap());
@@ -397,13 +418,25 @@ mod flight_tests {
 
     #[test]
     fn ser() {
-        let json = r#"{"name":"example-formation","flights":[{"name":"example-flight","health":"healthy"}]}"#;
-        let model = FormationStatus {
-            name: "example-formation".into(),
-            flights: vec![FlightStatus {
-                name: "example-flight".into(),
-                health: FlightHealthStatus::Healthy,
-            }],
+        let json = r#"{"name":"example-flight","oid":"flt-agc6amh7z527vijkv2cutplwaa","image":"foo.com/bar:latest","status":"healthy"}"#;
+        let model = Flight {
+            name: "example-flight".into(),
+            oid: Some("flt-agc6amh7z527vijkv2cutplwaa".parse().unwrap()),
+            image: "foo.com/bar:latest".parse::<ImageReference>().unwrap(),
+            status: FlightStatus::Healthy,
+        };
+
+        assert_eq!(json, serde_json::to_string(&model).unwrap());
+    }
+
+    #[test]
+    fn ser_no_oid() {
+        let json = r#"{"name":"example-flight","image":"foo.com/bar:latest","status":"healthy"}"#;
+        let model = Flight {
+            name: "example-flight".into(),
+            oid: None,
+            image: "foo.com/bar:latest".parse::<ImageReference>().unwrap(),
+            status: FlightStatus::Healthy,
         };
 
         assert_eq!(json, serde_json::to_string(&model).unwrap());
