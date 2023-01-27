@@ -388,6 +388,8 @@ pub trait OidPrefix {
             .map(|s| s.to_ascii_lowercase())
             .unwrap()
     }
+
+    fn long_name() -> String { Self::string_prefix() }
 }
 
 /// A Typed Object ID where the Prefix is part of the type
@@ -493,6 +495,23 @@ impl<'de, P: OidPrefix> ::serde::Deserialize<'de> for TypedOid<P> {
         String::deserialize(deserializer)?
             .parse()
             .map_err(::serde::de::Error::custom)
+    }
+}
+
+#[cfg(feature = "schemars")]
+impl<P: OidPrefix> ::schemars::JsonSchema for TypedOid<P> {
+    fn schema_name() -> String { P::long_name() }
+
+    fn json_schema(_gen: &mut schemars::gen::SchemaGenerator) -> schemars::schema::Schema {
+        ::schemars::schema::SchemaObject {
+            instance_type: Some(::schemars::schema::InstanceType::String.into()),
+            string: Some(Box::new(::schemars::schema::StringValidation {
+                pattern: Some(format!("^{}-[a-z1-7]{{26}}$", P::string_prefix())),
+                ..Default::default()
+            })),
+            ..Default::default()
+        }
+        .into()
     }
 }
 
