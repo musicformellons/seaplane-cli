@@ -1,6 +1,6 @@
 {
   "name": "seaplane",
-  "version": "0.0.24",
+  "version": "0.0.26",
   "description": "Seaplane Javascript SDK",
   "homepage": "https://seaplane.io",
   "main": "./build/cjs/index.js",
@@ -19,7 +19,7 @@
   "keywords": [],
   "author": "Seaplane IO, Inc.",
   "license": "Apache License",
-  "dependencies": {    
+  "dependencies": {
     "node-fetch-polyfill": "^2.0.6",
     "urlsafe-base64": "^1.0.0",
     "winston": "^3.8.2"
@@ -30,7 +30,7 @@
     "@jest/globals": "^29.3.1",
     "@types/jest": "^29.2.3",
     "@typescript-eslint/eslint-plugin": "^5.42.0",
-    "@typescript-eslint/parser": "^5.42.0",    
+    "@typescript-eslint/parser": "^5.42.0",
     "eslint": "^8.27.0",
     "husky": "^8.0.1",
     "jest": "^29.3.1",
