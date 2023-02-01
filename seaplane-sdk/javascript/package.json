@@ -1,6 +1,6 @@
 {
   "name": "seaplane",
-  "version": "0.0.26",
+  "version": "1.0.0",
   "description": "Seaplane Javascript SDK",
   "homepage": "https://seaplane.io",
   "main": "./build/cjs/index.js",
