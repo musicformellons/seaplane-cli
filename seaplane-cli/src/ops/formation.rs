@@ -1,9 +1,5 @@
 mod endpoint;
-use std::{
-    collections::HashSet,
-    io::Write,
-    path::{Path, PathBuf},
-};
+use std::{collections::HashSet, io::Write};
 
 pub use endpoint::*;
 use seaplane::api::compute::v1::{
@@ -32,10 +28,6 @@ use crate::{
 /// weights/activation statuses.
 #[derive(Debug, Deserialize, Serialize, Default, Clone)]
 pub struct Formations {
-    // Where was this "DB" loaded from on disk, so we can persist it back later
-    #[serde(skip)]
-    loaded_from: Option<PathBuf>,
-
     /// A list of "Formation"s
     #[serde(default)]
     pub formations: Vec<Formation>,
@@ -268,14 +260,8 @@ impl Formations {
     }
 }
 
-impl FromDisk for Formations {
-    fn set_loaded_from<P: AsRef<Path>>(&mut self, p: P) {
-        self.loaded_from = Some(p.as_ref().into());
-    }
-
-    fn loaded_from(&self) -> Option<&Path> { self.loaded_from.as_deref() }
-}
-
+// used in state v1 only
+impl FromDisk for Formations {}
 impl ToDisk for Formations {}
 
 impl Output for Formations {

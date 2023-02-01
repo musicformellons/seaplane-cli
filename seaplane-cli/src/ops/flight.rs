@@ -1,7 +1,6 @@
 use std::{
     fs,
     io::{self, Read, Write},
-    path::{Path, PathBuf},
 };
 
 use seaplane::api::compute::v1::Flight as FlightModel;
@@ -115,20 +114,8 @@ impl Flight {
 #[derive(Debug, Deserialize, Serialize, Default, Clone)]
 #[serde(transparent)]
 pub struct Flights {
-    #[serde(skip)]
-    loaded_from: Option<PathBuf>,
     inner: Vec<Flight>,
 }
-
-impl FromDisk for Flights {
-    fn set_loaded_from<P: AsRef<Path>>(&mut self, p: P) {
-        self.loaded_from = Some(p.as_ref().into());
-    }
-
-    fn loaded_from(&self) -> Option<&Path> { self.loaded_from.as_deref() }
-}
-
-impl ToDisk for Flights {}
 
 impl Flights {
     /// Takes strings in the form of @- or @path and creates then adds them to the DB. Only one @-
@@ -271,6 +258,10 @@ impl Flights {
             .find(|f| f.model.name() == needle || f.id.to_string().starts_with(needle))
     }
 }
+
+// used in state v1 only
+impl FromDisk for Flights {}
+impl ToDisk for Flights {}
 
 impl Output for Flights {
     fn print_json(&self, _ctx: &Ctx) -> Result<()> {

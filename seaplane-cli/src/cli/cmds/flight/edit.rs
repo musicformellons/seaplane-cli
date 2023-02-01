@@ -62,7 +62,7 @@ impl CliCommand for SeaplaneFlightEdit {
             return wrap_cli_context(e, ctx.args.exact, false);
         }
 
-        ctx.persist_flights()?;
+        ctx.persist_state()?;
 
         cli_print!("Successfully edited Flight Plan '");
         cli_print!(@Yellow, "{}", ctx.args.name_id.as_ref().unwrap());

@@ -89,7 +89,7 @@ impl CliCommand for SeaplaneFlightPlan {
         let id = new_flight.id;
         ctx.db.flights.add_flight(new_flight);
 
-        ctx.persist_flights()?;
+        ctx.persist_state()?;
 
         cli_print!("Successfully created Flight Plan '");
         cli_print!(@Green, "{new_flight_name}");

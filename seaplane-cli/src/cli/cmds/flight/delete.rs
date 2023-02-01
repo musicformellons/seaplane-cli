@@ -94,7 +94,7 @@ impl CliCommand for SeaplaneFlightDelete {
                 // TODO: we should also go through and delete all endpoints that reference this
                 // flight...but we don't have endpoints that are that smart yet
             }
-            ctx.persist_formations()?;
+            ctx.persist_state()?;
         }
 
         // Remove the flights
@@ -106,7 +106,7 @@ impl CliCommand for SeaplaneFlightDelete {
                 cli_println!("Deleted local Flight Plan {}", &flight.id.to_string());
             });
 
-        ctx.persist_flights()?;
+        ctx.persist_state()?;
 
         if !ctx.internal_run {
             cli_println!(

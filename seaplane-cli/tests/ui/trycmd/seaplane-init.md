@@ -9,7 +9,7 @@ Usage: seaplane[EXE] init [OPTIONS]
 Options:
       --force             Force create the files and directories (DANGER: will overwrite existing files)
   -v, --verbose...        Display more verbose output
-      --overwrite <ITEM>  Overwrite select files or directories (DANGER: will overwrite existing data) (supports comma separated list, or multiple uses) [possible values: all, formations, flights, config]
+      --overwrite <ITEM>  Overwrite select files or directories (DANGER: will overwrite existing data) (supports comma separated list, or multiple uses) [possible values: all, formations, config]
   -q, --quiet...          Suppress output at a specific level and below
       --color <COLOR>     Should the output include color? [default: auto] [possible values: always, ansi, auto, never]
       --no-color          Do not color output (alias for --color=never)
@@ -49,7 +49,7 @@ Options:
           Multiple items can be passed as a comma separated list, or by using the argument
           multiple times.
           
-          [possible values: all, formations, flights, config]
+          [possible values: all, formations, config]
 
   -q, --quiet...
           Suppress output at a specific level and below

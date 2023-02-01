@@ -133,8 +133,7 @@ impl CliCommand for SeaplaneFormationFetch {
             }
         }
 
-        ctx.persist_flights()?;
-        ctx.persist_formations()?;
+        ctx.persist_state()?;
 
         Ok(())
     }

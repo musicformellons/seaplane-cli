@@ -86,7 +86,7 @@ impl CliCommand for SeaplaneFormationPlan {
         if ctx.db.needs_persist {
             // Any flights we created in update_ctx can now be persisted. We didn't want to persist
             // them before as we could have still hit an error such as Duplicate Formation Names
-            ctx.persist_flights()?;
+            ctx.persist_state()?;
             ctx.db.needs_persist = false;
         }
 
@@ -101,7 +101,7 @@ impl CliCommand for SeaplaneFormationPlan {
         let id = new_formation.id.to_string();
         ctx.db.formations.formations.push(new_formation);
 
-        ctx.persist_formations()?;
+        ctx.persist_state()?;
 
         cli_print!("Successfully created local Formation Plan '");
         cli_print!(@Green, "{}", &formation_ctx.name_id);

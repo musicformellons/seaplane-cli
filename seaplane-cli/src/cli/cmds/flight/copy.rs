@@ -71,7 +71,7 @@ impl CliCommand for SeaplaneFlightCopy {
         // Add the new Flight
         ctx.db.flights.add_flight(dest_flight);
 
-        ctx.persist_flights()?;
+        ctx.persist_state()?;
 
         cli_print!("Successfully copied Flight Plan '");
         cli_print!(@Yellow, "{}", ctx.args.name_id.as_ref().unwrap());

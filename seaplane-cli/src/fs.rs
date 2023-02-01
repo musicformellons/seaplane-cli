@@ -108,17 +108,6 @@ pub trait FromDisk {
     /// If saved, get the path the item was loaded from
     fn loaded_from(&self) -> Option<&Path> { None }
 
-    /// Only load from disk if `yes` is `true`, otherwise return `None`
-    fn load_if<P: AsRef<Path>>(p: P, yes: bool) -> Option<Result<Self>>
-    where
-        Self: Sized + DeserializeOwned,
-    {
-        if yes {
-            return Some(Self::load(p));
-        }
-        None
-    }
-
     /// Deserialize from some given path
     fn load<P: AsRef<Path>>(p: P) -> Result<Self>
     where
@@ -139,7 +128,7 @@ pub trait FromDisk {
                     fs::read_to_string(path)
                         .map_err(CliError::from)
                         .context("\n\tpath: ")
-                        .with_color_context(|| (Color::Yellow, format!("{path:?}")))?
+                        .with_color_context(|| (Color::Yellow, format!("{path:?}\n")))?
                 } else {
                     return Err(CliError::from(e));
                 }
@@ -148,7 +137,7 @@ pub trait FromDisk {
         let mut item: Self = serde_json::from_str(&json_str)
             .map_err(CliError::from)
             .context("\n\tpath: ")
-            .with_color_context(|| (Color::Yellow, format!("{path:?}")))?;
+            .with_color_context(|| (Color::Yellow, format!("{path:?}\n")))?;
 
         item.set_loaded_from(p);
 
@@ -158,17 +147,6 @@ pub trait FromDisk {
 
 // TODO: make the serializer generic
 pub trait ToDisk: FromDisk {
-    /// Persist to path only if `yes` is `true`
-    fn persist_if(&self, yes: bool) -> Result<()>
-    where
-        Self: Sized + Serialize,
-    {
-        if yes {
-            return self.persist();
-        }
-        Ok(())
-    }
-
     /// Serializes itself to the given path
     fn persist(&self) -> Result<()>
     where

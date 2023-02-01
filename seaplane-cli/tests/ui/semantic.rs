@@ -60,14 +60,13 @@ fn seaplane_init() {
     // Valid overwrites
     assert!(cli!("init --overwrite=all").is_ok());
     assert!(cli!("init --overwrite=config").is_ok());
-    assert!(cli!("init --overwrite=flights").is_ok());
     assert!(cli!("init --overwrite=formations").is_ok());
 
     // Multiples
-    assert!(cli!("init --overwrite=config,flights").is_ok());
-    assert!(cli!("init --overwrite=config,flights --overwrite=formations,all").is_ok());
-    assert!(cli!("init --overwrite=config --overwrite=flights").is_ok());
-    assert!(cli!("init --overwrite=config,flights --overwrite=formations").is_ok());
+    assert!(cli!("init --overwrite=config,formations").is_ok());
+    assert!(cli!("init --overwrite=config --overwrite=formations,all").is_ok());
+    assert!(cli!("init --overwrite=config --overwrite=formations").is_ok());
+    assert!(cli!("init --overwrite=config,all --overwrite=formations").is_ok());
 
     // Invalid overwrite
     assert!(cli!("init --overwrite=foo").is_err());

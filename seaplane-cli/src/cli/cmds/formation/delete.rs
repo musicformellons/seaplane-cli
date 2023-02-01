@@ -184,7 +184,7 @@ impl CliCommand for SeaplaneFormationDelete {
             }
         }
 
-        ctx.persist_formations()?;
+        ctx.persist_state()?;
 
         // TODO: recalculate dichotomy of local v. remote numbers (i.e. --no-local, etc.)
         cli_println!(

@@ -1,8 +1,12 @@
 use std::fs;
 
 use clap::{ArgMatches, Command};
+use serde_json::json;
 
-use crate::{cli::CliCommand, config::RawConfig, context::Ctx, error::Result, fs::conf_dirs};
+use crate::{
+    cli::CliCommand, config::RawConfig, context::Ctx, error::Result, fs::conf_dirs,
+    ops::state_version::CURRENT_STATE_VERSION,
+};
 
 static LONG_FORCE: &str =
     "Force create the files and directories (DANGER: will overwrite existing files)
@@ -29,7 +33,7 @@ impl SeaplaneInit {
             .arg(arg!(--overwrite =["ITEM"]...)
                 .help("Overwrite select files or directories (DANGER: will overwrite existing data) (supports comma separated list, or multiple uses)")
                 .long_help(LONG_OVERWRITE)
-                .value_parser(["all", "formations", "flights", "config"]))
+                .value_parser(["all", "formations", "config"]))
     }
 }
 
@@ -52,8 +56,11 @@ impl CliCommand for SeaplaneInit {
                 toml::to_string_pretty(&RawConfig::default()).unwrap(),
                 "config",
             ),
-            (ctx.formations_file(), "{}".to_string(), "formations"),
-            (ctx.flights_file(), "[]".to_string(), "flights"),
+            (
+                ctx.state_file(),
+                json!({ "state_version": CURRENT_STATE_VERSION }).to_string(),
+                "formations",
+            ),
         ];
         // TODO: @security create the file with limited permissions
         let mut did_create = false;

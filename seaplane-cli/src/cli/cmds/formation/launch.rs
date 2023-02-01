@@ -258,7 +258,7 @@ impl CliCommand for SeaplaneFormationLaunch {
             cli_println!("')");
         }
 
-        ctx.persist_formations()?;
+        ctx.persist_state()?;
 
         Ok(())
     }

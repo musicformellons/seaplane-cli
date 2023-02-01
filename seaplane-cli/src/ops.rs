@@ -1,12 +1,14 @@
 //! This module provides types that wrap the API endpoint models and add additional fields/context
 //! that is only relevant for the CLI or purposes of consuming the API.
 
+pub mod db;
 pub mod encoded_string;
 pub mod flight;
 pub mod formation;
 pub mod locks;
 pub mod metadata;
 pub mod restrict;
+pub mod state_version;
 
 use std::fmt;
 

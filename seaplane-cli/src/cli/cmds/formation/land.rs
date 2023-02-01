@@ -78,7 +78,7 @@ impl CliCommand for SeaplaneFormationLand {
                 formation.grounded.insert(id);
             }
 
-            ctx.persist_formations()?;
+            ctx.persist_state()?;
 
             cli_print!("Successfully Landed remote Formation Instance '");
             cli_print!(@Green, "{name}");

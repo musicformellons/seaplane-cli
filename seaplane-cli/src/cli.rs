@@ -16,6 +16,8 @@ use crate::{
     error::Result,
     printer::{ColorChoice, Printer},
 };
+#[cfg(not(any(feature = "api_tests", feature = "semantic_ui_tests", feature = "ui_tests")))]
+use crate::{fs::FromDisk, ops::db::Db};
 
 const VERSION: &str = env!("SEAPLANE_VER_WITH_HASH");
 static AUTHORS: &str = crate_authors!();
@@ -180,11 +182,9 @@ impl CliCommand for Seaplane {
             feature = "ui_tests"
         )))]
         {
-            ctx.db = crate::context::Db::load_if(
-                ctx.flights_file(),
-                ctx.formations_file(),
-                !ctx.args.stateless,
-            )?;
+            if !ctx.args.stateless {
+                ctx.db = Db::load(ctx.state_file())?;
+            }
         }
 
         if let Some(key) = &matches.get_one::<String>("api-key") {

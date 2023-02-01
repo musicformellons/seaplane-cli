@@ -41,13 +41,16 @@ pub use restrict::RestrictCtx;
 use crate::{
     config::RawConfig,
     error::{CliErrorKind, Context, Result},
-    fs::{self, FromDisk, ToDisk},
-    ops::{flight::Flights, formation::Formations},
+    fs::{self, ToDisk},
+    ops::db::Db,
     printer::{ColorChoice, OutputFormat},
 };
 
+// Used in state v0
 const FLIGHTS_FILE: &str = "flights.json";
 const FORMATIONS_FILE: &str = "formations.json";
+// Used in state v1
+const STATE_FILE: &str = "state.json";
 /// The registry to use for image references when the registry is omitted by the user
 pub const DEFAULT_IMAGE_REGISTRY_URL: &str = "registry.cplane.cloud";
 
@@ -281,52 +284,18 @@ impl Ctx {
 
     pub fn conf_files(&self) -> &[PathBuf] { &self.conf_files }
 
+    pub fn state_file(&self) -> PathBuf { self.data_dir.join(STATE_FILE) }
     pub fn flights_file(&self) -> PathBuf { self.data_dir.join(FLIGHTS_FILE) }
-
     pub fn formations_file(&self) -> PathBuf { self.data_dir.join(FORMATIONS_FILE) }
 
     /// Write out an entirely new JSON file if `--stateless` wasn't used
-    pub fn persist_formations(&self) -> Result<()> {
-        self.db
-            .formations
-            .persist_if(!self.args.stateless)
-            .with_context(|| format!("Path: {:?}\n", self.formations_file()))
-    }
-
-    /// Write out an entirely new JSON file if `--stateless` wasn't used
-    pub fn persist_flights(&self) -> Result<()> {
-        self.db
-            .flights
-            .persist_if(!self.args.stateless)
-            .with_context(|| format!("Path: {:?}\n", self.flights_file()))
-    }
-}
-
-/// The in memory "Databases"
-#[derive(Debug, Default, Clone)]
-pub struct Db {
-    /// The in memory Flights database
-    pub flights: Flights,
-
-    /// The in memory Formations database
-    pub formations: Formations,
-
-    /// A *hint* that we should persist at some point. Not gospel
-    pub needs_persist: bool,
-}
-
-impl Db {
-    pub fn load<P: AsRef<Path>>(flights: P, formations: P) -> Result<Self> {
-        Self::load_if(flights, formations, true)
-    }
-
-    pub fn load_if<P: AsRef<Path>>(flights: P, formations: P, yes: bool) -> Result<Self> {
-        Ok(Self {
-            flights: FromDisk::load_if(flights, yes).unwrap_or_else(|| Ok(Flights::default()))?,
-            formations: FromDisk::load_if(formations, yes)
-                .unwrap_or_else(|| Ok(Formations::default()))?,
-            needs_persist: false,
-        })
+    pub fn persist_state(&self) -> Result<()> {
+        if !self.args.stateless {
+            self.db
+                .persist()
+                .with_context(|| format!("Path: {:?}\n", self.state_file()))?
+        }
+        Ok(())
     }
 }
 
