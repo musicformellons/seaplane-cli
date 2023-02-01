@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 0.5.0 - 01 Feb 2023
+
+### Features
+
+* Automatically detect, and upgrade local state ([#306](https://github.com/seaplane-io/seaplane/pull/306))
+
+### Improvements
+
+* Combine local state (`flights.json` and `formations.json` into a single
+  `state.json`) and version the state schema
+  ([#305](https://github.com/seaplane-io/seaplane/pull/305))
+
+### Maintenance
+
+* Fix lints, upgrade `toml` crate and fix debug output ([#304](https://github.com/seaplane-io/seaplane/pull/304))
+
 ## 0.4.1 - 18 Jan 2023
 
 ### Bug Fixes
