@@ -11,13 +11,13 @@ use clap::{crate_authors, value_parser, ArgAction, ArgMatches, Command};
 use const_format::concatcp;
 
 pub use crate::cli::cmds::*;
+#[cfg(not(any(feature = "api_tests", feature = "semantic_ui_tests", feature = "ui_tests")))]
+use crate::ops::db::Db;
 use crate::{
     context::Ctx,
     error::Result,
     printer::{ColorChoice, Printer},
 };
-#[cfg(not(any(feature = "api_tests", feature = "semantic_ui_tests", feature = "ui_tests")))]
-use crate::{fs::FromDisk, ops::db::Db};
 
 const VERSION: &str = env!("SEAPLANE_VER_WITH_HASH");
 static AUTHORS: &str = crate_authors!();
@@ -183,7 +183,7 @@ impl CliCommand for Seaplane {
         )))]
         {
             if !ctx.args.stateless {
-                ctx.db = Db::load(ctx.state_file())?;
+                ctx.db = Db::load_and_upgrade(ctx)?;
             }
         }
 

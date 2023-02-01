@@ -41,6 +41,14 @@ pub struct Formations {
 }
 
 impl Formations {
+    /// Extend and de-duplicate from another set of Formations
+    pub fn extend(&mut self, rhs: &Formations) {
+        self.formations.extend_from_slice(&rhs.formations);
+        self.formations.dedup_by(|l, r| l.id == r.id);
+        self.configurations.extend_from_slice(&rhs.configurations);
+        self.configurations.dedup_by(|l, r| l.id == r.id);
+    }
+
     pub fn get_configuration_by_uuid(&self, uuid: Uuid) -> Option<&FormationConfiguration> {
         self.configurations
             .iter()

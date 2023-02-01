@@ -118,6 +118,11 @@ pub struct Flights {
 }
 
 impl Flights {
+    pub fn extend(&mut self, rhs: &Flights) {
+        self.inner.extend_from_slice(&rhs.inner);
+        self.inner.dedup_by(|l, r| l.id == r.id);
+    }
+
     /// Takes strings in the form of @- or @path and creates then adds them to the DB. Only one @-
     /// may be used or an Error is returned.
     ///
