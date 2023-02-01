@@ -81,7 +81,7 @@ impl CliCommand for SeaplaneFormationLand {
             ctx.persist_formations()?;
 
             cli_print!("Successfully Landed remote Formation Instance '");
-            cli_print!(@Green, "{}", &name);
+            cli_print!(@Green, "{name}");
             cli_println!("'");
         }
 

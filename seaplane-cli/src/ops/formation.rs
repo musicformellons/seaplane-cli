@@ -846,8 +846,7 @@ impl Output for FormationStatus {
             self.status.print_sym();
             cli_print!(" Formation {}: ", self.name);
             self.status.print();
-            cli_println!("");
-            cli_println!("│");
+            cli_println!("\n│");
 
             for (i, cfg) in self.configurations.inner.iter().enumerate() {
                 cfg.print_pretty(i == self.configurations.len() - 1)

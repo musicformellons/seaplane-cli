@@ -41,7 +41,7 @@ impl CliCommand for SeaplaneRestrictDelete {
                 let es = EncodedString::new(dir);
                 dir = String::from_utf8_lossy(&es.decoded()?).to_string()
             };
-            cli_println!("Deleted a restriction on directory {} in {} API", dir, api);
+            cli_println!("Deleted a restriction on directory {dir} in {api} API");
         } else {
             cli_println!("{}", json!({"deleted_restriction": {"api": api, "directory": dir} }))
         }

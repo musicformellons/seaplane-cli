@@ -53,7 +53,7 @@ impl CliCommand for SeaplaneRestrictSet {
                 let es = EncodedString::new(dir);
                 dir = String::from_utf8_lossy(&es.decoded()?).to_string()
             };
-            cli_println!("Set a restriction on directory {} in {} API", dir, api);
+            cli_println!("Set a restriction on directory {dir} in {api} API");
         } else {
             cli_println!("{}", json!({"set_restriction": {"api": api, "directory": dir} }))
         }

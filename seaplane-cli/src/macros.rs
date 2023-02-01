@@ -185,22 +185,22 @@ macro_rules! cli_debug {
 // versions are the opposite, because it's more common to *not* want a prefix i.e. you're writing
 // multiple portions of the same line.
 macro_rules! cli_debugln {
-    (@prefix, @$color:ident, $($args:tt)+) => {{
-        cli_debug!(@prefix, @$color, $($args)+);
-        cli_debug!("\n");
-    }};
-    // TODO: change to zero or more (*)
-    (@prefix, $($args:tt)+) => {{
-        cli_debug!(@prefix, $($args)+);
-        cli_debug!("\n");
-    }};
-    (@$color:ident, $($args:tt)+) => {{
+    (@noprefix, @$color:ident, $($args:tt)+) => {{
         cli_debug!(@$color, $($args)+);
         cli_debug!("\n");
     }};
     // TODO: change to zero or more (*)
-    ($($args:tt)+) => {{
+    (@noprefix, $($args:tt)+) => {{
         cli_debug!($($args)+);
+        cli_debug!("\n");
+    }};
+    (@$color:ident, $($args:tt)+) => {{
+        cli_debug!(@prefix, @$color, $($args)+);
+        cli_debug!("\n");
+    }};
+    // TODO: change to zero or more (*)
+    ($($args:tt)+) => {{
+        cli_debug!(@prefix, $($args)+);
         cli_debug!("\n");
     }}
 }

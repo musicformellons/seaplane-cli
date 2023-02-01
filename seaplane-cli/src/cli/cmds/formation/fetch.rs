@@ -127,8 +127,7 @@ impl CliCommand for SeaplaneFormationFetch {
             if names.is_empty() {
                 cli_println!("No remote Formation Instances found");
             } else if count > 0 {
-                cli_println!("");
-                cli_println!("Successfully fetched {count} items");
+                cli_println!("\nSuccessfully fetched {count} items");
             } else {
                 cli_println!("All local definitions are up to date!");
             }

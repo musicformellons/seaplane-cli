@@ -163,6 +163,16 @@ impl std::fmt::Display for CliError {
 impl Error for CliError {}
 
 macro_rules! impl_err {
+    (@boxed, $errty:ty, $variant:ident) => {
+        impl From<$errty> for CliError {
+            fn from(e: $errty) -> Self {
+                CliError {
+                    kind: CliErrorKind::$variant(std::boxed::Box::new(e)),
+                    ..Default::default()
+                }
+            }
+        }
+    };
     ($errty:ty, $variant:ident) => {
         impl From<$errty> for CliError {
             fn from(e: $errty) -> Self {
@@ -176,8 +186,8 @@ macro_rules! impl_err {
 // about
 impl_err!(base64::DecodeError, Base64Decode);
 impl_err!(serde_json::Error, SerdeJson);
-impl_err!(toml::de::Error, TomlDe);
-impl_err!(toml::ser::Error, TomlSer);
+impl_err!(@boxed, toml::de::Error, TomlDe);
+impl_err!(@boxed, toml::ser::Error, TomlSer);
 impl_err!(seaplane::error::SeaplaneError, Seaplane);
 impl_err!(seaplane::rexports::container_image_ref::ImageReferenceError, ImageReference);
 impl_err!(std::string::FromUtf8Error, InvalidUtf8);
@@ -221,39 +231,39 @@ impl From<CliErrorKind> for CliError {
 
 #[derive(Debug)]
 pub enum CliErrorKind {
-    DuplicateName(String),
-    NoMatchingItem(String),
     AmbiguousItem(String),
-    Io(io::Error, Option<PathBuf>),
-    SerdeJson(serde_json::Error),
     Base64Decode(base64::DecodeError),
-    TomlDe(toml::de::Error),
-    TomlSer(toml::ser::Error),
-    HexDecode(hex::FromHexError),
-    UnknownWithContext(&'static str),
-    Seaplane(SeaplaneError),
-    ExistingValue(&'static str),
-    ImageReference(ImageReferenceError),
-    InvalidUtf8(std::string::FromUtf8Error),
-    CliArgNotUsed(&'static str),
-    InvalidCliValue(Option<&'static str>, String),
-    ConflictingArguments(String, String),
-    MissingPath,
-    Unknown,
-    PermissionDenied,
-    MissingApiKey,
-    MultipleAtStdin,
-    InlineFlightHasSpace,
-    InlineFlightMissingImage,
-    InlineFlightInvalidName(String),
-    InlineFlightUnknownItem(String),
-    InlineFlightMissingValue(String),
-    ParseInt(std::num::ParseIntError),
-    StrumParse(strum::ParseError),
-    FlightsInUse(Vec<String>),
-    EndpointInvalidFlight(String),
-    OneOff(String),
     Clap(clap::Error),
+    CliArgNotUsed(&'static str),
+    ConflictingArguments(String, String),
+    DuplicateName(String),
+    EndpointInvalidFlight(String),
+    ExistingValue(&'static str),
+    FlightsInUse(Vec<String>),
+    HexDecode(hex::FromHexError),
+    ImageReference(ImageReferenceError),
+    InlineFlightHasSpace,
+    InlineFlightInvalidName(String),
+    InlineFlightMissingImage,
+    InlineFlightMissingValue(String),
+    InlineFlightUnknownItem(String),
+    InvalidCliValue(Option<&'static str>, String),
+    InvalidUtf8(std::string::FromUtf8Error),
+    Io(io::Error, Option<PathBuf>),
+    MissingApiKey,
+    MissingPath,
+    MultipleAtStdin,
+    NoMatchingItem(String),
+    OneOff(String),
+    ParseInt(std::num::ParseIntError),
+    PermissionDenied,
+    Seaplane(SeaplaneError),
+    SerdeJson(serde_json::Error),
+    StrumParse(strum::ParseError),
+    TomlDe(Box<toml::de::Error>),
+    TomlSer(Box<toml::ser::Error>),
+    Unknown,
+    UnknownWithContext(&'static str),
 }
 
 impl CliErrorKind {
@@ -269,8 +279,7 @@ impl CliErrorKind {
                 for f in flights {
                     cli_eprintln!(@Yellow, "\t{f}");
                 }
-                cli_eprintln!("");
-                cli_eprint!("(hint: override this check and force delete with '");
+                cli_eprint!("\n(hint: override this check and force delete with '");
                 cli_eprint!(@Yellow, "--force");
                 cli_eprintln!("' which will also remove the Flight Plan from the Formation Plan)");
             }
@@ -286,9 +295,8 @@ impl CliErrorKind {
                 cli_eprint!(@Yellow, "{a}");
                 cli_eprint!("' with '");
                 cli_eprint!(@Yellow, "{b}");
-                cli_eprintln!("'");
                 cli_eprintln!(
-                    "(hint: one or both arguments may have been implied from other flags)"
+                    "'\n(hint: one or both arguments may have been implied from other flags)"
                 );
             }
             Base64Decode(e) => {

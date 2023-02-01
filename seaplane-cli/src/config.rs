@@ -99,11 +99,7 @@ impl RawConfig {
             };
 
             if cfg.found {
-                cli_warn!(@Yellow, "warn: ");
-                cli_warnln!(@noprefix,
-                    "overriding previous configuration options with {:?}",
-                    maybe_file
-                );
+                cli_warnln!("overriding previous configuration options with {maybe_file:?}");
                 cli_warn!("(hint: use ");
                 cli_warn!(@Green, "--verbose ");
                 cli_warnln!(@noprefix, "for more info)");

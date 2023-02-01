@@ -124,7 +124,7 @@ impl CliCommand for SeaplaneFormationDelete {
                         Ok(cfg_uuids) => cfg_uuids,
                     };
                     cli_print!("Deleted remote Formation Instance '");
-                    cli_print!(@Green, "{}", name);
+                    cli_print!(@Green, "{name}");
                     if cfg_uuids.is_empty() {
                         cli_println!("'");
                     } else {

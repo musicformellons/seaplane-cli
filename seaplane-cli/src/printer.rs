@@ -87,8 +87,8 @@ impl Default for ColorChoice {
 impl<'de> Deserialize<'de> for ColorChoice {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         use std::str::FromStr;
-        let s = <&str>::deserialize(deserializer)?;
-        ColorChoice::from_str(s).map_err(de::Error::custom)
+        let s = <String>::deserialize(deserializer)?;
+        ColorChoice::from_str(&s).map_err(de::Error::custom)
     }
 }
 

@@ -42,7 +42,7 @@ impl CliCommand for SeaplaneInit {
         // We only create the first (most preferred) configuration dir. If the user creates more
         // down our search path, that's fine, but we only create and advertise the first.
         let conf_dir = &conf_dirs()[0];
-        cli_debugln!("Creating or using config directory {:?}", conf_dir);
+        cli_debugln!("Creating or using config directory {conf_dir:?}");
         fs::create_dir_all(conf_dir)?;
 
         // Tuple below is: (File, "empty" bytes, it's --force=OPTION)
@@ -67,26 +67,33 @@ impl CliCommand for SeaplaneInit {
                         .iter()
                         .any(|item| item == opt || item == "all")
                 {
-                    cli_warn!(@Yellow, "warn: ");
-                    cli_warn!("overwriting existing file ");
-                    cli_warn!("{:?} ", file);
-                    cli_warn!("due to '");
-                    cli_warn!(@Green, "{}", if ctx.args.force { "--force".into() } else { format!("--overwrite={opt}")});
-                    cli_warnln!(@noprefix, "'\n");
-                } else {
+                    cli_debugln!(
+                        "overwriting existing file {file:?} due to {}",
+                        if ctx.args.force {
+                            "--force".into()
+                        } else {
+                            format!(
+                                "--overwrite={}",
+                                if ctx.args.overwrite.iter().any(|item| item == "all") {
+                                    "all"
+                                } else {
+                                    opt
+                                }
+                            )
+                        }
+                    );
+                } else if ctx.args.overwrite.is_empty() {
                     // We only want to advertise the *least* destructive option, not --force or
                     // --overwrite=all. The user can find those on their own.
-                    cli_warn!(@Yellow, "warn: ");
-                    cli_warn!("{:?} ", file);
-                    cli_warnln!(@noprefix, "already exists");
-                    cli_warn!("(hint: use '");
-                    cli_warn!(@Green, "seaplane init --overwrite={}", opt);
-                    cli_warnln!(@noprefix, "' to erase and overwrite it)\n");
+                    cli_debugln!("found existing file {file:?}");
+                    cli_debugln!(
+                        "(hint: use 'seaplane init --overwrite={opt}' to erase and overwrite it)"
+                    );
                     continue;
                 }
             }
             did_create = true;
-            cli_debugln!("creating file {:?}", file);
+            cli_debugln!("creating file {file:?}");
             fs::write(file, empty_bytes)?;
         }
 

@@ -106,8 +106,7 @@ impl CliCommand for SeaplaneFormationPlan {
         cli_print!("Successfully created local Formation Plan '");
         cli_print!(@Green, "{}", &formation_ctx.name_id);
         cli_print!("' with ID '");
-        cli_print!(@Green, "{}", &id[..8]);
-        cli_println!("'");
+        cli_print!(@Green, "{}'\n", &id[..8]);
 
         // Equivalent of doing 'seaplane formation launch NAME --exact'
         if formation_ctx.launch || formation_ctx.grounded {

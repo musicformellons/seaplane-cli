@@ -112,9 +112,8 @@ impl CliCommand for SeaplaneAccountLogin {
 
         if let Some(key) = cfg.account.api_key {
             if ctx.args.force {
-                cli_warn!(@Yellow, "warn: ");
-                cli_warn!("overwriting API key ");
-                cli_warn!(@Green, "{} ", key);
+                cli_warn!(@prefix, "overwriting API key ");
+                cli_warn!(@Green, "{key} ");
                 cli_warn!("due to ");
                 cli_warnln!(@noprefix, @Green, "--force");
             } else {
