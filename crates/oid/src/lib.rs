@@ -70,27 +70,21 @@ pub mod error;
 
 use std::{any::type_name, fmt, marker::PhantomData, str::FromStr};
 
+use data_encoding::Encoding;
+use data_encoding_macro::new_encoding;
 use uuid::Uuid;
 
 use crate::error::{Error, Result};
 
-macro_rules! base32_spec {
-    () => {{
-        static BASE32_SPEC: once_cell::sync::OnceCell<data_encoding::Encoding> =
-            once_cell::sync::OnceCell::new();
-        BASE32_SPEC.get_or_init(|| {
-            let mut spec = data_encoding::Specification::new();
-            spec.symbols.push_str("abcdefghijklmnopqrstuvwxyz234567");
-            spec.encoding().unwrap()
-        })
-    }};
-}
+const BASE32_LOWER: Encoding = new_encoding! {
+    symbols: "abcdefghijklmnopqrstuvwxyz234567",
+};
 
 fn uuid_from_str(s: &str) -> Result<Uuid> {
     if s.is_empty() {
         return Err(Error::MissingValue);
     }
-    Ok(Uuid::from_slice(&base32_spec!().decode(s.as_bytes())?)?)
+    Ok(Uuid::from_slice(&BASE32_LOWER.decode(s.as_bytes())?)?)
 }
 
 /// An OID Prefix designed to be similar to a human readable "subject line" for the ID
@@ -258,7 +252,7 @@ impl Oid {
 
     /// Get the value portion of the  of the OID, which is the base32 encoded string following the
     /// `-` separator
-    pub fn value(&self) -> String { base32_spec!().encode(self.uuid.as_bytes()) }
+    pub fn value(&self) -> String { BASE32_LOWER.encode(self.uuid.as_bytes()) }
 
     /// Get the UUID of the OID
     pub fn uuid(&self) -> &Uuid { &self.uuid }
@@ -440,7 +434,7 @@ impl<P: OidPrefix> TypedOid<P> {
 
     /// Get the value portion of the  of the OID, which is the base32 encoded string following the
     /// `-` separator
-    pub fn value(&self) -> String { base32_spec!().encode(self.uuid.as_bytes()) }
+    pub fn value(&self) -> String { BASE32_LOWER.encode(self.uuid.as_bytes()) }
 
     /// Get the UUID of the OID
     pub fn uuid(&self) -> &Uuid { &self.uuid }
