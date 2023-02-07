@@ -1,0 +1,18 @@
+*    @seaplane-io/devx
+
+/seaplane-cli/*         @kbknapp
+/seaplane-sdk/rust/*    @kbknapp
+/crates/*               @kbknapp
+/.cargo/*               @kbknapp
+/*.rs                   @kbknapp
+/justfile               @kbknapp
+/rust-toolchain.toml    @kbknapp
+/rustfmt.toml           @kbknapp
+/Cargo.*                @kbknapp
+
+/seaplane-sdk/python/*        @tonilopezmr
+/seaplane-sdk/javascript/*    @tonilopezmr
+
+/docs/*  @fokkedekker @Paige-Work
+
+/assets/*  @Paige-Work
