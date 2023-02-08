@@ -5,23 +5,23 @@ use crate::api::compute::v2::models::*;
 
 #[derive(Debug, Serialize, Deserialize, Clone, Eq, PartialEq)]
 pub struct PagedResponse<T> {
-    objects: Vec<T>,
-    meta: PageMetadata,
+    pub objects: Vec<T>,
+    pub meta: PageMetadata,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, Eq, PartialEq)]
 pub struct PageMetadata {
     /// The total number of entries in all pages
     #[serde(default)]
-    total: usize,
+    pub total: usize,
 
     /// URL to fetch the next page of entries
     #[serde(default)]
-    next: Option<Url>,
+    pub next: Option<Url>,
 
     /// URL to fetch the previous page of entries
     #[serde(default)]
-    prev: Option<Url>,
+    pub prev: Option<Url>,
 }
 
 pub type GetFormationsResponse = PagedResponse<Formation>;
