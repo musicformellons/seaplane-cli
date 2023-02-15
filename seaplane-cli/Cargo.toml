@@ -13,7 +13,7 @@ include = [
   "build.rs",
   "src/**/*",
   "Cargo.toml",
-  "../LICENSE",
+  "LICENSE",
   "share/*",
   "README.md",
 ]
