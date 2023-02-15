@@ -10,12 +10,12 @@ Arguments:
   <NAME|ID>  The name or ID of the Formation to remove, must be unambiguous
 
 Options:
-  -r, --recursive         Recursively delete all local definitions associated with this Formation
+  -F, --fetch             Fetch remote Formation Instances and synchronize local DB prior to running this command [aliases: sync, synchronize]
   -v, --verbose...        Display more verbose output
-  -f, --force             Delete this Formation even if there are remote instances In Flight (active), which will effectively stop all remote instances of this Formation
+  -a, --all               Operate on all matching local Formation Plans even when the name or ID is ambiguous
   -q, --quiet...          Suppress output at a specific level and below
-  -a, --all               Delete all matching Formations even when the name or ID is ambiguous or a partial match
       --color <COLOR>     Should the output include color? [default: auto] [possible values: always, ansi, auto, never]
+  -f, --force             Delete this Formation even if there are remote instances without confirmation
       --local             Delete local Formation Definitions (this is set by the default, use --no-local to skip)
       --no-color          Do not color output (alias for --color=never)
   -A, --api-key <STRING>  The API key associated with a Seaplane account used to access Seaplane API endpoints [env: SEAPLANE_API_KEY]
@@ -23,7 +23,6 @@ Options:
       --remote            Delete remote Formation Instances (this is set by default, use --no-remote to skip)
   -S, --stateless         Ignore local state files, do not read from or write to them
       --no-remote         DO NOT delete remote Formation Instances (this is set by the default, use --remote to remove them)
-  -F, --fetch             Fetch remote Formation Instances and synchronize local Plan definitions prior to attempting to delete [aliases: sync, synchronize]
   -h, --help              Print help (see more with '--help')
   -V, --version           Print version
 
@@ -42,8 +41,10 @@ Arguments:
           The name or ID of the Formation to remove, must be unambiguous
 
 Options:
-  -r, --recursive
-          Recursively delete all local definitions associated with this Formation
+  -F, --fetch
+          Fetch remote Formation Instances and synchronize local DB prior to running this command
+          
+          [aliases: sync, synchronize]
 
   -v, --verbose...
           Display more verbose output
@@ -52,8 +53,8 @@ Options:
               -v:  Display debug info
               -vv: Display trace info
 
-  -f, --force
-          Delete this Formation even if there are remote instances In Flight (active), which will effectively stop all remote instances of this Formation
+  -a, --all
+          Operate on all matching local Formation Plans even when the name or ID is ambiguous
 
   -q, --quiet...
           Suppress output at a specific level and below
@@ -63,14 +64,14 @@ Options:
               -qq:  Only display ERROR messages
               -qqq: Suppress all output
 
-  -a, --all
-          Delete all matching Formations even when the name or ID is ambiguous or a partial match
-
       --color <COLOR>
           Should the output include color?
           
           [default: auto]
           [possible values: always, ansi, auto, never]
+
+  -f, --force
+          Delete this Formation even if there are remote instances without confirmation
 
       --local
           Delete local Formation Definitions (this is set by the default, use --no-local to skip)
@@ -98,11 +99,6 @@ Options:
 
       --no-remote
           DO NOT delete remote Formation Instances (this is set by the default, use --remote to remove them)
-
-  -F, --fetch
-          Fetch remote Formation Instances and synchronize local Plan definitions prior to attempting to delete
-          
-          [aliases: sync, synchronize]
 
   -h, --help
           Print help (see a summary with '-h')

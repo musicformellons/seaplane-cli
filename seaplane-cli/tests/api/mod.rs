@@ -20,7 +20,7 @@ macro_rules! run {
     ($argv:expr) => {{
         seaplane_cli::test_main_exec_with_ctx(
             &argv!($argv),
-            $crate::api::ctx_from_url(MOCK_SERVER.base_url()),
+            $crate::api::ctx_from_url($crate::api::MOCK_SERVER.base_url()),
         )
     }};
 }
@@ -31,24 +31,26 @@ mod locks;
 mod metadata;
 mod restrict;
 
-fn ctx_from_url(url: String) -> Ctx {
+pub fn ctx_from_url(url: String) -> Ctx {
     let mut ctx = Ctx::default();
     let url: Url = url.parse().unwrap();
     ctx.compute_url = Some(url.clone());
     ctx.identity_url = Some(url.clone());
     ctx.metadata_url = Some(url.clone());
     ctx.locks_url = Some(url);
+    ctx.disable_pb = true;
+    ctx.insecure_urls = true;
     ctx
 }
 
 // To be used with httpmock standalone server for dev testing
 // MockServer::connect("127.0.0.1:5000")
-static MOCK_SERVER: Lazy<MockServer> = Lazy::new(|| {
+pub static MOCK_SERVER: Lazy<MockServer> = Lazy::new(|| {
     let resp_json =
         json!({"token": "abc.123.def", "tenant": "tnt-abcdef1234567890", "subdomain": "pequod"});
     let s = MockServer::start();
     // let s = MockServer::connect("127.0.0.1:5000");
-    let _mock = s.mock(|when, then| {
+    _ = s.mock(|when, then| {
         when.method(POST)
             .path("/identity/token")
             .header("authorization", "Bearer abc123")
@@ -58,19 +60,19 @@ static MOCK_SERVER: Lazy<MockServer> = Lazy::new(|| {
     s
 });
 
-fn when_json(when: When, m: Method, p: impl Into<String>) -> When {
+pub fn when_json(when: When, m: Method, p: impl Into<String>) -> When {
     when.method(m)
         .path(p)
         .header("authorization", "Bearer abc.123.def")
         .header("content-type", "application/json")
 }
 
-fn when(when: When, m: Method, p: impl Into<String>) -> When {
+pub fn when(when: When, m: Method, p: impl Into<String>) -> When {
     when.method(m)
         .path(p)
         .header("authorization", "Bearer abc.123.def")
 }
 
-fn then(then: Then, resp_body: &serde_json::Value) -> Then {
+pub fn then(then: Then, resp_body: &serde_json::Value) -> Then {
     then.status(200).json_body_obj(resp_body)
 }

@@ -35,7 +35,7 @@ fn main() {
     let out_dir = std::env::var("OUT_DIR").unwrap();
     std::fs::copy("share/third_party_licenses.md", format!("{out_dir}/third_party_licenses.md"))
         .expect("failed to copy third party licenses");
-    std::fs::copy("LICENSE", format!("{out_dir}/LICENSE")).expect("failed to copy licenses");
+    std::fs::copy("../LICENSE", format!("{out_dir}/LICENSE")).expect("failed to copy licenses");
 
     // TODO: Use the hash of only the CLI dir
     // If `git` is installed and located in `$PATH` of the build machine, it uses that to determine

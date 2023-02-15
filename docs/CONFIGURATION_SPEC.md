@@ -92,7 +92,7 @@ commands and CLI flags that take a container image reference.
 
 Default value: `registry.cplane.cloud`
 
-For example, `seaplane flight plan --image=nginx:latest` will be
+For example, `seaplane formation plan -flight image=nginx:latest` will be
 expanded to `registry.cplane.cloud/nginx:latest`
 
 ### The `[account]` Section

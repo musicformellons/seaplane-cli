@@ -9,7 +9,6 @@ Usage: seaplane[EXE] [OPTIONS] <COMMAND>
 
 Commands:
   account           Operate on Seaplane account details, including access tokens [aliases: acct]
-  flight            Operate on local Flight Plans which define "Flights" (logical containers), and are then referenced by Formations
   formation         Operate on local Formations Plans and remote Formation Instances of those Plans
   init              Create the Seaplane directory structure at the appropriate locations
   license           Print license information

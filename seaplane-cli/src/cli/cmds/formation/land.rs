@@ -1,88 +1,88 @@
 use clap::{ArgMatches, Command};
+#[cfg(not(feature = "api_tests"))]
+use seaplane::{api::ApiErrorKind, error::SeaplaneError};
 
 use crate::{
     api::FormationsReq,
-    cli::{
-        cmds::formation::SeaplaneFormationFetch,
-        errors,
-        validator::{validate_formation_name, validate_name_id},
-        CliCommand,
-    },
-    error::Result,
+    cli::{cmds::formation::common, CliCommand},
+    error::{CliErrorKind, Result},
+    ops::formation::FormationNameId,
     Ctx,
 };
+
+static LONG_ABOUT: &str = "Land (Stop) all configurations of a remote Formation Instance
+
+Unlike 'seaplane formation delete' the land command does not delete the Formation from the local
+database.";
 
 #[derive(Copy, Clone, Debug)]
 pub struct SeaplaneFormationLand;
 
 impl SeaplaneFormationLand {
     pub fn command() -> Command {
-        let validator = |s: &str| validate_name_id(validate_formation_name, s);
         Command::new("land")
             .visible_alias("stop")
-            .about("Land (Stop) all configurations of a remote Formation Instance")
-            .arg(
-                arg!(name_id =["NAME|ID"] required)
-                    .help("The name or ID of the Formation Instance to land")
-                    .value_parser(validator),
-            )
-            .arg(
-                arg!(--all - ('a'))
-                    .help("Stop all matching Formations even when FORMATION is ambiguous"),
-            )
-            .arg(arg!(--fetch|sync|synchronize - ('F')).help(
-                "Fetch remote Formation Instances and synchronize local Plan definitions prior to attempting to land",
-            ))
+            .about("Land a remote Formation Instance")
+            .long_about(LONG_ABOUT)
+            .arg(common::name_id(true).help("The name or ID of the Formation Instance to land"))
+            .arg(common::all())
+            .arg(common::fetch(true))
     }
 }
 
 impl CliCommand for SeaplaneFormationLand {
     fn run(&self, ctx: &mut Ctx) -> Result<()> {
-        if ctx.args.fetch {
-            let old_name = ctx.args.name_id.take();
-            ctx.internal_run = true;
-            SeaplaneFormationFetch.run(ctx)?;
-            ctx.internal_run = false;
-            ctx.args.name_id = old_name;
-        }
-        let name = ctx.args.name_id.as_ref().unwrap();
-        // Get the indices of any formations that match the given name/ID
-        let indices = if ctx.args.all {
-            ctx.db.formations.formation_indices_of_left_matches(name)
+        common::run_fetch(ctx)?;
+
+        let formation_ctx = ctx.formation_ctx.get_or_init();
+        // If this is an internal run being called by Delete it will have already calculated the
+        // indices for us
+        let oids = if let Some(indices) = formation_ctx.indices.clone() {
+            ctx.db.formations.oids_from_indices(&indices)
         } else {
-            ctx.db.formations.formation_indices_of_matches(name)
+            common::oids_matching_name_id(ctx)?
         };
 
-        match indices.len() {
-            0 => errors::no_matching_item(name.to_string(), false, ctx.args.all)?,
-            1 => (),
-            _ => {
-                if !ctx.args.all {
-                    errors::ambiguous_item(name.to_string(), true)?;
-                }
-            }
+        if oids.is_empty() {
+            return Err(CliErrorKind::OneOff(
+                "cannot land Formation due to missing Formation ID, run 'seaplane formation \
+                fetch-remote' to synchronize the local database and try again"
+                    .into(),
+            )
+            .into_err());
         }
 
         let mut req = FormationsReq::new_delay_token(ctx)?;
-        for idx in indices {
-            // re unwrap: the indices returned came from Formations so they have to be valid
-            let formation = ctx.db.formations.get_formation_mut(idx).unwrap();
-            req.set_name(formation.name.as_ref().unwrap())?;
-
-            // re unwrap: We got the formation from the local DB so it has to have a name
-            req.stop()?;
-
-            // Move all configurations from in air to grounded
-            let ids: Vec<_> = formation.in_air.drain().collect();
-            for id in ids {
-                formation.grounded.insert(id);
+        for oid in &oids {
+            req.set_id(*oid)?;
+            #[cfg_attr(feature = "api_tests", allow(clippy::question_mark))]
+            if let Err(e) = req.delete() {
+                // Ignoring a 404 NOT FOUND during mock tests is bad
+                #[cfg(not(feature = "api_tests"))]
+                if matches!(
+                    e.kind(),
+                    CliErrorKind::Seaplane(SeaplaneError::ApiResponse(ae))
+                    if ae.kind == ApiErrorKind::NotFound)
+                {
+                    // TODO: warn not found, only if --remote?
+                    continue;
+                }
+                return Err(e);
             }
-
-            ctx.persist_state()?;
-
-            cli_print!("Successfully Landed remote Formation Instance '");
-            cli_print!(@Green, "{name}");
-            cli_println!("'");
+            // prints:
+            //   Successfully Landed remote Formation Instance frm-abcdef12345 (stubb)
+            cli_print!("Successfully Landed remote Formation Instance ");
+            cli_print!(@Green, "{oid}");
+            if let Some(f) = ctx
+                .db
+                .formations
+                .get_by_name_id(&FormationNameId::Oid(*oid))
+            {
+                cli_print!(" (");
+                cli_print!(@Green, "{}", f.model.name);
+                cli_print!(")");
+            }
+            cli_println!("");
         }
 
         Ok(())
@@ -90,8 +90,9 @@ impl CliCommand for SeaplaneFormationLand {
 
     fn update_ctx(&self, matches: &ArgMatches, ctx: &mut Ctx) -> Result<()> {
         ctx.args.all = matches.get_flag("all");
-        ctx.args.name_id = matches.get_one::<String>("name_id").map(ToOwned::to_owned);
         ctx.args.fetch = matches.get_flag("fetch");
+        let mut fctx = ctx.formation_ctx.get_mut_or_init();
+        fctx.name_id = matches.get_one::<FormationNameId>("name_id").cloned();
         Ok(())
     }
 }

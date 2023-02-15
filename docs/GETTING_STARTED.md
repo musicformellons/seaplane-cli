@@ -7,23 +7,23 @@ This guide will walk through running your first workload on the Seaplane cloud.
 * [Prerequisites](#prerequisites)
 * [Quickstart](#quickstart)
 * [Setup](#setup)
-	* [The Seaplane CLI Tool](#the-seaplane-cli-tool)
-	* [Initialize our Environment](#initialize-our-environment)
-		* [Setting `NO_COLOR`](#setting-no_color)
-		* [Using `--no-color` or setting `--color=never`](#using---no-color-or-setting---colornever)
-		* [Setting `color = "never"` in the configuration file](#setting-color--never-in-the-configuration-file)
-	* [Configure Your API Key](#configure-your-api-key)
-		* [Security of `SEAPLANE_API_KEY` Environment Variable](#security-of-seaplane_api_key-environment-variable)
-		* [Security of `--api-key` CLI Flag](#security-of---api-key-cli-flag)
-		* [Storing the API key in the Configuration File](#storing-the-api-key-in-the-configuration-file)
-	* [Test!](#test)
+    * [The Seaplane CLI Tool](#the-seaplane-cli-tool)
+    * [Initialize our Environment](#initialize-our-environment)
+    * [Colorful Terminal](#colorful-terminal)
+        * [Setting `NO_COLOR`](#setting-no_color)
+        * [Using `--no-color` or setting `--color=never`](#using---no-color-or-setting---colornever)
+        * [Setting `color = "never"` in the configuration file](#setting-color--never-in-the-configuration-file)
+    * [Configure Your API Key](#configure-your-api-key)
+        * [Security of `SEAPLANE_API_KEY` Environment Variable](#security-of-seaplane_api_key-environment-variable)
+        * [Security of `--api-key` CLI Flag](#security-of---api-key-cli-flag)
+        * [Storing the API key in the Configuration File](#storing-the-api-key-in-the-configuration-file)
+    * [Test!](#test)
 * [Running Your Workload on Compute](#running-your-workload-on-compute)
-	* [Upload a Container Image](#upload-a-container-image)
-	* [Crate and Launch a Formation with a Single Flight](#crate-and-launch-a-formation-with-a-single-flight)
-		* [Your First Workload](#your-first-workload)
-		* [Working with Local Flight Plans](#working-with-local-flight-plans)
-		* [Working with Local Formation Plans](#working-with-local-formation-plans)
-	* [See a Hello World Page](#see-a-hello-world-page)
+    * [Upload a Container Image](#upload-a-container-image)
+    * [Crate and Launch a Formation with a Single Flight](#crate-and-launch-a-formation-with-a-single-flight)
+        * [Your First Workload](#your-first-workload)
+        * [Working with Local Formation Plans](#working-with-local-formation-plans)
+    * [See a Hello World Page](#see-a-hello-world-page)
 * [Using the Metadata Key Value Store](#using-the-metadata-key-value-store)
 
 <!-- vim-markdown-toc -->
@@ -60,25 +60,25 @@ platform:
 
 ```console
 $ seaplane formation plan \
-  --api-key "mysuperspecialapikey" \
-  --include-flight-plan "name=frontend,image=seaplane-demo/nginx:latest" \
-  --public-endpoint /=frontend:80 \
-  --launch 
+  --api-key 'mysuperspecialapikey' \
+  --flight image=seaplane-demo/nginx:latest \
+  --launch
 
 Successfully created Seaplane directories
-Successfully created local Flight Plan 'itchy-sweater' with ID '664954bb'
-Successfully created local Formation Plan 'few-actor' with ID 'b67437dc'
-Successfully launched remote Formation Instance 'few-actor' with remote Configuration UUIDs:
-    'd87938b6-c57d-47c4-8037-6e69026008ac'
+Successfully created local Formation Plan 'few-actor'
+Successfully launched remote Formation Instance 'few-actor' with ID 'frm-5wacbutjwbdexonddvdb2lnyxu'
+The remote Formation Instance URL is https://few-actor.seaplane-demo.on.cplane.cloud/
+(hint: it may take up to a minute for the Formation to become fully online)
+(hint: check the status of this Formation Instance with 'seaplane formation status few-actor')
 ```
 
-> **Warning** 
+> **Warning**
 > There are other more secure ways to pass your API key!
 
 To see it working:
 
 ```
-$ curl https://few-actor--seaplane-demo.on.cplane.cloud/ | head -n 4
+$ curl https://few-actor.seaplane-demo.on.cplane.cloud/ | head -n 4
 <!DOCTYPE html>
 <html>
 <head>
@@ -146,30 +146,30 @@ iterating and trying to improve our product!
 
 ```console
 $ seaplane
-seaplane v0.1.0 (f9f6dedab8)
-Seaplane IO, Inc.
+Seaplane CLI for managing resources on the Seaplane Cloud
 
-USAGE:
-    seaplane [OPTIONS] <SUBCOMMAND>
+Usage: seaplane [OPTIONS] <COMMAND>
 
-OPTIONS:
-    -A, --api-key <STRING>    The API key associated with a Seaplane account used to access Seaplane API endpoints [env: SEAPLANE_API_KEY]
-        --color <COLOR>       Should the output include color? [default: auto] [possible values: always, ansi, auto, never]
-    -h, --help                Print help information
-        --no-color            Do not color output (alias for --color=never)
-    -q, --quiet               Suppress output at a specific level and below
-    -v, --verbose             Display more verbose output
-    -V, --version             Print version information
+Commands:
+  account           Operate on Seaplane account details, including access tokens [aliases: acct]
+  formation         Operate on local Formations Plans and remote Formation Instances of those Plans
+  init              Create the Seaplane directory structure at the appropriate locations
+  license           Print license information
+  metadata          Operate on metadata key-value pairs using the Global Data Coordination API [aliases: meta, md]
+  locks             Operate on the Locks API
+  restrict          Restrict the placement of data for Global Data Coordination API
+  shell-completion  Generate shell completion scripts for the Seaplane CLI
+  help              Print this message or the help of the given subcommand(s)
 
-SUBCOMMANDS:
-    account             Operate on your Seaplane account, including access tokens [aliases: acct]
-    flight              Operate on Seaplane Flights (logical containers), which are the core component of Formations
-    formation           Operate on Seaplane Formations
-    help                Print this message or the help of the given subcommand(s)
-    image
-    init                Create the Seaplane directory structure at the appropriate locations
-    license
-    shell-completion    Generate shell completion script files for seaplane
+Options:
+  -v, --verbose...        Display more verbose output
+  -q, --quiet...          Suppress output at a specific level and below
+      --color <COLOR>     Should the output include color? [default: auto] [possible values: always, ansi, auto, never]
+      --no-color          Do not color output (alias for --color=never)
+  -A, --api-key <STRING>  The API key associated with a Seaplane account used to access Seaplane API endpoints [env: SEAPLANE_API_KEY]
+  -S, --stateless         Ignore local state files, do not read from or write to them
+  -h, --help              Print help (see more with '--help')
+  -V, --version           Print version
 ```
 
 Success!
@@ -191,35 +191,10 @@ $ seaplane init
 Successfully created Seaplane directories
 ```
 
-If you're curious which exact files and directories were created, you can add
-the `--verbose` flag. If you've already initialized, you can safely re-run with
-the `--verbose` flag just to see. We won't overwrite anything unless you tell
-us to.
+### Colorful Terminal
 
-For example, on a mac, the output looks like this:
-
-```console
-$ seaplane init --verbose
-Looking for configuration file at "/Users/kevin/Library/Application Support/io.Seaplane.seaplane/seaplane.toml"
-Found configuration file "/Users/kevin/Library/Application Support/io.Seaplane.seaplane/seaplane.toml"
-Looking for configuration file at "/Users/kevin/.config/seaplane/seaplane.toml"
-Looking for configuration file at "/Users/kevin/.seaplane/seaplane.toml"
-Creating directory "/Users/kevin/Library/Application Support/io.Seaplane.seaplane"
-Creating directory "/Users/kevin/Library/Application Support/io.Seaplane.seaplane"
-warn: "/Users/kevin/Library/Application Support/io.Seaplane.seaplane/seaplane.toml" already exists
-(hint: use 'seaplane init --overwrite=config to erase and overwrite it)
-
-warn: "/Users/kevin/Library/Application Support/io.Seaplane.seaplane/formations.json" already exists
-(hint: use 'seaplane init --overwrite=formations to erase and overwrite it)
-
-warn: "/Users/kevin/Library/Application Support/io.Seaplane.seaplane/flights.json" already exists
-(hint: use 'seaplane init --overwrite=flights to erase and overwrite it)
-
-Successfully created Seaplane directories
-```
-
-If you're following along live (because the above text doesn't do it justice)
-you may have noticed that last command added some color to the output.
+If you're following along live (because the examples in this document don't do
+it justice) you may notice that some commands add color to the output.
 
 We believe tasteful coloring of words helps draw attention to important parts
 of the output, this is especially important in errors and hints.
@@ -373,16 +348,15 @@ We'll be using the `nginxdemos/hello`
 ### Crate and Launch a Formation with a Single Flight
 
 In Seaplane a *Formation* can be thought of as your application or service.
-Formations are made up of *Flights* which are logical containers. 
+Formations are made up of *Flights* which are logical containers.
 
-Using the Seaplane CLI we can create Formation and Flight Plans. These Plans
+Using the Seaplane CLI we can create Formations. These Formation Plans
 are merely local definitions, so we can edit them, copy them, change them,
 pretty much anything we need.
 
 Once we're satisfied with our local Formation Plan we can `launch` it; sending
 it to the Seaplane Cloud and creating a Remote Instance from our local Plan
-definition. Once launched Seaplane can activate it for receiving public
-traffic.
+definition.
 
 We can also both `plan` and `launch` all in one go, if desired.
 
@@ -394,111 +368,30 @@ Plans.
 
 We'll be running the `nginx-hello` container from earlier.
 
-> **Note** 
+> **Note**
 > Here `seaplane-demo` is our Tenant ID. You'll need to replace that with your
 > own tenant ID.
 
 ```console
 $ seaplane formation plan \
-  --include-flight-plan "image=seaplane-demo/nginxdemos/hello:latest" \
+  --flight "image=seaplane-demo/nginxdemos/hello:latest" \
   --launch
-Successfully created local Flight Plan 'mellow-order' with ID 'd4e877b7'
-Successfully created local Formation Plan 'nimble-bike' with ID '8bfe5304'
-Successflly launched remote Formation Instance 'nimble-bike' with Configuration UUIDs:
-    'c534dc48-03b6-400b-bc19-f7d28cfd1897'
+Successfully created local Formation Plan 'nimble-bike'
+Successfully launched remote Formation Instance 'nimble-bike' with ID:  'frm-5wacbutjwbdexonddvdb2lnyxu'
+The remote Formation Instance URL is https://nimble-bike.seaplane-demo.on.cplane.cloud/
+(hint: it may take up to a minute for the Formation to become fully online)
+(hint: check the status of this Formation Instance with 'seaplane formation status nimble-bike')
 ```
 
 That's it!
 
-Notice it created local Flight and Formation Plans for us, and because we
-didn't specify anything it also gave them some randomly assigned names.
+Notice it created local Formation Plans for us, and because we didn't specify
+anything it also gave them some randomly assigned names.
 
 If all you want is to see that it worked, skip down to the [See Hello World
 Page](#see-a-hello-world-page) section below.
 
-#### Working with Local Flight Plans
-
-Flight Plans are *included* in Formation Plans (which we'll see in depth later
-on) and tell Seaplane what kind of containers you'd like to use for your
-workload.
-
-Flight Plans on their own are nothing more than a local definition to be
-referenced in Formations.
-
-We can see our Flight Plans:
-
-```console
-$ seaplane flight list
-LOCAL ID  NAME          IMAGE                             MIN  MAX  ARCH  API PERMS
-d4e877b7  mellow-order  seaplane-demo/nginx-hello:latest  1    INF  auto  false
-```
-
-Notice a bunch of default values because we didn't specify anything in
-particular other than an `image`.
-
-Let's say we wanted to edit this Flight Plan to include in another Formation.
-We could create an entirely new Flight Plan via the `seaplane flight plan`
-command, but instead let's just edit the one we've already made. 
-
-Let's say that we actually don't want to be running the `:latest` tag, we
-*actually* want to pin to a specific digest. We'll use
-`sha256:33d30466bb608f607a8d708d39bf13ec7a908dde1a8a8b228f7f3f4c6a4d1bdf` for
-this example.
-
-> **Note** 
-> Even when you specify `:latest` Seaplane pins your containers to the last
-> digest at that point so that your Flights don't change out from under you.
-> The example commands are somewhat contrived and purely to demonstrate the CLI
-> and how to use it.
-
-When using `seaplane flight edit` we must specify a `NAME` or an `ID` (local
-ID) that we want to edit, along with any parameters we'd like to change.
-
-```console
-$ seaplane flight edit d4e8 --image seaplane_demo/nginxdemos/hello@sha256:33d30466bb608f607a8d708d39bf13ec7a908dde1a8a8b228f7f3f4c6a4d1bdf
-
-$ seaplane flight list
-LOCAL ID  NAME              IMAGE                                                                                                   MIN  MAX  ARCH  API PERMS
-d4e877b7  mellow-order      seaplane_demo/nginxdemos/hello@sha256:33d30466bb608f607a8d708d39bf13ec7a908dde1a8a8b228f7f3f4c6a4d1bdf  1    INF  auto  false
-```
-
-> **Warning** 
-> This edit *only affects our local Flight Plan definition*! Nothing has
-> changed to our running Formation Instance in the Seaplane Cloud. Remember,
-> once a remote instance has been created from a local definition, the two are
-> disconnected from one another. Much like creating a house from a set of blue
-> prints, and then changing the blue prints doesn't automatically change any
-> houses built prior!
-
-Notice we used part of the `LOCAL ID` to reference our Flight Plan. We could
-have also done so by unambiguous partial name, or full name if we desired.
-
-Hmm. You know what? Actually, I think we do want another Flight Plan that
-points to the `:latest` tag. We can copy `mellow-order` and just make that one
-change.
-
-```console
-$ seaplane flight copy mellow-order --image seaplane_demo/nginxdemos/hello:latest
-Successfully copied Flight 'mellow-order' to new Flight 'waiting-leaf' with ID '2d331f0c'
-
-$ seaplane flight list
-LOCAL ID  NAME          IMAGE                                                                                                   MIN  MAX  ARCH  API PERMS
-d4e877b7  mellow-order  seaplane_demo/nginxdemos/hello@sha256:33d30466bb608f607a8d708d39bf13ec7a908dde1a8a8b228f7f3f4c6a4d1bdf  1    INF  auto  false
-2d331f0c  waiting-leaf  seaplane_demo/nginxdemos/hello:latest                                                                   1    INF  auto  false
-```
-
-There are a bunch of other things you can do with your Flights as well, see the
-`seaplane flight --help` for details.
-
 #### Working with Local Formation Plans
-
-Remember that we said a Formation is made up of Flights? *Technically* a
-Formation is made up of zero or more Formation Configurations. These
-configurations define what Flights are utilized by referencing one or more
-Flight Plan definitions, and how they're allowed to communicate/scale. A
-Formation can have *zero or more* configurations because having multiple
-Configurations will allow you load balance between them! This empowers things
-like blue/green deployments, atomic upgrades, all kinds of nifty tools!
 
 > **Warning** 
 > Remember, a *remote instance* is created from a *local plan*. Much like
@@ -509,45 +402,36 @@ like blue/green deployments, atomic upgrades, all kinds of nifty tools!
 > altered local Formation Plans and remote Formation Instances created from
 > them.
 
-But for now, we're staying simple. We're just working with a single
-Configuration, which only references a single Flight Plan. So no load
-balancing, or other complexities. Those will come in future chapters!
-
-The reason we bring up this distinction now is if you you're looking for
-something similar to `seaplane flight list`, but for Formations; you'll find
-it...but it may not make sense, at least without knowing about Formation
-Configurations.
+For now, we're staying simple. We're just working with a single Formation,
+which only references a single Flight Plan (container image).
 
 So lets check that command now:
 
 ```console
 $ seaplane formation list
-LOCAL ID  NAME         LOCAL  DEPLOYED (GROUNDED)   DEPLOYED (IN AIR)   TOTAL CONFIGURATIONS
-8bfe5304  nimble-bike  1      0                     1                   1
+NAME         LOCAL  DEPLOYED   OID
+nimble-bike  true   true       frm-5wacbutjwbdexonddvdb2lnyxu
 ```
 
-Notice how it says we have one `LOCAL`, and one `DEPLOYED (IN AIR)`. What do
-those mean? The `seaplane formation list` is telling you how many Formation
-Configurations it knows about, and what their status is. So it's saying that we
-have one local definition (which we created earlier), and one `DEPLOYED (IN
-AIR)` which means, "Uploaded to the Seaplane Cloud (Deployed) and set to active
-(In Air)."
+> **Note**
+> If you haven't launched the local Formation Plan yet, yours will say `false`
+> under `DEPLOYED` and will omit the OID which is assigned by the remote API
 
-Let's create another Formation Plan, without any configuration so you can
+Let's create another Formation Plan, without launching it so you can
 better see the distinction.
 
 ```console
 $ seaplane formation plan
-Successfully created local Formation Plan 'kind-week' with ID '86bd3a0c'
+Successfully created local Formation Plan 'kind-week'
 
 $ seaplane formation list
-LOCAL ID  NAME         LOCAL  DEPLOYED (GROUNDED)   DEPLOYED (IN AIR)   TOTAL CONFIGURATIONS
-8bfe5304  nimble-bike  1      0                     1                   1
-86bd3a0c  kind-week    0      0                     0                   0
+NAME         LOCAL  DEPLOYED   OID
+nimble-bike  true   true       frm-5wacbutjwbdexonddvdb2lnyxu
+kind-week    true   false
 ```
 
 Now we have a new Formation Plan! A perfectly useless Formation with no
-included Flight Plans, no nothing, but hey!
+Flight Plans, no nothing, but hey!
 
 OK, let's actually delete that empty Formation Plan and create one a little
 more useful. This time when we create the Formation Plan we *will not* be
@@ -556,57 +440,59 @@ manually.
 
 ```console
 $ seaplane formation delete kind-week
-Deleted local Formation Plan 86bd3a0c72cfc6e6ea2c4c7c37766361d801ea84bab72ae42d4b0d86afd42217
+Deleted local Formation Plan kind-week
 
 Successfully removed 1 item
 
-$ seaplane formation plan --include-flight-plan mellow-order
-Successfully created local Formation Plan 'festive-winter' with ID 'd3aa195d'
+$ seaplane formation plan --flight image=seaplane-demos/nginx:latest
+Successfully created local Formation Plan 'festive-winter'
 
 $ seaplane formation list
-LOCAL ID  NAME            LOCAL  DEPLOYED (GROUNDED)   DEPLOYED (IN AIR)   TOTAL CONFIGURATIONS
-8bfe5304  nimble-bike     1      0                     1                   1
-d3aa195d  festive-winter  1      0                     0                   1
+NAME             LOCAL  DEPLOYED   OID
+nimble-bike      true   true       frm-5wacbutjwbdexonddvdb2lnyxu
+festive-winter   true   false
 ```
 
-Now, notice that `festive-winter` has one local configuration, but none
-currently deployed. Let's change that, by deploying an Instance of this
+Let's deploy `festive-winter` that, by deploying an Instance of this
 Formation Plan but without setting it to active.
 
 ```console
-$ seaplane formation launch --grounded festive-winter
-Successfully launched remote Formation Instance 'festive-winter'
-```
-
-The `--grounded` flag tells Seaplane not set the configuration to active, so no
-actual traffic can reach it.
-
-We can see this by looking at the Formations again:
-
-```console
-$ seaplane formation list
-LOCAL ID  NAME            LOCAL  DEPLOYED (GROUNDED)   DEPLOYED (IN AIR)   TOTAL CONFIGURATIONS
-8bfe5304  nimble-bike     1      0                     1                   1
-d3aa195d  festive-winter  1      1                     0                   1
-```
-
-But let's say we *do* want to start up that configuration and make it active.
-We can actually just re-pass the same command but without the `--grounded`
-flag. Which will make all configurations for a given local Formation Plan
-active (And we only have one right now.)
-
-```console
 $ seaplane formation launch festive-winter
-Successfully launched remote Formation Instance 'festive-winter'
-
-$ seaplane formation list
-LOCAL ID  NAME            LOCAL  DEPLOYED (GROUNDED)   DEPLOYED (IN AIR)   TOTAL CONFIGURATIONS
-8bfe5304  nimble-bike     1      0                     1                   1
-d3aa195d  festive-winter  1      0                     1                   1
+Successfully launched remote Formation Instance 'festive-winter' with ID: frm-3ksdf813nasdlksdfinwudfkd3
+The remote Formation Instance URL is https://festive-winter.seaplane-demo.on.cplane.cloud/
+(hint: it may take up to a minute for the Formation to become fully online)
+(hint: check the status of this Formation Instance with 'seaplane formation status festive-winter')
 ```
 
-Notice `festive-winter` has changed it's configuration status from `GROUNDED`
-to `IN AIR`!
+We can see this change by looking at the Formations again:
+
+```console
+$ seaplane formation list
+NAME             LOCAL  DEPLOYED   OID
+nimble-bike      true   true       frm-5wacbutjwbdexonddvdb2lnyxu
+festive-winter   true   true       frm-3ksdf813nasdlksdfinwudfkd3
+```
+
+We can also check the status of our Formations directly:
+
+```console
+$ seaplane formation status
+◉ Formation nimble-bike (frm-5wacbutjwbdexonddvdb2lnyxu): HEALTHY
+└─┐
+  │   FLIGHT                  STATUS     OID
+  └─◉ weak-joint (gateway)    HEALTHY    flt-4bjyoaoqhbaorip3izfrou3siu
+
+◉ Formation festive-winter (frm-3ksdf813nasdlksdfinwudfkd3): HEALTHY
+└─┐
+  │   FLIGHT                  STATUS     OID
+  └─◉ stern-fiber (gateway)   HEALTHY    flt-kr7dkiqwbrf35frwkm7vxsghci
+```
+
+Notice our two Formations are up and healthy! Also notice that the Flights have
+been assign their own IDs, and are listed as `gateway` (the Flight that
+receives the public traffic). This was automatically implied because we only
+created Formations with a single Flight. Had we defined more Flights per
+Formation we would have had to manually assign one of them to be a gateway.
 
 ### See a Hello World Page
 
@@ -621,7 +507,7 @@ If all went according to plan, you should have a container image running and
 addressable from:
 
 ```
-$ curl https://nimble-bike--seaplane-demo.on.cplane.cloud/ | head -n 4
+$ curl https://nimble-bike.seaplane-demo.on.cplane.cloud/ | head -n 4
 <!DOCTYPE html>
 <html>
 <head>

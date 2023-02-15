@@ -9,53 +9,69 @@ pub mod locks;
 pub mod metadata;
 pub mod restrict;
 pub mod state_version;
+pub mod validator;
 
-use std::fmt;
+use std::{fmt, str::FromStr};
 
-use rand::Rng;
-use serde::{Deserialize, Serialize};
+pub use crate::ops::encoded_string::EncodedString;
+use crate::ops::validator::validate_name;
 
-pub use self::encoded_string::EncodedString;
-use crate::cli::validator::{validate_flight_name, validate_formation_name};
-
-pub fn generate_flight_name() -> String {
-    // TODO: Maybe set an upper bound on the number of iterations and don't expect
-    names::Generator::default()
-        .find(|name| validate_flight_name(name).is_ok())
-        .expect("Failed to generate a random name")
+// An enum representing either a valid Formation Name or a valid OID
+#[derive(Debug, Clone)]
+pub enum NameId<T> {
+    Name(String),
+    Oid(T),
 }
 
-pub fn generate_formation_name() -> String {
-    // TODO: Maybe set an upper bound on the number of iterations and don't expect
-    names::Generator::default()
-        .find(|name| validate_formation_name(name).is_ok())
-        .expect("Failed to generate a random name")
-}
+impl<T> NameId<T> {
+    pub fn is_name(&self) -> bool { matches!(self, NameId::Name(_)) }
 
-#[derive(Deserialize, Serialize, Copy, Clone, Hash, PartialEq, Eq)]
-#[serde(transparent)]
-pub struct Id {
-    #[serde(
-        serialize_with = "hex::serde::serialize",
-        deserialize_with = "hex::serde::deserialize"
-    )]
-    pub inner: [u8; 32],
-}
+    pub fn is_oid(&self) -> bool { matches!(self, NameId::Oid(_)) }
 
-impl Default for Id {
-    fn default() -> Self { Self { inner: rand::thread_rng().gen() } }
-}
+    pub fn name(&self) -> Option<&str> {
+        if let NameId::Name(s) = self {
+            return Some(s);
+        }
+        None
+    }
 
-impl Id {
-    pub fn new() -> Self { Self::default() }
-}
-
-impl fmt::Display for Id {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", hex::encode(self.inner))
+    pub fn oid(&self) -> Option<&T> {
+        if let NameId::Oid(t) = self {
+            return Some(t);
+        }
+        None
     }
 }
 
-impl fmt::Debug for Id {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result { write!(f, "Id [ {self} ]") }
+impl<T> FromStr for NameId<T>
+where
+    T: FromStr,
+{
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s.parse::<T>() {
+            Ok(val) => Ok(NameId::Oid(val)),
+            Err(_) => Ok(NameId::Name(validate_name(s)?)),
+        }
+    }
+}
+
+impl<T> fmt::Display for NameId<T>
+where
+    T: fmt::Display,
+{
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            NameId::Name(name) => write!(f, "{name}"),
+            NameId::Oid(oid) => write!(f, "{oid}"),
+        }
+    }
+}
+
+pub fn generate_name() -> String {
+    // TODO: Maybe set an upper bound on the number of iterations and don't expect
+    names::Generator::default()
+        .find(|name| validate_name(name).is_ok())
+        .expect("Failed to generate a random name")
 }

@@ -11,7 +11,7 @@ Commands:
   plan          Create a Seaplane Formation [aliases: create, add]
   delete        Deletes local Formation Plans and/or remote Formation Instances [aliases: del, remove, rm]
   fetch-remote  Fetch remote Formation Instances and create/synchronize local Plan definitions [aliases: fetch, sync, synchronize]
-  land          Land (Stop) all configurations of a remote Formation Instance [aliases: stop]
+  land          Land a remote Formation Instance [aliases: stop]
   launch        Start a local Formation Plan creating a remote Formation Instance [aliases: start]
   list          List all local Formation Plans [aliases: ls]
   status        Show the status of a remote Formation Instance

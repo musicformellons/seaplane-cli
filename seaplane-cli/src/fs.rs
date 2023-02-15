@@ -64,7 +64,6 @@ impl<'p> AtomicFile<'p> {
     }
 
     /// Gives a chance to persist the file and retrieve the error if any
-    #[allow(dead_code)]
     pub fn persist(mut self) -> Result<()> {
         let tf = self.temp_file.take().unwrap();
         tf.persist(self.path).map(|_| ()).map_err(CliError::from)

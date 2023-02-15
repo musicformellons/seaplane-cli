@@ -25,7 +25,7 @@
 pub mod flight;
 pub use flight::FlightCtx;
 pub mod formation;
-pub use formation::{FormationCfgCtx, FormationCtx};
+pub use formation::FormationCtx;
 pub mod metadata;
 pub use metadata::MetadataCtx;
 pub mod locks;
@@ -62,8 +62,8 @@ pub struct Args {
     /// Should be display ANSI color codes in output?
     pub color: ColorChoice,
 
-    /// The name or local ID of an item
-    pub name_id: Option<String>,
+    /// The raw name or local ID of an item
+    // pub name_id: Option<String>,
 
     /// What to overwrite
     pub overwrite: Vec<String>,
@@ -113,9 +113,6 @@ pub struct Ctx {
     /// The platform specific path to a data location
     data_dir: PathBuf,
 
-    /// Context relate to exclusively to Flight operations and commands
-    pub flight_ctx: LateInit<FlightCtx>,
-
     /// Context relate to exclusively to Formation operations and commands
     pub formation_ctx: LateInit<FormationCtx>,
 
@@ -162,13 +159,6 @@ impl Clone for Ctx {
     fn clone(&self) -> Self {
         Self {
             data_dir: self.data_dir.clone(),
-            flight_ctx: if self.flight_ctx.get().is_some() {
-                let li = LateInit::default();
-                li.init(self.flight_ctx.get().cloned().unwrap());
-                li
-            } else {
-                LateInit::default()
-            },
             formation_ctx: if self.formation_ctx.get().is_some() {
                 let li = LateInit::default();
                 li.init(self.formation_ctx.get().cloned().unwrap());
@@ -218,7 +208,6 @@ impl Default for Ctx {
     fn default() -> Self {
         Self {
             data_dir: fs::data_dir(),
-            flight_ctx: LateInit::default(),
             formation_ctx: LateInit::default(),
             md_ctx: LateInit::default(),
             locks_ctx: LateInit::default(),

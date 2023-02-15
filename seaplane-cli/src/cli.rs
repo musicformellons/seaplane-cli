@@ -1,4 +1,5 @@
 pub mod cmds;
+pub mod common;
 pub mod errors;
 pub mod specs;
 pub mod validator;
@@ -120,7 +121,6 @@ impl Seaplane {
             .arg(arg!(--("stateless") -('S') global)
                 .help("Ignore local state files, do not read from or write to them"))
             .subcommand(SeaplaneAccount::command())
-            .subcommand(SeaplaneFlight::command())
             .subcommand(SeaplaneFormation::command())
             .subcommand(SeaplaneInit::command())
             .subcommand(SeaplaneLicense::command())
@@ -216,7 +216,6 @@ impl CliCommand for Seaplane {
     ) -> Option<(Box<dyn CliCommand>, &'a ArgMatches)> {
         match matches.subcommand() {
             Some(("account", m)) => Some((Box::new(SeaplaneAccount), m)),
-            Some(("flight", m)) => Some((Box::new(SeaplaneFlight), m)),
             Some(("formation", m)) => Some((Box::new(SeaplaneFormation), m)),
             Some(("init", m)) => Some((Box::new(SeaplaneInit), m)),
             Some(("metadata", m)) => Some((Box::new(SeaplaneMetadata), m)),

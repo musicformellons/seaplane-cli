@@ -1,7 +1,4 @@
-use std::{
-    fs,
-    path::{Path, PathBuf},
-};
+use std::path::{Path, PathBuf};
 
 use serde::{Deserialize, Serialize};
 
@@ -9,7 +6,7 @@ use crate::{
     context::Ctx,
     error::Result,
     fs::{FromDisk, ToDisk},
-    ops::{flight::Flights, formation::Formations, state_version::StateVersion},
+    ops::{formation::Formations, state_version::StateVersion},
 };
 
 /// The in memory "Databases"
@@ -22,10 +19,6 @@ pub struct Db {
     #[serde(default)]
     pub state_version: StateVersion,
 
-    /// The in memory Flights database
-    #[serde(default)]
-    pub flights: Flights,
-
     /// The in memory Formations database
     #[serde(default)]
     pub formations: Formations,
@@ -36,46 +29,17 @@ pub struct Db {
 }
 
 impl Db {
-    /// Attempt to load state starting at v0 and upgrade until the current state version. State
-    /// will be persisted at the current version.
+    /// Try to load the earliest state possible and upgrade to current.
+    /// State will be persisted at the current version.
     pub fn load_and_upgrade(ctx: &Ctx) -> Result<Self> {
-        // optimistically load v1 (current)
-        let mut v1 = Self::load_v1(ctx.state_file())?;
-
-        // attempt to load v0
-        let v0 = Self::load_v0(ctx.flights_file(), ctx.formations_file())?;
-        // needs_persist will be true from in load_v0 if we successfully loaded either some flights
-        // or formations from the v0 state.
-        if v0.needs_persist {
-            // Extend (and which does the deduplication) our current state from the old state
-            v1.formations.extend(&v0.formations);
-            v1.flights.extend(&v0.flights);
-        }
+        // optimistically load v2 (current)
+        let current = Self::load(ctx.state_file())?;
 
         // Save current state
-        v1.persist()?;
+        current.persist()?;
 
-        Ok(v1)
+        Ok(current)
     }
-
-    fn load_v0<P: AsRef<Path>>(flights: P, formations: P) -> Result<Self> {
-        let flights = flights.as_ref();
-        let formations = formations.as_ref();
-        if flights.exists() || formations.exists() {
-            let ret = Self {
-                flights: FromDisk::load(flights).unwrap_or_default(),
-                formations: FromDisk::load(formations).unwrap_or_default(),
-                needs_persist: true,
-                ..Self::default()
-            };
-            fs::remove_file(flights)?;
-            fs::remove_file(formations)?;
-            return Ok(ret);
-        }
-        Ok(Self::default())
-    }
-
-    fn load_v1<P: AsRef<Path>>(state: P) -> Result<Self> { Self::load(state) }
 }
 
 impl FromDisk for Db {

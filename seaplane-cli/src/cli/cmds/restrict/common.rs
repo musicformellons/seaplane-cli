@@ -1,7 +1,7 @@
 use clap::{builder::PossibleValue, value_parser, Arg, ArgMatches};
 use seaplane::api::shared::v1::{Provider as ProviderModel, Region as RegionModel};
 
-use crate::OutputFormat;
+use crate::cli::common;
 
 const LONG_DECODE: &str = "Decode the directories before printing them
 
@@ -253,9 +253,7 @@ pub struct SeaplaneRestrictCommonArgMatches<'a>(pub &'a ArgMatches);
 
 pub fn display_args() -> Vec<Arg> {
     vec![
-        arg!(--format =["FORMAT"=>"table"] global)
-            .help("Change the output format")
-            .value_parser(value_parser!(OutputFormat)),
+        common::format(),
         arg!(--decode - ('D'))
             .help("Decode the directories before printing them")
             .long_help(LONG_DECODE)

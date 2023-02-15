@@ -6,7 +6,9 @@ use std::{
 };
 
 use seaplane::{
-    api::ApiErrorKind, error::SeaplaneError, rexports::container_image_ref::ImageReferenceError,
+    api::ApiErrorKind,
+    error::SeaplaneError,
+    rexports::{container_image_ref::ImageReferenceError, seaplane_oid::error::Error as OidError},
 };
 
 use crate::{
@@ -189,7 +191,8 @@ impl_err!(serde_json::Error, SerdeJson);
 impl_err!(@boxed, toml::de::Error, TomlDe);
 impl_err!(@boxed, toml::ser::Error, TomlSer);
 impl_err!(seaplane::error::SeaplaneError, Seaplane);
-impl_err!(seaplane::rexports::container_image_ref::ImageReferenceError, ImageReference);
+impl_err!(ImageReferenceError, ImageReference);
+impl_err!(OidError, Oid);
 impl_err!(std::string::FromUtf8Error, InvalidUtf8);
 impl_err!(hex::FromHexError, HexDecode);
 impl_err!(std::num::ParseIntError, ParseInt);
@@ -254,6 +257,7 @@ pub enum CliErrorKind {
     MissingPath,
     MultipleAtStdin,
     NoMatchingItem(String),
+    Oid(OidError),
     OneOff(String),
     ParseInt(std::num::ParseIntError),
     PermissionDenied,
@@ -275,16 +279,16 @@ impl CliErrorKind {
                 cli_eprintln!("{msg}");
             }
             FlightsInUse(flights) => {
-                cli_eprintln!("the following Flight Plans are referenced by a Formation Plan and cannot be deleted");
+                cli_eprintln!("the following Flights are referenced by a Formation Plan and cannot be deleted");
                 for f in flights {
                     cli_eprintln!(@Yellow, "\t{f}");
                 }
                 cli_eprint!("\n(hint: override this check and force delete with '");
                 cli_eprint!(@Yellow, "--force");
-                cli_eprintln!("' which will also remove the Flight Plan from the Formation Plan)");
+                cli_eprintln!("' which will also remove the Flight from the Formation Plan)");
             }
             EndpointInvalidFlight(flight) => {
-                cli_eprint!("Flight Plan '");
+                cli_eprint!("Flight '");
                 cli_eprint!(@Red, "{flight}");
                 cli_eprintln!(
                     "' is referenced in an endpoint but does not exist in the local Plans"
@@ -381,7 +385,7 @@ impl CliErrorKind {
             }
             MultipleAtStdin => {
                 cli_eprint!("more than one '");
-                cli_print!(@Yellow, "@-");
+                cli_print!(@Yellow, "-");
                 cli_println!("' values were provided and only one is allowed");
             }
             Seaplane(e) => match e {
@@ -403,10 +407,12 @@ impl CliErrorKind {
                 cli_eprintln!("{value} already exists");
             }
             InlineFlightUnknownItem(item) => {
-                cli_eprintln!("{item} is not a valid INLINE-FLIGHT-SPEC item (valid keys are: name, image, maximum, minimum, api-permission, architecture)");
+                cli_eprintln!(
+                    "{item} is not a valid INLINE-FLIGHT-SPEC item (valid keys are: name, image)"
+                );
             }
             InlineFlightInvalidName(name) => {
-                cli_eprintln!("'{name}' is not a valid Flight Plan name");
+                cli_eprintln!("'{name}' is not a valid Flight name");
             }
             InlineFlightHasSpace => {
                 cli_eprintln!("INLINE-FLIGHT-SPEC contains a space ' ' which isn't allowed.");
@@ -420,6 +426,9 @@ impl CliErrorKind {
                 cli_eprintln!("INLINE-FLIGHT-SPEC missing a value for the key {key}");
             }
             Clap(e) => {
+                cli_eprintln!("{e}")
+            }
+            Oid(e) => {
                 cli_eprintln!("{e}")
             }
         }
@@ -472,6 +481,7 @@ impl PartialEq<Self> for CliErrorKind {
             ParseInt(_) => matches!(rhs, ParseInt(_)),
             FlightsInUse(_) => matches!(rhs, FlightsInUse(_)),
             Clap(_) => matches!(rhs, Clap(_)),
+            Oid(_) => matches!(rhs, Oid(_)),
         }
     }
 }

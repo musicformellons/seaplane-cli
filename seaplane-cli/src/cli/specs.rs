@@ -2,17 +2,15 @@ pub const FLIGHT_SPEC: &str = "FLIGHT SPEC
 
     The Flight may be specified in one of the following ways
 
-    FLIGHT_SPEC := NAME | ID | @path | @- | INLINE-SPEC
-    NAME        := The local Flight Plan name
-    ID          := The local hex-encoded ID of the Flight Plan
-    @path       := PATH is an existing file with a Flight Plan definition in JSON format
-    @-          := STDIN will be read for a Flight Plan definition in JSON format
+    FLIGHT_SPEC := INLINE-SPEC | PATH | -
+    PATH        := PATH is an existing file with a Flight in JSON format
+    -           := STDIN will be read for a Flight in JSON format
     INLINE-SPEC := Comma separated LIST of ATTRIBUTE
     ATTRIBUTE   := image=IMAGE [ | name=NAME | minimum=NUM | maximum=NUM | api-permission | architecture=ARCH ]
     NUM         := Positive integer (minimum default is 1 if omitted; maximum default is 'autoscale as needed')
     ARCH        := amd64 | arm64
 
-    NOTE that when using @- only one Flight Plan may be provided via STDIN";
+    NOTE that when using - only one Flight may be provided via STDIN";
 
 pub const REGION_SPEC: &str = "REGION SPEC
 

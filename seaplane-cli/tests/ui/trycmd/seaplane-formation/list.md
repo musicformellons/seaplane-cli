@@ -5,7 +5,7 @@ List all local Formation Plans
 Usage: seaplane[EXE] formation list [OPTIONS]
 
 Options:
-  -F, --fetch             Fetch remote Formation Instances and create/synchronize with local Plan Definitions prior to listing (by default only local Plans are displayed) [aliases: sync, synchronize]
+  -F, --fetch             Fetch remote Formation Instances and synchronize local DB prior to running this command [aliases: sync, synchronize]
   -v, --verbose...        Display more verbose output
       --format <FORMAT>   Change the output format [default: table] [possible values: table, json]
   -q, --quiet...          Suppress output at a specific level and below
@@ -22,9 +22,9 @@ Options:
 $ seaplane formation list --help
 List all local Formation Plans
 
-This command will display the status and number of configurations for each of your Formation
-Plans. The Formations displayed come from the local database of known Formations. You may wish
-to update the local database with Remote Formation Instances as well by either first running:
+This command will display the status each of your Formation Plans. The Formations displayed come
+from the local database of known Formations. You may wish to update the local database with Remote
+Formation Instances as well by either first running:
 
 [..]
 
@@ -32,14 +32,14 @@ OR including `--fetch` such as:
 
 [..]
 
-After which your local database of Formation and Flight Plans will contain all remote Formation
-Instances and their configurations as well.
+After which your local database of Formations and Flights will contain all remote Formation
+Instances as well.
 
 Usage: seaplane[EXE] formation list [OPTIONS]
 
 Options:
   -F, --fetch
-          Fetch remote Formation Instances and create/synchronize with local Plan Definitions prior to listing (by default only local Plans are displayed)
+          Fetch remote Formation Instances and synchronize local DB prior to running this command
           
           [aliases: sync, synchronize]
 
