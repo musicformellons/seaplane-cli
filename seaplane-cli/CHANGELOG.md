@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 0.6.0-beta.1 - 15 Feb 2023
+
+### Compute API v2
+
+* Uses the beta Compute API v2 ([#308](https://github.com/seaplane-io/seaplane/pull/308))
+
+### Bug Fixes
+
+* Fix a typo that prevented one from using self-signed TLS certificates (when enabled) ([#314](https://github.com/seaplane-io/seaplane/pull/314))
+
 ## 0.5.0 - 01 Feb 2023
 
 ### Features
