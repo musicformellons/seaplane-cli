@@ -153,7 +153,7 @@ impl LocksReq {
         }
         #[cfg(feature = "allow_invalid_certs")]
         {
-            builder = builder.allow_http(self.invalid_certs);
+            builder = builder.allow_invalid_certs(self.invalid_certs);
         }
 
         if let Some(url) = &self.locks_url {
