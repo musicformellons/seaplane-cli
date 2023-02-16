@@ -375,3 +375,24 @@ _sign $AC_PASSWORD TAG=SHORTSHA SIGNER='${USER}': _install-gon
     echo Saving Artifacts to ${DISTDIR}
     cp ${SIGNDIR}/seaplane-cli-{{ TAG }}-${TARGET}-macos.zip ${DISTDIR}
 
+# Generate an OID using the specified prefix and UUID (UUID is randomly generated v4 if omitted)
+_gen-oid prefix="frm" uuid='': (_cargo-install 'cargo-script')
+    #!/usr/bin/env run-cargo-script
+    //! ```cargo
+    //! [dependencies]
+    //! seaplane-oid = "0.4.0"
+    //! uuid = { version = "1.2.2", features=["v4"] }
+    //! ```
+    fn main() {
+        let uuid_str = "{{ uuid }}";
+        let id = if uuid_str.is_empty() {
+            uuid::Uuid::new_v4()
+        } else {
+            uuid_str.parse::<uuid::Uuid>().unwrap()
+        };
+        let oid = seaplane_oid::Oid::with_uuid("{{ prefix }}", id)
+            .expect("hey, that might not have been a valid uuid!");
+
+        println!("{oid}");
+    }
+

@@ -18,7 +18,7 @@ use crate::{
 pub struct Frm;
 impl OidPrefix for Frm {}
 
-/// A Formation Object ID, ex. `frm-agc6amh7z527vijkv2cutplwaa`
+/// A Formation Object ID, ex. `frm-sjt5inobm97i317b95uerqv080`
 pub type FormationId = TypedOid<Frm>;
 
 #[doc(hidden)]
@@ -26,7 +26,7 @@ pub type FormationId = TypedOid<Frm>;
 pub struct Flt;
 impl OidPrefix for Flt {}
 
-/// A Flight Object ID, ex. `flt-agc6amh7z527vijkv2cutplwaa`
+/// A Flight Object ID, ex. `flt-6f9asfo8ql0ar3mihb0ruv14i0`
 pub type FlightId = TypedOid<Flt>;
 
 /// Whether a Flight is Health or Unhealthy as determined by the runtime
@@ -202,18 +202,18 @@ mod formation_tests {
     fn deser() {
         let json = r#"{
             "name": "example-formation",
-            "oid": "frm-agc6amh7z527vijkv2cutplwaa",
+            "oid": "frm-sjt5inobm97i317b95uerqv080",
             "url": "https://example-formation.tenant.on.cplane.cloud",
             "flights": [{
                 "name":"example-flight",
-                "oid":"flt-agc6amh7z527vijkv2cutplwaa",
+                "oid":"flt-6f9asfo8ql0ar3mihb0ruv14i0",
                 "image":"foo.com/bar:latest"
             }],
             "gateway-flight": "example-flight"
         }"#;
         let model = Formation {
             name: "example-formation".into(),
-            oid: Some("frm-agc6amh7z527vijkv2cutplwaa".parse().unwrap()),
+            oid: Some("frm-sjt5inobm97i317b95uerqv080".parse().unwrap()),
             url: Some(
                 "https://example-formation.tenant.on.cplane.cloud"
                     .parse()
@@ -221,7 +221,7 @@ mod formation_tests {
             ),
             flights: vec![Flight {
                 name: "example-flight".into(),
-                oid: Some("flt-agc6amh7z527vijkv2cutplwaa".parse().unwrap()),
+                oid: Some("flt-6f9asfo8ql0ar3mihb0ruv14i0".parse().unwrap()),
                 image: "foo.com/bar:latest".parse::<ImageReference>().unwrap(),
                 status: FlightStatus::Starting,
             }],
@@ -233,14 +233,14 @@ mod formation_tests {
 
     #[test]
     fn ser() {
-        let json = r#"{"name":"example-formation","oid":"frm-agc6amh7z527vijkv2cutplwaa","flights":[{"name":"example-flight","oid":"flt-agc6amh7z527vijkv2cutplwaa","image":"foo.com/bar:latest"}],"gateway-flight":"example-flight"}"#;
+        let json = r#"{"name":"example-formation","oid":"frm-sjt5inobm97i317b95uerqv080","flights":[{"name":"example-flight","oid":"flt-6f9asfo8ql0ar3mihb0ruv14i0","image":"foo.com/bar:latest"}],"gateway-flight":"example-flight"}"#;
         let model = Formation {
             name: "example-formation".into(),
-            oid: Some("frm-agc6amh7z527vijkv2cutplwaa".parse().unwrap()),
+            oid: Some("frm-sjt5inobm97i317b95uerqv080".parse().unwrap()),
             url: None,
             flights: vec![Flight {
                 name: "example-flight".into(),
-                oid: Some("flt-agc6amh7z527vijkv2cutplwaa".parse().unwrap()),
+                oid: Some("flt-6f9asfo8ql0ar3mihb0ruv14i0".parse().unwrap()),
                 image: "foo.com/bar:latest".parse::<ImageReference>().unwrap(),
                 status: FlightStatus::Starting,
             }],
@@ -403,12 +403,12 @@ mod flight_tests {
     fn deser() {
         let json = r#"{
             "name":"example-flight",
-            "oid":"flt-agc6amh7z527vijkv2cutplwaa",
+            "oid":"flt-6f9asfo8ql0ar3mihb0ruv14i0",
             "image":"foo.com/bar:latest"
         }"#;
         let model = Flight {
             name: "example-flight".into(),
-            oid: Some("flt-agc6amh7z527vijkv2cutplwaa".parse().unwrap()),
+            oid: Some("flt-6f9asfo8ql0ar3mihb0ruv14i0".parse().unwrap()),
             image: "foo.com/bar:latest".parse::<ImageReference>().unwrap(),
             status: FlightStatus::Starting,
         };
@@ -418,10 +418,10 @@ mod flight_tests {
 
     #[test]
     fn ser() {
-        let json = r#"{"name":"example-flight","oid":"flt-agc6amh7z527vijkv2cutplwaa","image":"foo.com/bar:latest","status":"healthy"}"#;
+        let json = r#"{"name":"example-flight","oid":"flt-6f9asfo8ql0ar3mihb0ruv14i0","image":"foo.com/bar:latest","status":"healthy"}"#;
         let model = Flight {
             name: "example-flight".into(),
-            oid: Some("flt-agc6amh7z527vijkv2cutplwaa".parse().unwrap()),
+            oid: Some("flt-6f9asfo8ql0ar3mihb0ruv14i0".parse().unwrap()),
             image: "foo.com/bar:latest".parse::<ImageReference>().unwrap(),
             status: FlightStatus::Healthy,
         };

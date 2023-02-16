@@ -1,6 +1,9 @@
 use std::fmt;
 
-use base64::{alphabet, decode_engine, encode_engine, engine::fast_portable};
+use base64::{
+    alphabet::URL_SAFE,
+    engine::{general_purpose::NO_PAD, Engine, GeneralPurpose},
+};
 use reqwest::Url;
 use serde::{Deserialize, Serialize};
 
@@ -49,8 +52,8 @@ impl Base64Encoded {
     /// Constructs from an unencoded byte array, encoding with URL-safe base64 in the process
     #[allow(dead_code)]
     pub(crate) fn from_unencoded(unencoded: impl AsRef<[u8]>) -> Self {
-        let engine = fast_portable::FastPortable::from(&alphabet::URL_SAFE, fast_portable::NO_PAD);
-        Base64Encoded(encode_engine(unencoded, &engine))
+        let engine = GeneralPurpose::new(&URL_SAFE, NO_PAD);
+        Base64Encoded(engine.encode(unencoded))
     }
 
     /// Constructs a `Base64Encoded`, assuming the input is already encoded.
@@ -64,8 +67,10 @@ impl Base64Encoded {
     /// Will panic if the inner string is not correctly encoded.
     #[allow(dead_code)]
     pub(crate) fn decoded(&self) -> Vec<u8> {
-        let engine = fast_portable::FastPortable::from(&alphabet::URL_SAFE, fast_portable::NO_PAD);
-        decode_engine(&self.0, &engine).expect("failed to decode, should be safe by construction")
+        let engine = GeneralPurpose::new(&URL_SAFE, NO_PAD);
+        engine
+            .decode(&self.0)
+            .expect("failed to decode, should be safe by construction")
     }
 
     /// Returns the inner string

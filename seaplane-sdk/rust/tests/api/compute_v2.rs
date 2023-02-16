@@ -22,7 +22,7 @@ fn build_req(incl_id: bool) -> FormationsRequest {
         .token("abc123")
         .base_url(MOCK_SERVER.base_url());
     if incl_id {
-        bdr = bdr.formation_id("frm-agc6amh7z527vijkv2cutplwaa".parse().unwrap());
+        bdr = bdr.formation_id("frm-sjt5inobm97i317b95uerqv080".parse().unwrap());
     }
     bdr.build().unwrap()
 }
@@ -56,10 +56,10 @@ fn get_all_formations() {
         "objects":[{
           "name": "example-formation",
           "url": "https://example-formation.tenant.on.cplane.cloud",
-          "oid": "frm-agc6amh7z527vijkv2cutplwaa",
+          "oid": "frm-sjt5inobm97i317b95uerqv080",
           "flights": [{
               "name": "example-flight",
-              "oid": "flt-agc6amh7z527vijkv2cutplwaa",
+              "oid": "flt-270siajscp653dvbl5h2ljajhs",
               "image": "registry.cplane.cloud/seaplane-demo/nginxdemos/hello:latest",
               "status": "healthy"
           }],
@@ -91,7 +91,7 @@ fn get_all_formations() {
 #[test]
 fn get_formation() {
     let mut frm = build_formation();
-    frm.oid = Some("frm-agc6amh7z527vijkv2cutplwaa".parse().unwrap());
+    frm.oid = Some("frm-sjt5inobm97i317b95uerqv080".parse().unwrap());
     frm.url = Some(
         "https://example-formation.tenant.on.cplane.cloud"
             .parse()
@@ -100,7 +100,7 @@ fn get_formation() {
     let resp_body = serde_json::to_value(&frm).unwrap();
 
     let mock = MOCK_SERVER.mock(|w, t| {
-        when(w, GET, "/v2beta/formations/frm-agc6amh7z527vijkv2cutplwaa")
+        when(w, GET, "/v2beta/formations/frm-sjt5inobm97i317b95uerqv080")
             .header("content-type", "application/json");
         then(t, resp_body);
     });
@@ -118,7 +118,7 @@ fn get_formation() {
 #[test]
 fn create_formation() {
     let mut frm = build_formation();
-    frm.oid = Some("frm-agc6amh7z527vijkv2cutplwaa".parse().unwrap());
+    frm.oid = Some("frm-sjt5inobm97i317b95uerqv080".parse().unwrap());
     frm.url = Some(
         "https://example-formation.tenant.on.cplane.cloud"
             .parse()
@@ -147,7 +147,7 @@ fn create_formation() {
 #[test]
 fn delete_formation() {
     let mock = MOCK_SERVER.mock(|w, t| {
-        when(w, DELETE, "/v2beta/formations/frm-agc6amh7z527vijkv2cutplwaa")
+        when(w, DELETE, "/v2beta/formations/frm-sjt5inobm97i317b95uerqv080")
             .header("content-type", "application/json");
         t.status(200);
     });
