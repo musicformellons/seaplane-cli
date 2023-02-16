@@ -68,7 +68,7 @@ macro_rules! test_fn_fetch {
                        $local_db,
                        true,
                        "Successfully fetched Formation Instance stubb \
-                        (frm-bcbdixdcojdu3o67lbh2gflaxe)",
+                        (frm-euqecs8n6h5l552ps6skal12lc)",
                        mock_fetch!($oid));
     };
     ($test_fn:ident, $argv:expr, $oid:expr, $local_db:expr) => {
@@ -78,7 +78,7 @@ macro_rules! test_fn_fetch {
                        $local_db,
                        false,
                        "Successfully fetched Formation Instance stubb \
-                        (frm-bcbdixdcojdu3o67lbh2gflaxe)",
+                        (frm-euqecs8n6h5l552ps6skal12lc)",
                        mock_fetch!($oid));
     };
     (@all $test_fn:ident, $argv:expr, $local_db:expr) => {
@@ -88,9 +88,9 @@ macro_rules! test_fn_fetch {
                        $local_db,
                        false,
                        "Successfully fetched Formation Instance stubb \
-                        (frm-bcbdixdcojdu3o67lbh2gflaxe)\n\
+                        (frm-euqecs8n6h5l552ps6skal12lc)\n\
                         Successfully fetched Formation Instance stubb2 \
-                        (frm-yenvkuety5fonocolcebsac6cy)",
+                        (frm-45rt0pqpo93q78t6au6dd8kn04)",
                        mock_fetch!());
     };
 }
@@ -100,7 +100,7 @@ macro_rules! test_fn_fetch {
 test_fn_fetch!(
     one_name_has_oid,
     "formation fetch-remote stubb",
-    "frm-bcbdixdcojdu3o67lbh2gflaxe",
+    "frm-euqecs8n6h5l552ps6skal12lc",
     default_deployed_formation()
 );
 // If we don't already have OIDs populated we should get a CLI error saying we dont know the OID of
@@ -109,21 +109,21 @@ test_fn_fetch!(
     @is_err
     one_name_no_oid,
     "formation fetch-remote stubb",
-    "frm-bcbdixdcojdu3o67lbh2gflaxe",
+    "frm-euqecs8n6h5l552ps6skal12lc",
     default_local_formation()
 );
 
 test_fn_fetch!(
     one_oid,
-    "formation fetch-remote frm-bcbdixdcojdu3o67lbh2gflaxe",
-    "frm-bcbdixdcojdu3o67lbh2gflaxe",
+    "formation fetch-remote frm-euqecs8n6h5l552ps6skal12lc",
+    "frm-euqecs8n6h5l552ps6skal12lc",
     default_deployed_formation()
 );
 // since we're asking for a specific OID it shouldn't matter if we don't know any local OIDs
 test_fn_fetch!(
     one_oid_no_oids,
-    "formation fetch-remote frm-bcbdixdcojdu3o67lbh2gflaxe",
-    "frm-bcbdixdcojdu3o67lbh2gflaxe",
+    "formation fetch-remote frm-euqecs8n6h5l552ps6skal12lc",
+    "frm-euqecs8n6h5l552ps6skal12lc",
     default_local_formation()
 );
 

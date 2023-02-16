@@ -1,5 +1,9 @@
 use std::io::Write;
 
+use base64::{
+    alphabet::URL_SAFE,
+    engine::{general_purpose::NO_PAD, Engine, GeneralPurpose},
+};
 use seaplane::api::locks::v1::{LockInfo, LockInfoInner, LockName as LockNameModel};
 use serde::Serialize;
 use tabwriter::TabWriter;
@@ -27,11 +31,8 @@ impl LockName {
 
     /// Creates a new LockName from an un-encoded byte slice ref, encoding it along the way
     pub fn from_name_unencoded<S: AsRef<[u8]>>(name: S) -> Self {
-        let engine = ::base64::engine::fast_portable::FastPortable::from(
-            &::base64::alphabet::URL_SAFE,
-            ::base64::engine::fast_portable::NO_PAD,
-        );
-        let name = base64::encode_engine(name.as_ref(), &engine);
+        let engine = GeneralPurpose::new(&URL_SAFE, NO_PAD);
+        let name = engine.encode(name.as_ref());
         Self { name: EncodedString::new(name) }
     }
 

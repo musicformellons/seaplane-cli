@@ -1,5 +1,9 @@
 use std::collections::HashSet;
 
+use base64::{
+    alphabet::URL_SAFE,
+    engine::{general_purpose::NO_PAD, Engine, GeneralPurpose},
+};
 use seaplane::api::{
     restrict::v1::{RestrictedDirectory, RestrictionDetails},
     shared::v1::{Provider as ProviderModel, Region as RegionModel},
@@ -54,11 +58,8 @@ impl RestrictCtx {
             api: Some(api.into()),
             directory: if base64 {
                 // Check that what the user passed really is valid base64
-                let engine = ::base64::engine::fast_portable::FastPortable::from(
-                    &::base64::alphabet::URL_SAFE,
-                    ::base64::engine::fast_portable::NO_PAD,
-                );
-                let _ = base64::decode_engine(dir, &engine)?;
+                let engine = GeneralPurpose::new(&URL_SAFE, NO_PAD);
+                let _ = engine.decode(dir)?;
                 Some(RestrictedDirectory::from_encoded(dir))
             } else {
                 Some(RestrictedDirectory::from_unencoded(dir))
@@ -106,11 +107,8 @@ impl RestrictCtx {
             api: Some(raw_api.into()),
             directory: if base64 {
                 // Check that what the user passed really is valid base64
-                let engine = ::base64::engine::fast_portable::FastPortable::from(
-                    &::base64::alphabet::URL_SAFE,
-                    ::base64::engine::fast_portable::NO_PAD,
-                );
-                let _ = base64::decode_engine(raw_dir, &engine)?;
+                let engine = GeneralPurpose::new(&URL_SAFE, NO_PAD);
+                let _unused = engine.decode(raw_dir)?;
                 Some(RestrictedDirectory::from_encoded(raw_dir))
             } else {
                 Some(RestrictedDirectory::from_unencoded(raw_dir))

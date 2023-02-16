@@ -485,7 +485,7 @@ $ seaplane formation status
 ◉ Formation festive-winter (frm-3ksdf813nasdlksdfinwudfkd3): HEALTHY
 └─┐
   │   FLIGHT                  STATUS     OID
-  └─◉ stern-fiber (gateway)   HEALTHY    flt-kr7dkiqwbrf35frwkm7vxsghci
+  └─◉ stern-fiber (gateway)   HEALTHY    flt-dkk055g7qp5cdfr1ui9rc363dc
 ```
 
 Notice our two Formations are up and healthy! Also notice that the Flights have

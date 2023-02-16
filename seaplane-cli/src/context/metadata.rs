@@ -3,6 +3,10 @@ use std::{
     io::{self, Read},
 };
 
+use base64::{
+    alphabet::URL_SAFE,
+    engine::{general_purpose::NO_PAD, Engine, GeneralPurpose},
+};
 use seaplane::api::{metadata::v1::Key, shared::v1::Directory};
 
 use crate::{
@@ -53,11 +57,8 @@ impl MetadataCtx {
         for key in raw_keys {
             if base64 {
                 // Check that what the user passed really is valid base64
-                let engine = ::base64::engine::fast_portable::FastPortable::from(
-                    &::base64::alphabet::URL_SAFE,
-                    ::base64::engine::fast_portable::NO_PAD,
-                );
-                let _ = base64::decode_engine(key, &engine)?;
+                let engine = GeneralPurpose::new(&URL_SAFE, NO_PAD);
+                let _unused = engine.decode(key)?;
                 kvs.push(KeyValue::from_key(key));
             } else {
                 kvs.push(KeyValue::from_key_unencoded(key));
@@ -100,22 +101,16 @@ impl MetadataCtx {
             raw_value.as_bytes().to_vec()
         };
 
-        let engine = ::base64::engine::fast_portable::FastPortable::from(
-            &::base64::alphabet::URL_SAFE,
-            ::base64::engine::fast_portable::NO_PAD,
-        );
+        let engine = GeneralPurpose::new(&URL_SAFE, NO_PAD);
         let kv = if base64 {
             // make sure it's valid base64
-            let _ = base64::decode_engine(raw_key, &engine)?;
-            let _ = base64::decode_engine(&value, &engine)?;
+            let _unused = engine.decode(raw_key)?;
+            let _unused = engine.decode(&value)?;
             // The user used `--base64` and it is valid base64 so there is no reason the from_utf8
             // should fail
             KeyValue::new(raw_key, &String::from_utf8(value)?)
         } else {
-            KeyValue::new(
-                base64::encode_engine(raw_key, &engine),
-                base64::encode_engine(value, &engine),
-            )
+            KeyValue::new(engine.encode(raw_key), engine.encode(value))
         };
 
         let mut kvs = KeyValues::default();

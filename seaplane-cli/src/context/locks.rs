@@ -1,3 +1,7 @@
+use base64::{
+    alphabet::URL_SAFE,
+    engine::{general_purpose::NO_PAD, Engine, GeneralPurpose},
+};
 use seaplane::api::locks::v1::LockId;
 
 use crate::{cli::cmds::locks::SeaplaneLocksCommonArgMatches, error::Result, ops::locks::LockName};
@@ -29,11 +33,8 @@ impl LocksCtx {
         let lock_name: Option<LockName> = if base64 {
             let res: Option<Result<LockName>> = raw_lock_name.map(|name| {
                 // Check that what the user passed really is valid base64
-                let engine = ::base64::engine::fast_portable::FastPortable::from(
-                    &::base64::alphabet::URL_SAFE,
-                    ::base64::engine::fast_portable::NO_PAD,
-                );
-                let _ = base64::decode_engine(name, &engine)?;
+                let engine = GeneralPurpose::new(&URL_SAFE, NO_PAD);
+                let _unused = engine.decode(name)?;
                 Ok::<LockName, _>(LockName::new(name))
             });
             res.transpose()?

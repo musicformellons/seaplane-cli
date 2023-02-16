@@ -1,5 +1,9 @@
 use std::io::Write;
 
+use base64::{
+    alphabet::URL_SAFE,
+    engine::{general_purpose::NO_PAD, Engine, GeneralPurpose},
+};
 use seaplane::api::metadata::v1::KeyValue as KeyValueModel;
 use serde::Serialize;
 use tabwriter::TabWriter;
@@ -31,23 +35,14 @@ impl KeyValue {
 
     /// Creates a new KeyValue from an un-encoded key and value, encoding them along the way
     pub fn new_unencoded<S: AsRef<str>>(key: S, value: S) -> Self {
-        let engine = ::base64::engine::fast_portable::FastPortable::from(
-            &::base64::alphabet::URL_SAFE,
-            ::base64::engine::fast_portable::NO_PAD,
-        );
-        Self::new(
-            base64::encode_engine(key.as_ref(), &engine),
-            base64::encode_engine(value.as_ref(), &engine),
-        )
+        let engine = GeneralPurpose::new(&URL_SAFE, NO_PAD);
+        Self::new(engine.encode(key.as_ref()), engine.encode(value.as_ref()))
     }
 
     /// Creates a new KeyValue from an un-encoded string ref, encoding it along the way
     pub fn from_key_unencoded<S: AsRef<str>>(key: S) -> Self {
-        let engine = ::base64::engine::fast_portable::FastPortable::from(
-            &::base64::alphabet::URL_SAFE,
-            ::base64::engine::fast_portable::NO_PAD,
-        );
-        Self::from_key(base64::encode_engine(key.as_ref(), &engine))
+        let engine = GeneralPurpose::new(&URL_SAFE, NO_PAD);
+        Self::from_key(engine.encode(key.as_ref()))
     }
 
     /// Creates a new KeyValue from an already encoded string ref. You must pinky promise the key

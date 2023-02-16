@@ -5,7 +5,7 @@
 //! └─┐
 //!   │   FLIGHT    STATUS     OID
 //!   ├─◉ flask     HEALTHY    flt-4bjyoaoqhbaorip3izfrou3siu
-//!   └─◉ pequod    UNHEALTHY  flt-kr7dkiqwbrf35frwkm7vxsghci
+//!   └─◉ pequod    UNHEALTHY  flt-oqpr968hs53bb6egf1h4gcqsho
 //! ```
 //!
 //! Chars we'll need from (<http://www.unicode.org/charts/PDF/U2500.pdf>): `│ ├ ─ └ ┐`

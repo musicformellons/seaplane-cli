@@ -6,7 +6,6 @@ use std::{
 };
 
 use seaplane::{
-    api::ApiErrorKind,
     error::SeaplaneError,
     rexports::{container_image_ref::ImageReferenceError, seaplane_oid::error::Error as OidError},
 };
@@ -391,13 +390,6 @@ impl CliErrorKind {
             Seaplane(e) => match e {
                 SeaplaneError::ApiResponse(ae) => {
                     cli_eprintln!("{ae}");
-                    if ae.kind == ApiErrorKind::BadRequest
-                        && ae.message.contains("`force` flag was not set")
-                    {
-                        cli_eprint!("(hint: set the force parameter with '");
-                        cli_eprint!(@Yellow, "--force");
-                        cli_eprintln!("')");
-                    }
                 }
                 _ => {
                     cli_eprintln!("Seaplane API: {e}")

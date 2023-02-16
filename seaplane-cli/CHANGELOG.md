@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 0.6.0-beta.2 - 16 Feb 2023
+
+### Improvements
+
+* Update dependencies ([#319](https://github.com/seaplane-io/seaplane/pull/319))
+  * `seaplane` to v0.6.3 which changes the encoding for OIDs to be compatible with existing data
+  * `base64` to v0.21
+* Removed invalid error message
+
 ## 0.6.0-beta.1 - 15 Feb 2023
 
 ### Compute API v2

@@ -32,7 +32,7 @@ fn name() {
     mock_launch!(
         "formation launch stubb",
         ctx_with_formations(vec![default_local_formation()]),
-        "Successfully Launched remote Formation Instance stubb (frm-bcbdixdcojdu3o67lbh2gflaxe)\n\
+        "Successfully Launched remote Formation Instance stubb (frm-euqecs8n6h5l552ps6skal12lc)\n\
         Formation Instance URL is: https://stubb.tenant.on.cplane.cloud/\n\
         (hint: it may take up to a minute for the Formation to become fully online)\n\
         (hint: check the status of this Formation Instance with 'seaplane formation status stubb')",

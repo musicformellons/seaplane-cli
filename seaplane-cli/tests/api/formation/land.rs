@@ -14,7 +14,7 @@ macro_rules! mock_land {
     ($argv:expr, $ctx:expr, $correct_out:expr, $err:expr, $hit:expr) => {{
         let mut mock_fetch = mock_fetch!();
         let mut mock_land = MOCK_SERVER.mock(|w, then| {
-            when(w, DELETE, "/v2beta/formations/frm-bcbdixdcojdu3o67lbh2gflaxe");
+            when(w, DELETE, "/v2beta/formations/frm-euqecs8n6h5l552ps6skal12lc");
             then.status(200).body("success");
         });
         let res = test_main_exec_with_ctx(&argv!($argv), $ctx);
@@ -63,7 +63,7 @@ macro_rules! test_fn_land {
                         $argv,
                         ctx_with_formations(vec![$local_db]),
                         "Successfully Landed remote Formation Instance \
-                        frm-bcbdixdcojdu3o67lbh2gflaxe (stubb)",
+                        frm-euqecs8n6h5l552ps6skal12lc (stubb)",
                         false);
     };
     ($test_fn:ident, $argv:expr, $local_db:expr, $correct_out:expr) => {
@@ -98,18 +98,18 @@ test_fn_land!(
 // Same dance as above, but by OID instead of name
 test_fn_land!(
     oid_has_local_oid,
-    "formation land frm-bcbdixdcojdu3o67lbh2gflaxe",
+    "formation land frm-euqecs8n6h5l552ps6skal12lc",
     default_deployed_formation()
 );
 test_fn_land!(
     oid_no_local_oid,
-    "formation land frm-bcbdixdcojdu3o67lbh2gflaxe",
+    "formation land frm-euqecs8n6h5l552ps6skal12lc",
     default_local_formation(),
-    "Successfully Landed remote Formation Instance frm-bcbdixdcojdu3o67lbh2gflaxe"
+    "Successfully Landed remote Formation Instance frm-euqecs8n6h5l552ps6skal12lc"
 );
 // using --fetch and already knowing the OID should be no problem
 test_fn_land!(
     oid_no_local_oid_fetch,
-    "formation land frm-bcbdixdcojdu3o67lbh2gflaxe --fetch",
+    "formation land frm-euqecs8n6h5l552ps6skal12lc --fetch",
     default_deployed_formation()
 );

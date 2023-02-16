@@ -371,22 +371,23 @@ macro_rules! arg {
 /// Shorthand for checking if an argument in the CLI commands was base64 or not, and doing
 /// the conversion if necessary
 macro_rules! maybe_base64_arg {
-    ($m:expr, $arg:expr, $is_base64:expr) => {
+    ($m:expr, $arg:expr, $is_base64:expr) => {{
+        use ::base64::Engine;
         if let Some(raw_key) = $m.get_one::<String>($arg) {
-            let engine = ::base64::engine::fast_portable::FastPortable::from(
+            let engine = ::base64::engine::GeneralPurpose::new(
                 &::base64::alphabet::URL_SAFE,
-                ::base64::engine::fast_portable::NO_PAD,
+                ::base64::engine::general_purpose::NO_PAD,
             );
             if $is_base64 {
-                let _ = ::base64::decode_engine(raw_key, &engine)?;
+                let _ = engine.decode(raw_key)?;
                 Some(raw_key.to_string())
             } else {
-                Some(::base64::encode_engine(raw_key, &engine))
+                Some(engine.encode(raw_key))
             }
         } else {
             None
         }
-    };
+    }};
 }
 
 /// Performs the wrapped method request against the SDK API. If the response is that the access

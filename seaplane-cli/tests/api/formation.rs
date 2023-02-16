@@ -70,10 +70,10 @@ fn default_deployed_formation() -> FormationModel {
     let mut formation = default_local_formation();
     deployed_formation(
         &mut formation,
-        "frm-bcbdixdcojdu3o67lbh2gflaxe",
+        "frm-euqecs8n6h5l552ps6skal12lc",
         "https://stubb.tenant.on.cplane.cloud",
-        ("flask", "flt-kr7dkiqwbrf35frwkm7vxsghci"),
-        ("pequod", "flt-h7qvwdgh3fhwrm3iinslthbf6u"),
+        ("flask", "flt-dkk055g7qp5cdfr1ui9rc363dc"),
+        ("pequod", "flt-va5g8orh1503ja6r9mqf1gvvj8"),
     );
     formation
 }
@@ -81,10 +81,10 @@ fn multi_deployed_formations() -> Vec<FormationModel> {
     let mut f2 = local_formation("stubb2", "flask2", "pequod2");
     deployed_formation(
         &mut f2,
-        "frm-yenvkuety5fonocolcebsac6cy",
+        "frm-45rt0pqpo93q78t6au6dd8kn04",
         "https://stubb2.tenant.on.cplane.cloud",
-        ("flask2", "flt-hpzxknhkzfczxnrkzsd54cohxq"),
-        ("pequod2", "flt-i3hg6c3xfbdaxbpnotcqesulfe"),
+        ("flask2", "flt-r5mrglbl0d4qjeopdh8vli89oo"),
+        ("pequod2", "flt-90mifnt75d4i3a6eevt4po2f7k"),
     );
     vec![default_deployed_formation(), f2]
 }

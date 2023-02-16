@@ -16,22 +16,22 @@ const STARTING: &str = r#"◉ Formation stubb: Starting
   ├─◉ flask     Starting
   └─◉ pequod    Starting"#;
 
-const ONE: &str = r#"◉ Formation stubb (frm-bcbdixdcojdu3o67lbh2gflaxe): Healthy
+const ONE: &str = r#"◉ Formation stubb (frm-euqecs8n6h5l552ps6skal12lc): Healthy
 └─┐
   │   FLIGHT    STATUS     OID
-  ├─◉ flask     Healthy    flt-kr7dkiqwbrf35frwkm7vxsghci
-  └─◉ pequod    Healthy    flt-h7qvwdgh3fhwrm3iinslthbf6u"#;
+  ├─◉ flask     Healthy    flt-dkk055g7qp5cdfr1ui9rc363dc
+  └─◉ pequod    Healthy    flt-va5g8orh1503ja6r9mqf1gvvj8"#;
 
-const MULTI: &str = r#"◉ Formation stubb (frm-bcbdixdcojdu3o67lbh2gflaxe): Healthy
+const MULTI: &str = r#"◉ Formation stubb (frm-euqecs8n6h5l552ps6skal12lc): Healthy
 └─┐
   │   FLIGHT    STATUS     OID
-  ├─◉ flask     Healthy    flt-kr7dkiqwbrf35frwkm7vxsghci
-  └─◉ pequod    Healthy    flt-h7qvwdgh3fhwrm3iinslthbf6u
-◉ Formation stubb2 (frm-yenvkuety5fonocolcebsac6cy): Healthy
+  ├─◉ flask     Healthy    flt-dkk055g7qp5cdfr1ui9rc363dc
+  └─◉ pequod    Healthy    flt-va5g8orh1503ja6r9mqf1gvvj8
+◉ Formation stubb2 (frm-45rt0pqpo93q78t6au6dd8kn04): Healthy
 └─┐
   │   FLIGHT     STATUS     OID
-  ├─◉ flask2     Healthy    flt-hpzxknhkzfczxnrkzsd54cohxq
-  └─◉ pequod2    Healthy    flt-i3hg6c3xfbdaxbpnotcqesulfe"#;
+  ├─◉ flask2     Healthy    flt-r5mrglbl0d4qjeopdh8vli89oo
+  └─◉ pequod2    Healthy    flt-90mifnt75d4i3a6eevt4po2f7k"#;
 
 macro_rules! test_fn_status {
     (@impl $test_fn:ident, $argv:expr, $ctx:expr, $correct_out:expr, $MOCK:expr) => {
@@ -89,25 +89,25 @@ test_fn_status!(
 // Ask for single formation by OID
 test_fn_status!(
     one_oid_has_oid,
-    "formation status frm-bcbdixdcojdu3o67lbh2gflaxe",
+    "formation status frm-euqecs8n6h5l552ps6skal12lc",
     default_deployed_formation(),
     ONE
 );
 test_fn_status!(
     one_oid_has_oid_no_fetch,
-    "formation status frm-bcbdixdcojdu3o67lbh2gflaxe --no-fetch",
+    "formation status frm-euqecs8n6h5l552ps6skal12lc --no-fetch",
     default_deployed_formation(),
     ONE
 );
 test_fn_status!(
     one_oid_no_local_oid,
-    "formation status frm-bcbdixdcojdu3o67lbh2gflaxe",
+    "formation status frm-euqecs8n6h5l552ps6skal12lc",
     default_local_formation(),
     ONE
 );
 test_fn_status!(
     one_oid_no_local_oid_no_fetch,
-    "formation status frm-bcbdixdcojdu3o67lbh2gflaxe --no-fetch",
+    "formation status frm-euqecs8n6h5l552ps6skal12lc --no-fetch",
     default_local_formation(),
     STARTING
 );

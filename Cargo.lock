@@ -202,9 +202,9 @@ checksum = "9e1b586273c5702936fe7b7d6896644d8be71e6314cfe09d3167c95f712589e8"
 
 [[package]]
 name = "base64"
-version = "0.20.0"
+version = "0.21.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0ea22880d78093b0cbe17c89f64a7d457941e65759157ec6cb31a31d652b05e5"
+checksum = "a4a4ddaa51a5bc52a6948f74c06d20aaaddb71924eab79b8c97a8c556e942d6a"
 
 [[package]]
 name = "basic-cookies"
@@ -1821,9 +1821,9 @@ checksum = "d29ab0c6d3fc0ee92fe66e2d99f700eab17a8d57d1c1d3b748380fb20baa78cd"
 
 [[package]]
 name = "seaplane"
-version = "0.6.2"
+version = "0.6.3"
 dependencies = [
- "base64 0.20.0",
+ "base64 0.21.0",
  "cfg-if",
  "chrono",
  "container-image-ref 0.1.0",
@@ -1832,7 +1832,7 @@ dependencies = [
  "once_cell",
  "regex",
  "reqwest",
- "seaplane-oid 0.3.2",
+ "seaplane-oid 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde",
  "serde_json",
  "strum",
@@ -1843,11 +1843,11 @@ dependencies = [
 
 [[package]]
 name = "seaplane"
-version = "0.6.2"
+version = "0.6.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "193534be495c8a901a10109203d852dfd5ee61b3216650654caafc85d73139b3"
+checksum = "17781c591992cb1222f863eda35afbbb1ac6bf5e621bf9988117d2e28d662316"
 dependencies = [
- "base64 0.20.0",
+ "base64 0.21.0",
  "cfg-if",
  "chrono",
  "container-image-ref 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -1855,7 +1855,7 @@ dependencies = [
  "once_cell",
  "regex",
  "reqwest",
- "seaplane-oid 0.3.2",
+ "seaplane-oid 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde",
  "serde_json",
  "strum",
@@ -1866,10 +1866,10 @@ dependencies = [
 
 [[package]]
 name = "seaplane-cli"
-version = "0.6.0-beta.1"
+version = "0.6.0-beta.2"
 dependencies = [
  "atty",
- "base64 0.20.0",
+ "base64 0.21.0",
  "cfg-if",
  "clap",
  "clap_complete",
@@ -1882,7 +1882,7 @@ dependencies = [
  "once_cell",
  "rand",
  "reqwest",
- "seaplane 0.6.2 (registry+https://github.com/rust-lang/crates.io-index)",
+ "seaplane 0.6.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde",
  "serde_json",
  "stfu8",
@@ -1899,19 +1899,6 @@ dependencies = [
 
 [[package]]
 name = "seaplane-oid"
-version = "0.3.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "36fde5b1b9ea5db7b364bead6e346d53fdff6dc7a2c4433cf3301d177f3660a1"
-dependencies = [
- "data-encoding",
- "once_cell",
- "serde",
- "thiserror",
- "uuid",
-]
-
-[[package]]
-name = "seaplane-oid"
 version = "0.4.0"
 dependencies = [
  "data-encoding",
@@ -1921,6 +1908,19 @@ dependencies = [
  "thiserror",
  "uuid",
  "wildmatch",
+]
+
+[[package]]
+name = "seaplane-oid"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5e03e76562ad50a25a697a2600c1aadc1d85b1becb10d17f0d6b20b9ab1fec74"
+dependencies = [
+ "data-encoding",
+ "data-encoding-macro",
+ "serde",
+ "thiserror",
+ "uuid",
 ]
 
 [[package]]

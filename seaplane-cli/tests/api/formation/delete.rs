@@ -21,7 +21,7 @@ macro_rules! test_fn_delete {
                 (
                     true,
                     format!("Successfully Landed remote Formation Instance \
-                    frm-bcbdixdcojdu3o67lbh2gflaxe{}", $after)
+                    frm-euqecs8n6h5l552ps6skal12lc{}", $after)
                 )
             };
 
@@ -81,18 +81,18 @@ test_fn_delete!(
 // Same dance as above, but by OID instead of name
 test_fn_delete!(
     oid_has_local_oid,
-    "formation delete frm-bcbdixdcojdu3o67lbh2gflaxe",
+    "formation delete frm-euqecs8n6h5l552ps6skal12lc",
     default_deployed_formation()
 );
 test_fn_delete!(@no_name
     oid_no_local_oid,
-    "formation delete frm-bcbdixdcojdu3o67lbh2gflaxe",
+    "formation delete frm-euqecs8n6h5l552ps6skal12lc",
     default_local_formation()
 );
 // using --fetch and already knowing the OID should be no problem
 test_fn_delete!(
     oid_no_local_oid_fetch,
-    "formation delete frm-bcbdixdcojdu3o67lbh2gflaxe --fetch",
+    "formation delete frm-euqecs8n6h5l552ps6skal12lc --fetch",
     default_deployed_formation()
 );
 
