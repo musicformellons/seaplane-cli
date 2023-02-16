@@ -43,13 +43,13 @@
 //!
 //!     // OIDs can be parsed from strings, however the "value" must be a valid
 //!     // base32 encoded UUID
-//!     let oid: Oid = "tst-agc6amh7z527vijkv2cutplwaa".parse()?;
+//!     let oid: Oid = "tst-0ous781p4lu7v000pa2a2bn1gc".parse()?;
 //!     println!("{oid}");
 //!
 //!     // OIDs can also be created from the raw parts
 //!     let oid = Oid::with_uuid(
 //!         "exm",
-//!         "0185e030-ffcf-75fa-a12a-ae8549bd7600"
+//!         "063dc3a0-3925-7c7f-8000-ca84a12ee183"
 //!             .parse::<Uuid>()
 //!             .unwrap(),
 //!     )?;
@@ -77,7 +77,7 @@ use uuid::Uuid;
 use crate::error::{Error, Result};
 
 const BASE32_LOWER: Encoding = new_encoding! {
-    symbols: "abcdefghijklmnopqrstuvwxyz234567",
+    symbols: "0123456789abcdefghijklmnopqrstuv",
 };
 
 fn uuid_from_str(s: &str) -> Result<Uuid> {
@@ -317,19 +317,19 @@ mod oid_tests {
 
     #[test]
     fn str_to_oid() {
-        let res = "tst-agc6amh7z527vijkv2cutplwaa".parse::<Oid>();
+        let res = "tst-0oqpkoaadlruj000j7u2ugns2g".parse::<Oid>();
         assert_eq!(
             res.unwrap(),
             Oid {
                 prefix: "tst".parse().unwrap(),
-                uuid: "0185e030-ffcf-75fa-a12a-ae8549bd7600".parse().unwrap(),
+                uuid: "06359a61-4a6d-77e9-8000-99fc2f42fc14".parse().unwrap(),
             }
         );
     }
 
     #[test]
     fn str_to_oid_err_prefix() {
-        let res = "-agc6amh7z527vijkv2cutplwaa".parse::<Oid>();
+        let res = "-0oqpkoaadlruj000j7u2ugns2g".parse::<Oid>();
         assert!(res.is_err());
         assert_eq!(res.unwrap_err(), Error::MissingPrefix);
     }
@@ -343,31 +343,31 @@ mod oid_tests {
 
     #[test]
     fn str_to_oid_err_decode() {
-        let res = "tst-&gc6amh7z527vijkv2ctplwaa".parse::<Oid>();
+        let res = "tst-&oqpkoaadlruj000j7u2ugns2g".parse::<Oid>();
         assert!(res.is_err());
         assert!(matches!(res.unwrap_err(), Error::Base32Decode(_)));
     }
 
     #[test]
     fn str_to_oid_err_no_sep() {
-        let res = "agc6amh7z527vijkv2cutplwaa".parse::<Oid>();
+        let res = "0oqpkoaadlruj000j7u2ugns2g".parse::<Oid>();
         assert!(res.is_err());
         assert_eq!(res.unwrap_err(), Error::MissingSeparator);
     }
 
     #[test]
     fn str_to_oid_err_two_sep() {
-        let res = "tst-agc6amh7z-527vijkv2ctplwaa".parse::<Oid>();
+        let res = "tst-0oqpkoaad-lruj000j7u2ugns2g".parse::<Oid>();
         assert!(res.is_err());
         assert!(matches!(res.unwrap_err(), Error::Base32Decode(_)));
     }
 
     #[test]
     fn oid_to_uuid() {
-        let oid: Oid = "tst-agc6amh7z527vijkv2cutplwaa".parse().unwrap();
+        let oid: Oid = "tst-0oqpkoaadlruj000j7u2ugns2g".parse().unwrap();
         assert_eq!(
             oid.uuid(),
-            &"0185e030-ffcf-75fa-a12a-ae8549bd7600"
+            &"06359a61-4a6d-77e9-8000-99fc2f42fc14"
                 .parse::<Uuid>()
                 .unwrap()
         );
@@ -500,7 +500,7 @@ impl<P: OidPrefix> ::schemars::JsonSchema for TypedOid<P> {
         ::schemars::schema::SchemaObject {
             instance_type: Some(::schemars::schema::InstanceType::String.into()),
             string: Some(Box::new(::schemars::schema::StringValidation {
-                pattern: Some(format!("^{}-[a-z1-7]{{26}}$", P::string_prefix())),
+                pattern: Some(format!("^{}-[0-9a-vA-V]{{26}}$", P::string_prefix())),
                 ..Default::default()
             })),
             ..Default::default()
@@ -527,17 +527,17 @@ mod typed_oid_tests {
             "{oid}"
         );
 
-        let res = "tst-5wacbutjwbdexonddvdb2lnyxu".parse::<TypedOid<Tst>>();
+        let res = "tst-0ous781p4lu7v000pa2a2bn1gc".parse::<TypedOid<Tst>>();
         assert!(res.is_ok());
         let oid: TypedOid<Tst> = res.unwrap();
         assert_eq!(
             oid.uuid(),
-            &"ed8020d2-69b0-464b-b9a3-1d461d2db8bd"
+            &"063dc3a0-3925-7c7f-8000-ca84a12ee183"
                 .parse::<Uuid>()
                 .unwrap()
         );
 
-        let res = "frm-5wacbutjwbdexonddvdb2lnyxu".parse::<TypedOid<Tst>>();
+        let res = "frm-0ous781p4lu7v000pa2a2bn1gc".parse::<TypedOid<Tst>>();
         assert!(res.is_err());
         assert_eq!(res.unwrap_err(), Error::InvalidPrefixChar);
     }

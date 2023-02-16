@@ -18,10 +18,10 @@ A library for using and handling Seaplane Object IDs.
 
 ## About
 
-An Object ID (OID) is a base32 (no padding) encoded UUID with a prefix
-separated by a `-`.
+An Object ID (OID) is a [RFC4648] base32 (no padding) extended hex-encoded UUID
+with a prefix separated by a `-`.
 
-For example `tst-agc6amh7z527vijkv2cutplwaa`, by convention the prefix is three
+For example `tst-0ous781p4lu7v000pa2a2bn1gc`, by convention the prefix is three
 ASCII lowercase characters, however that is a hard constraint of OIDs in
 general. The current implementation limits prefixes to 3 characters, but prefix
 limit could be exposed as a tunable if that need arises.
@@ -63,13 +63,13 @@ fn main() -> Result<()> {
 
     // OIDs can be parsed from strings, however the "value" must be a valid
     // base32 encoded UUID
-    let oid: Oid = "tst-agc6amh7z527vijkv2cutplwaa".parse()?;
+    let oid: Oid = "tst-0ous781p4lu7v000pa2a2bn1gc".parse()?;
     println!("{oid}");
 
     // OIDs can also be created from the raw parts
     let oid = Oid::with_uuid(
         "exm",
-        "0185e030-ffcf-75fa-a12a-ae8549bd7600"
+        "063dc3a0-3925-7c7f-8000-ca84a12ee183"
             .parse::<Uuid>()
             .unwrap(),
     )?;
@@ -98,3 +98,4 @@ Licensed under the Apache License, Version 2.0, [LICENSE]. Copyright 2023 Seapla
 [//]: # (Links)
 
 [LICENSE]: https://github.com/seaplane-io/seaplane/blob/main/LICENSE
+[RFC4648]: https://datatracker.ietf.org/doc/html/rfc4648.html#section-7
