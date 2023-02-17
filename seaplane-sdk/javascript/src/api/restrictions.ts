@@ -24,15 +24,15 @@ export default class Restrictions {
   }
 
   async get(api: SeaplaneApi, key: Key): Promise<Restriction> {
-    const url = `${this.url}/${api}/base64:${encode(key.key)}`;
+    const url = `${this.url}/${api}/base64:${encode(key.key)}/`;
 
-    const result = this.request.send((token) => seaFetch(token).get(url));
+    const result = await this.request.send((token) => seaFetch(token).get(url));
 
     return mapToRestriction(result);
   }
 
   async set(api: SeaplaneApi, key: Key, restrictionDetails: RestrictionDetails): Promise<boolean> {
-    const url = `${this.url}/${api}/base64:${encode(key.key)}`;
+    const url = `${this.url}/${api}/base64:${encode(key.key)}/`;
 
     const data = {
       regions_allowed: restrictionDetails.regionsAllowed.map((region) => region),
@@ -40,14 +40,14 @@ export default class Restrictions {
       providers_allowed: restrictionDetails.providersAllowed.map((provider) => provider),
       providers_denied: restrictionDetails.providersDenied.map((provider) => provider),
     };
-
-    const result = await this.request.send((token) => seaFetch(token).post(url, JSON.stringify(data)));
+    
+    const result = await this.request.send((token) => seaFetch(token).put(url, JSON.stringify(data)));
 
     return result == 'Ok';
   }
 
   async delete(api: SeaplaneApi, key: Key): Promise<boolean> {
-    const url = `${this.url}/${api}/base64:${encode(key.key)}`;
+    const url = `${this.url}/${api}/base64:${encode(key.key)}/`;
 
     const result = await this.request.send((token) => seaFetch(token).delete(url));
 

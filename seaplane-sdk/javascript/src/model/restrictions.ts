@@ -4,8 +4,8 @@ import { Key, mapKey } from './metadata';
 import { SeaplaneError } from './errors';
 
 export enum SeaplaneApi {
-  Locks,
-  Metadata,
+  Locks = 'locks',
+  Metadata = 'config',
 }
 
 export enum RestrictionState {

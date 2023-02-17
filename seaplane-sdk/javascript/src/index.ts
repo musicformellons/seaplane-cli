@@ -12,5 +12,13 @@ import Metadata from './api/metadata';
 import Identify from './api/identify';
 import Locks from './api/locks';
 import Restrictions from './api/restrictions';
+import * as model from './model'
 
-export { Configuration, Metadata, Identify, Locks, Restrictions };
+export { 
+  Configuration, 
+  Metadata, 
+  Identify, 
+  Locks, 
+  Restrictions,
+  model
+};
