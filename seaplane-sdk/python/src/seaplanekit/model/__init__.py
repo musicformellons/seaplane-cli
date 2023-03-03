@@ -3,3 +3,4 @@ from .metadata import *  # noqa
 from .provider import *  # noqa
 from .region import *  # noqa
 from .restrict import *  # noqa
+from .compute import * #noqa

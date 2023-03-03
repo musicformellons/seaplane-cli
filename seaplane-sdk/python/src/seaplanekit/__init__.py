@@ -1,6 +1,7 @@
 from .api.lock_api import LockAPI
 from .api.metadata_api import MetadataAPI
 from .api.restrict_api import RestrictAPI
+from .api.compute_api import ComputeAPI
 from .api.token_api import TokenAPI
 from .configuration import Configuration, config
 
@@ -26,5 +27,8 @@ class Seaplane:
     def restrict(self) -> RestrictAPI:
         return RestrictAPI(config)
 
+    @property
+    def compute(self) -> ComputeAPI:
+        return ComputeAPI(config)
 
 sea = Seaplane()
