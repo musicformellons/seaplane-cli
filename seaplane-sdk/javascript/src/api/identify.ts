@@ -10,7 +10,7 @@ export default class Identify {
   autoRenew: boolean;
 
   constructor(configuration: Configuration) {
-    this.url = `${configuration.values().identifyEndpoint}/identity/token`;
+    this.url = `${configuration.values().identifyEndpoint}/v1/token`;
     this.apiKey = configuration.apiKey;
     this.accessToken = configuration.accessToken;
     this.autoRenew = configuration.autoRenew;
