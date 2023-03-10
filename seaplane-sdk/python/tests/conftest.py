@@ -13,7 +13,7 @@ def add_token_request(requests_mocker: Any) -> None:
         return request.headers["Authorization"] == "Bearer api_key" and request.json() == {}
 
     requests_mocker.post(
-        "https://flightdeck.cplane.cloud/identity/token",
+        "https://flightdeck.cplane.cloud/v1/token",
         additional_matcher=match_authorization_and_body,
         status_code=200,
         json={"token": "This is a token"},  # noqa
@@ -32,7 +32,7 @@ def success_token_post() -> Generator[None, None, None]:
 def fail_token_post() -> Generator[None, None, None]:
     with requests_mock.Mocker() as requests_mocker:
         requests_mocker.post(
-            "https://flightdeck.cplane.cloud/identity/token", status_code=400, json=""
+            "https://flightdeck.cplane.cloud/v1/token", status_code=400, json=""
         )
 
         yield

@@ -21,7 +21,7 @@ class TokenAPI:
     """
 
     def __init__(self, configuration) -> None:  # type: ignore
-        self.url = f"{configuration.identify_endpoint}/identity/token"
+        self.url = f"{configuration.identify_endpoint}/token"
         self.api_key = configuration.seaplane_api_key
         self.access_token = configuration._current_access_token
         self.auto_renew = configuration._token_auto_renew
