@@ -12,13 +12,7 @@ import Metadata from './api/metadata';
 import Identify from './api/identify';
 import Locks from './api/locks';
 import Restrictions from './api/restrictions';
-import * as model from './model'
+import Compute from './api/compute';
+import * as model from './model';
 
-export { 
-  Configuration, 
-  Metadata, 
-  Identify, 
-  Locks, 
-  Restrictions,
-  model
-};
+export { Configuration, Metadata, Identify, Locks, Restrictions, Compute, model };

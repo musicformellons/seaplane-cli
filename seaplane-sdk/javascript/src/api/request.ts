@@ -11,7 +11,6 @@ export default class Request {
   }
 
   private async renewIfFails(error: any, bodyError: string, request: (token: string) => Promise<any>): Promise<any> {
-    // eslint-disable-line
     const httpError = new HTTPError(error.status, bodyError);
 
     if (error.status != 401 || !this.identify.autoRenew) {
@@ -25,6 +24,7 @@ export default class Request {
 
   async send(request: (token: string) => Promise<any>): Promise<any> {
     // eslint-disable-line
+
     const accessToken: string = this.identify.accessToken || (await this.identify.getToken());
 
     const response = await request(accessToken);
@@ -39,6 +39,7 @@ export default class Request {
   }
 
   private parse(body: string): any | undefined {
+    // eslint-disable-line
     try {
       return JSON.parse(body);
     } catch (e) {

@@ -48,12 +48,12 @@ interface RestrictionBody {
     regions_denied: [string];
     providers_allowed: [string];
     providers_denied: [string];
-  }
+  };
 }
 
 export const mapToRestriction = (restrictionBody: any): Restriction => {
-  const restriction = restrictionBody as RestrictionBody
-  
+  const restriction = restrictionBody as RestrictionBody;
+
   const key = mapKey(restriction['directory'] as string);
 
   if (key == null) {
@@ -83,7 +83,11 @@ const mapToSeaplaneApi = (api?: string): SeaplaneApi | null => {
   return seaplaneApi(api);
 };
 
-export const mapToRestrictionPage = (restrictionPage: {restrictions: [], next_api: string, next_key: string}): RestrictionPage => ({
+export const mapToRestrictionPage = (restrictionPage: {
+  restrictions: [];
+  next_api: string;
+  next_key: string;
+}): RestrictionPage => ({
   restrictions: restrictionPage['restrictions'].map(mapToRestriction),
   nextApi: mapToSeaplaneApi(restrictionPage['next_api']),
   nextKey: mapKey(restrictionPage['next_key']),
@@ -92,4 +96,5 @@ export const mapToRestrictionPage = (restrictionPage: {restrictions: [], next_ap
 const capitalize: (string: string) => string = (string) => string.charAt(0).toUpperCase() + string.slice(1);
 
 const seaplaneApi: (api: string) => SeaplaneApi = (api) => (api == 'config' ? SeaplaneApi.Metadata : SeaplaneApi.Locks);
-const mapState: (state: string) => RestrictionState = (state) => state == 'enforced' ? RestrictionState.Enforced : RestrictionState.Pending
+const mapState: (state: string) => RestrictionState = (state) =>
+  state == 'enforced' ? RestrictionState.Enforced : RestrictionState.Pending;

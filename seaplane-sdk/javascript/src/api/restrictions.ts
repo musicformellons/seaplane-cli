@@ -40,7 +40,7 @@ export default class Restrictions {
       providers_allowed: restrictionDetails.providersAllowed.map((provider) => provider),
       providers_denied: restrictionDetails.providersDenied.map((provider) => provider),
     };
-    
+
     const result = await this.request.send((token) => seaFetch(token).put(url, JSON.stringify(data)));
 
     return result == 'Ok';

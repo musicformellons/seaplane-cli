@@ -9,7 +9,7 @@ We maintain a Seaplane SDK in both Javascript and Typescript modules.
 Install dependencies
 
 ```
-$ npm instll seaplane
+$ npm install seaplane
 ```
 
 ## Packaging
