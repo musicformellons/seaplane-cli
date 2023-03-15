@@ -5,8 +5,8 @@ End to End tests to Restrict Coordination API.
 from typing import List, Tuple
 import uuid
 
-from seaplanekit import sea
-from seaplanekit.model import (
+from seaplane import sea
+from seaplane.model import (
     Key,
     KeyValue,
     Name,

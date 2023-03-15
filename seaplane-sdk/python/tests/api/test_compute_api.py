@@ -3,10 +3,10 @@ from typing import Any, Generator
 import pytest
 import requests_mock
 
-from seaplanekit import sea
-from seaplanekit.api.compute_api import ComputeAPI
-from seaplanekit.configuration import Configuration
-from seaplanekit.model import FormationPage, Formation, Flight, MetaPage
+from seaplane import sea
+from seaplane.api.compute_api import ComputeAPI
+from seaplane.configuration import Configuration
+from seaplane.model import FormationPage, Formation, Flight, MetaPage
 
 from ..conftest import add_token_request
 from ..util import get_absolute_path, get_file_bytes

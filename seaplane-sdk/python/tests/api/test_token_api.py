@@ -2,9 +2,9 @@ from typing import Generator
 
 import pytest
 
-from seaplanekit.api.token_api import TokenAPI
-from seaplanekit.configuration import Configuration
-from seaplanekit.model.errors import HTTPError
+from seaplane.api.token_api import TokenAPI
+from seaplane.configuration import Configuration
+from seaplane.model.errors import HTTPError
 
 
 @pytest.fixture

@@ -24,4 +24,4 @@ Installation
 
 .. code-block:: console
 
-   $ pip install seaplanekit
+   $ pip install seaplane

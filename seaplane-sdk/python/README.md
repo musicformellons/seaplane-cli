@@ -1,6 +1,6 @@
 # Seaplane Python SDK
-[![PyPI](https://badge.fury.io/py/seaplanekit.svg)](https://badge.fury.io/py/seaplanekit)
-[![Python](https://img.shields.io/pypi/pyversions/seaplanekit.svg?style=plastic)](https://badge.fury.io/py/seaplanekit)
+[![PyPI](https://badge.fury.io/py/seaplane.svg)](https://badge.fury.io/py/seaplane)
+[![Python](https://img.shields.io/pypi/pyversions/seaplane.svg?style=plastic)](https://badge.fury.io/py/seaplane)
 
 Simple Python library to manage your resources at seaplane.
 
@@ -19,7 +19,7 @@ To build and test this software yourself, see the CONTRIBUTING document that is 
 ## Installation
 
 ```shell
-pip install seaplanekit
+pip install seaplane
 ```
 
 ## Configure your API KEY
@@ -28,7 +28,7 @@ pip install seaplanekit
 * Use `config` object in order to set the api key.
 
 ```python
-from seaplanekit import sea
+from seaplane import sea
 
 sea.config.set_api_key("your_api_key")
 ```

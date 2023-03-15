@@ -3,11 +3,11 @@ from typing import Any, Generator
 import pytest
 import requests_mock
 
-from seaplanekit import sea
-from seaplanekit.api.lock_api import LockAPI
-from seaplanekit.configuration import Configuration
-from seaplanekit.model import HeldLock, Lock, LockInfo, LockPage, Name
-from seaplanekit.model.errors import HTTPError
+from seaplane import sea
+from seaplane.api.lock_api import LockAPI
+from seaplane.configuration import Configuration
+from seaplane.model import HeldLock, Lock, LockInfo, LockPage, Name
+from seaplane.model.errors import HTTPError
 
 from ..conftest import add_token_request
 

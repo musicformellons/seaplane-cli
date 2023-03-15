@@ -1,4 +1,4 @@
-from seaplanekit.model.metadata import (
+from seaplane.model.metadata import (
     KeyString,
     KeyValue,
     KeyValueStream,

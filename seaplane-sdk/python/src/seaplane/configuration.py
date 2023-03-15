@@ -46,7 +46,7 @@ class Configuration:
         Setting the token, will change auto-renew to False
         needing to renew the token manually when the token expires.
 
-            $ from seaplanekit import sea
+            $ from seaplane import sea
 
             $ token = sea.auth.get_token()
             $ sea.config.set_token(token)
@@ -73,7 +73,7 @@ class Configuration:
         once the token expires, It throws an HTTPError with a 401 http status code
         until the token is renew it calling `sea.auth.renew_token()`.
 
-            $ from seaplanekit import sea
+            $ from seaplane import sea
 
             $ sea.config.token_autorenew(False)
             $ ... When the token expires, renew it ...
@@ -124,7 +124,7 @@ class Configuration:
         Python logging levels can be used directly with Seaplane Python SDK or
         use the already defined in seaplane.log module.
 
-            $ from seaplanekit import sea, log
+            $ from seaplane import sea, log
             $ sea.config.log_level(log.INFO)
 
 

@@ -2,10 +2,10 @@ from typing import Generator
 
 import pytest
 
-from seaplanekit.api.restrict_api import RestrictAPI
-from seaplanekit.configuration import Configuration
-from seaplanekit.model import Key
-from seaplanekit.model.errors import SeaplaneError
+from seaplane.api.restrict_api import RestrictAPI
+from seaplane.configuration import Configuration
+from seaplane.model import Key
+from seaplane.model.errors import SeaplaneError
 
 
 @pytest.fixture

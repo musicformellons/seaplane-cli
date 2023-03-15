@@ -1,4 +1,4 @@
-from seaplanekit.configuration import Configuration, config
+from seaplane.configuration import Configuration, config
 
 
 def test_given_api_key_returns_none_when_not_initialized() -> None:

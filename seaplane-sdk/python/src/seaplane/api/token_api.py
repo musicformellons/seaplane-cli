@@ -35,7 +35,7 @@ class TokenAPI:
         Setting the token, will change auto-renew to False
         needing to renew the token manually when the token expires.
 
-            $ from seaplanekit import sea
+            $ from seaplane import sea
 
             $ token = sea.auth.get_token()
             $ sea.auth.set_token(token)

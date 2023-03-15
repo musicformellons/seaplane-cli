@@ -3,10 +3,10 @@ from typing import Any, Generator
 import pytest
 import requests_mock
 
-from seaplanekit import sea
-from seaplanekit.api.metadata_api import MetadataAPI
-from seaplanekit.configuration import Configuration
-from seaplanekit.model import KeyString, KeyValue, KeyValuePage, KeyValueStream, KeyValueString
+from seaplane import sea
+from seaplane.api.metadata_api import MetadataAPI
+from seaplane.configuration import Configuration
+from seaplane.model import KeyString, KeyValue, KeyValuePage, KeyValueStream, KeyValueString
 
 from ..conftest import add_token_request
 from ..util import get_absolute_path, get_file_bytes

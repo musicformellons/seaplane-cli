@@ -6,8 +6,8 @@ This tests can't be ran more than once every 1 minute.
 
 from typing import List, Tuple
 
-from seaplanekit import sea
-from seaplanekit.model import LockPage, Name
+from seaplane import sea
+from seaplane.model import LockPage, Name
 
 from . import E2E_API_KEY
 
