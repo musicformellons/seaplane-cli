@@ -39,3 +39,21 @@ $ npm run test
 ```bash
 $ npm run pretty
 ```
+
+## Publish a new version
+
+> ⚠️ Only approved contributors can push tags to trigger a new release.
+
+You have to create a new tag, adding the version of your package.
+
+The version in `package.json` has to be bigger than the published package. You can increase the version using npm, using, `major.minor.patch`.
+
+```
+npm version patch 
+```
+
+The tag convention is `sdk-js-v*` being `*` the version of the SDK.
+
+```
+git tag -a sdk-js-v1.0 -m "Javascript SDK v1.0 Release"
+```

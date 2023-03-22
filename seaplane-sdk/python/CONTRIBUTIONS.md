@@ -125,3 +125,18 @@ mypy is configured in [`pyproject.toml`](./pyproject.toml). To type check code, 
 (fact) $ nox -s type_check
 ```
 See also [awesome-python-typing](https://github.com/typeddjango/awesome-python-typing).
+
+## Publish a new version
+
+
+> ⚠️ Only approved contributors can push tags to trigger a new release.
+
+You have to create a new tag, adding the version of your package.
+
+The version in `pyproject.toml` has to be bigger than the published package.
+
+The tag convention is `sdk-py-v*` being `*` the version of the SDK.
+
+```
+git tag -a sdk-py-v0.2 -m "Python SDK v0.2 Release"
+```
