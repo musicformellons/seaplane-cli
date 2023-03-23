@@ -47,7 +47,7 @@ class ComputeAPI:
         )        
 
     def get(self, formation_id: str) -> Formation:
-        """Returns the Formation associated with the created Fromation OID.
+        """Returns the Formation associated with the created Formation OID.
 
         Parameters
         ----------
