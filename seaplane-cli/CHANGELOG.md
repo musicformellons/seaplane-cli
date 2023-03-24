@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 0.6.0-beta.3 - 24 Mar 2023
+
+### Bug Fixes
+
+* Gateway Flights are now correctly serialized when sent to the API ([#332](https://github.com/seaplane-io/seaplane/pull/332))
+
+### Improvements
+
+* Upgrade to `seaplane` SDK to v0.7.0 which includes
+  * removes deactivated Compute API v1
+  * upgrades to the Identity Token v1 endpoints
+* Upgrade to `directories` v5
+
 ## 0.6.0-beta.2 - 16 Feb 2023
 
 ### Improvements
