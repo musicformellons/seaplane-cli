@@ -9,7 +9,8 @@ use crate::api::{
 macro_rules! mock_launch {
     ($argv:expr, $ctx:expr, $correct_out:expr, $hit:expr) => {{
         let mut mock_launch = MOCK_SERVER.mock(|w, then| {
-            when(w, POST, "/v2beta/formations");
+            when(w, POST, "/v2beta/formations")
+                .json_body(serde_json::to_value(default_local_formation()).unwrap());
             then.status(201)
                 .json_body(serde_json::to_value(default_deployed_formation()).unwrap());
         });

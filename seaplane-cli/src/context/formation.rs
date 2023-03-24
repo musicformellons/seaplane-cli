@@ -31,6 +31,7 @@ pub struct FormationCtx {
     pub remote: bool,
     pub local: bool,
     pub flights: Vec<FlightCtx>,
+    pub gateway_flight: Option<String>,
     // Used internally to pass already gathered DB indices between operations
     pub indices: Option<Vec<usize>>,
 }
@@ -44,6 +45,7 @@ impl Default for FormationCtx {
             local: true,
             flights: Vec::new(),
             indices: None,
+            gateway_flight: None,
         }
     }
 }
@@ -62,6 +64,10 @@ impl FormationCtx {
 
         for flight in &self.flights {
             f_model = f_model.add_flight(flight.model());
+        }
+
+        if let Some(gw) = &self.gateway_flight {
+            f_model = f_model.gateway_flight(gw);
         }
 
         // TODO: probably match and check errors

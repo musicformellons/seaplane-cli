@@ -64,6 +64,7 @@ fn deployed_formation(
         f2.oid = Some(f2_oid.parse().unwrap());
         f2.status = FlightStatus::Healthy;
     }
+    formation.gateway_flight = Some(f1_name.to_owned());
 }
 
 fn default_deployed_formation() -> FormationModel {

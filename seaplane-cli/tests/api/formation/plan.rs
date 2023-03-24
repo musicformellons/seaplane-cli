@@ -4,7 +4,10 @@ use seaplane::api::compute::v2::{PageMetadata, PagedResponse};
 use seaplane_cli::{printer::printer, test_main_exec_with_ctx};
 
 use crate::api::{
-    formation::{ctx_with_formations, default_deployed_formation, multi_deployed_formations},
+    formation::{
+        ctx_with_formations, default_deployed_formation, default_local_formation,
+        multi_deployed_formations,
+    },
     when, MOCK_SERVER,
 };
 
@@ -48,11 +51,28 @@ test_fn_plan!(
               --name stubb \
               --flight name=flask,image=foo.com/bar:latest \
               --flight name=pequod,image=foo.com/baz:latest \
+              --gateway-flight flask"
+);
+test_fn_plan!(
+    one_launch,
+    "formation plan \
+              --name stubb \
+              --flight name=flask,image=foo.com/bar:latest \
+              --flight name=pequod,image=foo.com/baz:latest \
               --gateway-flight flask \
               --launch"
 );
 test_fn_plan!(
     fetch_first,
+    "formation plan \
+              --name stubb \
+              --flight name=flask,image=foo.com/bar:latest \
+              --flight name=pequod,image=foo.com/baz:latest \
+              --gateway-flight flask \
+              --fetch"
+);
+test_fn_plan!(
+    fetch_first_launch,
     "formation plan \
               --name stubb \
               --flight name=flask,image=foo.com/bar:latest \

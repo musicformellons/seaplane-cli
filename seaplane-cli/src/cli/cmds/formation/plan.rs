@@ -136,6 +136,8 @@ impl CliCommand for SeaplaneFormationPlan {
                 .extend(FlightCtx::from_str(flight, &ctx.registry)?);
         }
 
+        fctx.gateway_flight = matches.get_one::<String>("gateway-flight").cloned();
+
         Ok(())
     }
 }
