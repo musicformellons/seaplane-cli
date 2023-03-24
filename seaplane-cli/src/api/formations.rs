@@ -5,7 +5,7 @@ use seaplane::{
             CreateFormationResponse, DeleteFormationResponse, Formation as FormationModel,
             FormationId, FormationsRequest, GetFormationResponse, GetFormationsResponse,
         },
-        identity::v0::AccessToken,
+        identity::v1::AccessToken,
         ApiErrorKind,
     },
     error::SeaplaneError,

@@ -150,7 +150,7 @@ impl FlightCtx {
         }
     }
 
-    /// Creates a new seaplane::api::compute::v1::Flight from the contained values
+    /// Creates a new seaplane::api::compute::v2::Flight from the contained values
     pub fn model(&self) -> FlightModel {
         // Create the new Flight model from the CLI inputs
         let flight_model = FlightModel::builder()

@@ -62,26 +62,22 @@ impl Drop for Pb {
 
 #[derive(EnumString, Display, Deserialize, Copy, Clone, Debug, PartialEq, Eq, clap::ValueEnum)]
 #[strum(ascii_case_insensitive, serialize_all = "lowercase")]
+#[derive(Default)]
 pub enum OutputFormat {
+    #[default]
     Table,
     Json,
 }
 
-impl Default for OutputFormat {
-    fn default() -> Self { OutputFormat::Table }
-}
-
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, clap::ValueEnum, Display, EnumString)]
 #[strum(ascii_case_insensitive, serialize_all = "lowercase")]
+#[derive(Default)]
 pub enum ColorChoice {
     Always,
     Ansi,
+    #[default]
     Auto,
     Never,
-}
-
-impl Default for ColorChoice {
-    fn default() -> Self { ColorChoice::Auto }
 }
 
 impl<'de> Deserialize<'de> for ColorChoice {

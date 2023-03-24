@@ -51,7 +51,7 @@ impl Default for FormationCtx {
 }
 
 impl FormationCtx {
-    /// Creates a new seaplane::api::compute::v1::FormationConfiguration from the contained values
+    /// Creates a new seaplane::api::compute::v2::Formation from the contained values
     pub fn model(&self) -> Result<FormationModel> {
         // Create the new Formation model from the CLI inputs
         let mut f_model = FormationModel::builder();

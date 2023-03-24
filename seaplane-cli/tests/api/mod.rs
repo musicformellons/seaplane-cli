@@ -52,7 +52,7 @@ pub static MOCK_SERVER: Lazy<MockServer> = Lazy::new(|| {
     // let s = MockServer::connect("127.0.0.1:5000");
     _ = s.mock(|when, then| {
         when.method(POST)
-            .path("/identity/token")
+            .path("/v1/token")
             .header("authorization", "Bearer abc123")
             .header("accept", "application/json");
         then.status(201).json_body(resp_json.clone());

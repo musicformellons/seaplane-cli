@@ -1,7 +1,7 @@
 use reqwest::Url;
 use seaplane::{
     api::{
-        identity::v0::AccessToken,
+        identity::v1::AccessToken,
         locks::v1::{
             HeldLock as HeldLockModel, LockId, LockInfo as LockInfoModel, LockInfoRange, LockName,
             LocksRequest, LocksRequestBuilder,
