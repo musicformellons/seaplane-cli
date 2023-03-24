@@ -59,6 +59,7 @@ impl<T> RequestBuilder<T> {
     /// The target resource to query as part of the request.
     ///
     /// **NOTE:** This is not required for all endpoints
+    #[cfg(feature = "compute_api_v2")]
     pub(crate) fn target(mut self, target: T) -> Self {
         self.target = Some(target);
         self

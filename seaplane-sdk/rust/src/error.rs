@@ -24,12 +24,6 @@ pub enum SeaplaneError {
     UrlParse(#[from] url::ParseError),
     #[error("invalid json")]
     Json(#[from] serde_json::error::Error),
-    #[error("request did not include any active configurations while force=false")]
-    MissingActiveConfiguration,
-    #[error("missing a required UUID")]
-    MissingUuid,
-    #[error("the given request conflict with one another")]
-    ConflictingParams,
     #[error("flights cannot be empty")]
     EmptyFlights,
     #[error("a gateway flight was not specified or could not be implied because the number of flights is > 1")]
@@ -82,9 +76,6 @@ impl PartialEq for SeaplaneError {
             MissingFormationName => matches!(rhs, MissingFormationName),
             UrlParse(_) => matches!(rhs, UrlParse(_)),
             Json(_) => matches!(rhs, Json(_)),
-            MissingActiveConfiguration => matches!(rhs, MissingActiveConfiguration),
-            MissingUuid => matches!(rhs, MissingUuid),
-            ConflictingParams => matches!(rhs, ConflictingParams),
             EmptyFlights => matches!(rhs, EmptyFlights),
             NoGatewayFlight => matches!(rhs, NoGatewayFlight),
             InvalidGatewayFlight => matches!(rhs, InvalidGatewayFlight),

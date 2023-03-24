@@ -1,8 +1,6 @@
 // We have to go through this little bit of indirection because of how integration directory
 // structure works.
 
-#[cfg(feature = "compute_api_v1")]
-mod compute_v1;
 #[cfg(all(feature = "compute_api_v2", feature = "unstable"))]
 mod compute_v2;
 #[cfg(feature = "locks_api_v1")]
