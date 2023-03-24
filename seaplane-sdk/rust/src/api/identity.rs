@@ -3,5 +3,5 @@
 /// Identity contains endpoints for things such as Authentication
 pub static IDENTITY_API_URL: &str = "https://flightdeck.cplane.cloud/";
 
-#[cfg(feature = "identity_api_v0")]
-pub mod v0;
+#[cfg(feature = "identity_api_v1")]
+pub mod v1;

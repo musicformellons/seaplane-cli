@@ -12,7 +12,7 @@ use crate::{
     error::{Result, SeaplaneError},
 };
 
-static TOKEN_API_BASE_PATH: &str = "identity/token";
+static TOKEN_API_BASE_PATH: &str = "v1/token";
 
 /// An access token with tenant subdomain and ID
 #[derive(Deserialize, Serialize, Debug, Clone)]
@@ -127,7 +127,7 @@ impl TokenRequestBuilder {
     }
 }
 
-/// For making requests against the `/identity/token` APIs.
+/// For making requests against the `/v1/token` APIs.
 #[derive(Debug)]
 pub struct TokenRequest {
     api_key: String,
@@ -146,7 +146,7 @@ impl TokenRequest {
     /// # Examples
     ///
     /// ```no_run
-    /// # use seaplane::api::identity::v0::TokenRequest;
+    /// # use seaplane::api::identity::v1::TokenRequest;
     /// let req = TokenRequest::builder().api_key("abc123").build().unwrap();
     ///
     /// let resp = req.access_token().unwrap();
@@ -168,7 +168,7 @@ impl TokenRequest {
     /// # Examples
     ///
     /// ```no_run
-    /// # use seaplane::api::identity::v0::TokenRequest;
+    /// # use seaplane::api::identity::v1::TokenRequest;
     /// let req = TokenRequest::builder().api_key("abc123").build().unwrap();
     ///
     /// let resp = req.access_token_json().unwrap();

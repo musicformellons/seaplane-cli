@@ -34,12 +34,12 @@ uuid = { version = "1.2.1", features = ["serde", "v4"] }
 url = { version = "2.2.2", features = ["serde"] }
 
 [features]
-default = ["compute_api_v2", "metadata_api_v1", "locks_api_v1", "restrict_api_v1", "identity_api_v0"]
+default = ["compute_api_v2", "metadata_api_v1", "locks_api_v1", "restrict_api_v1", "identity_api_v1"]
 compute_api_v2 = []
 metadata_api_v1 = []
 locks_api_v1 = []
 restrict_api_v1 = []
-identity_api_v0 = []
+identity_api_v1 = []
 danger_zone = ["allow_invalid_certs", "allow_insecure_urls"] # Turn on all the dangerous stuff
 allow_invalid_certs = [] # Allows one to opt in to invalid HTTPS certs
 allow_insecure_urls = [] # Allows one to opt in to HTTP instead of requiring HTTPS (useful for testing/development)
