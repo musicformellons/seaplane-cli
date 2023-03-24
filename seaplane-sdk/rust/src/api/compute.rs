@@ -1,6 +1,6 @@
 mod error;
 
-#[cfg(all(feature = "compute_api_v2", feature = "unstable"))]
+#[cfg(feature = "compute_api_v2")]
 pub mod v2;
 
 /// The base URL for our Compute API endpoints

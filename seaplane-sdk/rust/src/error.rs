@@ -2,7 +2,7 @@
 
 use thiserror::Error;
 
-#[cfg(all(feature = "compute_api_v2", feature = "unstable"))]
+#[cfg(feature = "compute_api_v2")]
 use crate::api::compute::v2::error::{ComputeRequest, FormationValidation};
 use crate::api::ApiError;
 
@@ -46,10 +46,10 @@ pub enum SeaplaneError {
     IncorrectRestrictRequestTarget,
     #[error("the API returned an error status")]
     ApiResponse(#[from] ApiError),
-    #[cfg(all(feature = "compute_api_v2", feature = "unstable"))]
+    #[cfg(feature = "compute_api_v2")]
     #[error("{0}")]
     FormationValidation(#[from] FormationValidation),
-    #[cfg(all(feature = "compute_api_v2", feature = "unstable"))]
+    #[cfg(feature = "compute_api_v2")]
     #[error("{0}")]
     ComputeRequest(#[from] ComputeRequest),
 }
@@ -90,7 +90,7 @@ impl PartialEq for SeaplaneError {
                 ApiResponse(oae) => ae == oae,
                 _ => false,
             },
-            #[cfg(all(feature = "compute_api_v2", feature = "unstable"))]
+            #[cfg(feature = "compute_api_v2")]
             FormationValidation(e) => {
                 if let FormationValidation(re) = rhs {
                     e == re
@@ -98,7 +98,7 @@ impl PartialEq for SeaplaneError {
                     false
                 }
             }
-            #[cfg(all(feature = "compute_api_v2", feature = "unstable"))]
+            #[cfg(feature = "compute_api_v2")]
             ComputeRequest(e) => {
                 if let ComputeRequest(re) = rhs {
                     e == re
