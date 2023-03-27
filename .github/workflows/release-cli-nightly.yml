@@ -51,7 +51,7 @@ jobs:
         #- build-mac-x64
     steps:
       - name: Remove previous Nightly Release
-        uses: dev-drprasad/delete-tag-and-release@v0.2.0
+        uses: dev-drprasad/delete-tag-and-release@v0.2.1
         with:
           delete_release: true
           tag_name: nightly
