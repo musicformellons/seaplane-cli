@@ -1,6 +1,6 @@
 use clap::{ArgMatches, Command};
 #[cfg(not(feature = "api_tests"))]
-use seaplane::{api::ApiErrorKind, error::SeaplaneError};
+use seaplane::error::SeaplaneError;
 
 use crate::{
     api::FormationsReq,
@@ -57,15 +57,14 @@ impl CliCommand for SeaplaneFormationLand {
             req.set_id(*oid)?;
             #[cfg_attr(feature = "api_tests", allow(clippy::question_mark))]
             if let Err(e) = req.delete() {
-                // Ignoring a 404 NOT FOUND during mock tests is bad
+                // Ignoring a 404 NOT FOUND during mock tests is bad, but in real life it's fine
+                // becuase the thing we wanted to delete doesn't exist
                 #[cfg(not(feature = "api_tests"))]
-                if matches!(
-                    e.kind(),
-                    CliErrorKind::Seaplane(SeaplaneError::ApiResponse(ae))
-                    if ae.kind == ApiErrorKind::NotFound)
-                {
-                    // TODO: warn not found, only if --remote?
-                    continue;
+                if let CliErrorKind::Seaplane(SeaplaneError::ApiResponse(ae)) = e.kind() {
+                    if ae.is_http_not_found() {
+                        // TODO: warn not found, only if --remote?
+                        continue;
+                    }
                 }
                 return Err(e);
             }

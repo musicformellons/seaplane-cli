@@ -447,17 +447,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "container-image-ref"
-version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "567feecd334c97fe7684657880343585d41197feaf18aa5723554ead2607896a"
-dependencies = [
- "nom",
- "serde",
- "thiserror",
-]
-
-[[package]]
 name = "content_inspector"
 version = "0.2.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1855,36 +1844,13 @@ checksum = "d29ab0c6d3fc0ee92fe66e2d99f700eab17a8d57d1c1d3b748380fb20baa78cd"
 
 [[package]]
 name = "seaplane"
-version = "0.7.0"
+version = "0.8.0"
 dependencies = [
  "base64 0.21.0",
  "cfg-if",
  "chrono",
- "container-image-ref 0.1.0",
+ "container-image-ref",
  "httpmock",
- "nom",
- "once_cell",
- "regex",
- "reqwest",
- "seaplane-oid 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "serde",
- "serde_json",
- "strum",
- "thiserror",
- "url",
- "uuid",
-]
-
-[[package]]
-name = "seaplane"
-version = "0.7.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9b6bd49cf179d4f8a06a5c664ed44365343a9ad5d05416fdb7c364ed5904112f"
-dependencies = [
- "base64 0.21.0",
- "cfg-if",
- "chrono",
- "container-image-ref 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "nom",
  "once_cell",
  "regex",
@@ -1916,7 +1882,7 @@ dependencies = [
  "once_cell",
  "rand",
  "reqwest",
- "seaplane 0.7.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "seaplane",
  "serde",
  "serde_json",
  "stfu8",

@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 0.6.0-beta.4 - 28 Mar 2023
+
+### Improvements
+
+* Upgrade to `seaplane` v0.8 with new error modesl ([#341](https://github.com/seaplane-io/seaplane/pull/341))
+
 ## 0.6.0-beta.3 - 24 Mar 2023
 
 ### Bug Fixes

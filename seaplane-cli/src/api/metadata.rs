@@ -7,7 +7,6 @@ use seaplane::{
             Value as ValueModel,
         },
         shared::v1::RangeQueryContext,
-        ApiErrorKind,
     },
     error::SeaplaneError,
 };

@@ -6,7 +6,6 @@ use seaplane::{
             FormationId, FormationsRequest, GetFormationResponse, GetFormationsResponse,
         },
         identity::v1::AccessToken,
-        ApiErrorKind,
     },
     error::SeaplaneError,
 };

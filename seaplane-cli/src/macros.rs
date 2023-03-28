@@ -403,8 +403,7 @@ macro_rules! maybe_retry {
         let res = match req.$fn($( $arg ),*) {
             Ok(ret) => Ok(ret),
             Err(SeaplaneError::ApiResponse(ae))
-                if ae.kind == ApiErrorKind::Unauthorized =>
-            {
+            if ae.is_http_unauthorized() => {
                 $this.token = Some(request_token(
                         &$this.api_key,
                         $this.identity_url.as_ref(),

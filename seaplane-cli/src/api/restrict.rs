@@ -6,7 +6,6 @@ use seaplane::{
             RestrictRequest, RestrictedDirectory, Restriction, RestrictionDetails, RestrictionRange,
         },
         shared::v1::RangeQueryContext,
-        ApiErrorKind,
     },
     error::SeaplaneError,
 };

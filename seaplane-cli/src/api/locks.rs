@@ -7,7 +7,6 @@ use seaplane::{
             LocksRequest, LocksRequestBuilder,
         },
         shared::v1::{Directory, RangeQueryContext},
-        ApiErrorKind,
     },
     error::SeaplaneError,
 };
@@ -163,7 +162,7 @@ impl LocksReq {
         let req = builder.build().unwrap();
 
         match req.get_page() {
-            Err(SeaplaneError::ApiResponse(ae)) if ae.kind == ApiErrorKind::Unauthorized => {
+            Err(SeaplaneError::ApiResponse(ae)) if ae.is_http_unauthorized() => {
                 self.token = Some(request_token(
                     &self.api_key,
                     self.identity_url.as_ref(),
