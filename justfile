@@ -178,7 +178,7 @@ test-rust: test-sdk-rust (_test-rust-crate CLI_MANIFEST) (_test-rust-api-crate C
 test-cli: (_doc-rust-crate CLI_MANIFEST) (_test-rust-crate CLI_MANIFEST) (_test-rust-api-crate CLI_MANIFEST) test-ui
 
 # Run basic integration and unit tests for the Rust SDK
-test-sdk-rust: _test-rust-crate _test-rust-api-crate (_test-rust-api-crate SDK_RUST_MANIFEST ',compute_api_v2,unstable') _test-rust-doc-crate _doc-rust-crate
+test-sdk-rust: _test-rust-crate _test-rust-api-crate (_test-rust-api-crate SDK_RUST_MANIFEST ',locks_api_v1,compute_api_v2,restrict_api_v1,identity_api_v1,metadata_api_v1') _test-rust-doc-crate _doc-rust-crate
 
 # Run basic integration and unit tests for the library container-image-ref
 test-libs-container-image-ref: (_test-rust-crate IMAGE_REF_MANIFEST) (_test-rust-doc-crate IMAGE_REF_MANIFEST)

@@ -9,6 +9,7 @@ mod locks_v1;
 mod metadata_v1;
 #[cfg(feature = "restrict_api_v1")]
 mod restrict_v1;
+#[cfg(feature = "identity_api_v1")]
 mod token_v1;
 
 use httpmock::prelude::*;
