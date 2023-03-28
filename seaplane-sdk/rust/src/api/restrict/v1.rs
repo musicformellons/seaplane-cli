@@ -1,19 +1,22 @@
 //! The `/restrict` endpoint APIs which allows working with [`Restriction`]s
 pub mod models;
+
 use std::str::FromStr;
 
-pub use models::*;
 use reqwest::{
     header::{self, CONTENT_TYPE},
     Url,
 };
 
+pub use self::models::*;
 use crate::{
     api::{
-        map_api_error, restrict::RESTRICT_API_URL, shared::v1::RangeQueryContext, ApiRequest,
-        RequestBuilder,
+        map_api_error,
+        restrict::{error::RestrictError, RESTRICT_API_URL},
+        shared::v1::RangeQueryContext,
+        ApiRequest, RequestBuilder,
     },
-    error::{Result, SeaplaneError},
+    error::Result,
 };
 
 static RESTRICT_API_BASE_PATH: &str = "v1/restrict/";
@@ -123,7 +126,7 @@ impl RestrictRequest {
                 .request
                 .endpoint_url
                 .join(&format!("{}/base64:{}/", api, directory.encoded()))?),
-            _ => Err(SeaplaneError::IncorrectRestrictRequestTarget),
+            _ => Err(RestrictError::IncorrectRestrictRequestTarget)?,
         }
     }
 
@@ -143,13 +146,13 @@ impl RestrictRequest {
                         )));
                         Ok(url)
                     }
-                    (..) => Err(SeaplaneError::IncorrectRestrictRequestTarget),
+                    (..) => Err(RestrictError::IncorrectRestrictRequestTarget)?,
                 }
             }
 
             Some(RequestTarget::ApiRange { api, context }) => {
                 let api = Api::from_str(api)
-                    .map_err(|_| SeaplaneError::IncorrectRestrictRequestTarget)?;
+                    .map_err(|_| RestrictError::IncorrectRestrictRequestTarget)?;
 
                 let mut url = self.request.endpoint_url.join(&format!("{api}/"))?;
 
@@ -161,7 +164,7 @@ impl RestrictRequest {
                     }
                 }
             }
-            _ => Err(SeaplaneError::IncorrectRestrictRequestTarget),
+            _ => Err(RestrictError::IncorrectRestrictRequestTarget)?,
         }
     }
 
@@ -283,7 +286,7 @@ impl RestrictRequest {
     pub fn get_page(&self) -> Result<RestrictionRange> {
         match &self.request.target {
             None | Some(RequestTarget::Single { .. }) => {
-                Err(SeaplaneError::IncorrectRestrictRequestTarget)
+                Err(RestrictError::IncorrectRestrictRequestTarget)?
             }
             Some(RequestTarget::ApiRange { .. }) => {
                 let url = self.range_url()?;
@@ -372,7 +375,7 @@ impl RestrictRequest {
             if let Some(next_key) = rr.next_key {
                 match &mut self.request.target {
                     None | Some(RequestTarget::Single { .. }) => {
-                        return Err(SeaplaneError::IncorrectRestrictRequestTarget);
+                        Err(RestrictError::IncorrectRestrictRequestTarget)?
                     }
                     Some(RequestTarget::ApiRange { api: _, context }) => {
                         context.set_from(next_key);

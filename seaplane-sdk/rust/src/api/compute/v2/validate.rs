@@ -1,6 +1,6 @@
 use std::result::Result as StdResult;
 
-use crate::api::compute::v2::error::FormationValidation;
+use crate::api::compute::error::FormationValidation;
 #[cfg(doc)]
 use crate::api::compute::v2::Formation;
 

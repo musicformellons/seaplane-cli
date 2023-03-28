@@ -1,7 +1,6 @@
 //! The `/formations` endpoint APIs which allows working with [`Formation`]s,
 //! [`Flight`]s, and the underlying containers
 
-pub mod error;
 mod models;
 pub mod response;
 mod validate;
@@ -11,7 +10,11 @@ pub use validate::*;
 
 use crate::{
     api::{
-        compute::{error::map_api_error, v2::error::ComputeRequest, COMPUTE_API_URL},
+        compute::{
+            error::{ComputeError, FormationValidation},
+            COMPUTE_API_URL,
+        },
+        error::map_api_error,
         ApiRequest, RequestBuilder,
     },
     error::Result,
@@ -141,8 +144,9 @@ impl FormationsRequest {
     /// assert!(req.delete().is_ok());
     /// ```
     pub fn delete(&self) -> Result<DeleteFormationResponse> {
+        use FormationValidation::*;
         if self.request.target.is_none() {
-            return Err(ComputeRequest::MissingFormationId.into());
+            Err(ComputeError::FormationValidation(MissingFormationId))?;
         }
         let url = self
             .request
@@ -207,7 +211,7 @@ impl FormationsRequest {
     /// ```
     pub fn get(&self) -> Result<GetFormationResponse> {
         if self.request.target.is_none() {
-            return Err(ComputeRequest::MissingFormationId.into());
+            Err(ComputeError::FormationValidation(FormationValidation::MissingFormationId))?
         }
         let url = self
             .request

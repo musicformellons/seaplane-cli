@@ -4,7 +4,10 @@ use serde::{Deserialize, Serialize};
 use strum::{AsRefStr, EnumString, EnumVariantNames};
 
 use crate::{
-    api::shared::v1::{Provider, RangeQueryContext, Region},
+    api::{
+        restrict::error::RestrictError,
+        shared::v1::{Provider, RangeQueryContext, Region},
+    },
     base64::Base64Encoded,
     error::SeaplaneError,
     impl_base64,
@@ -182,7 +185,7 @@ impl RestrictionDetailsBuilder {
                 .count())
             > 0
         {
-            return Err(SeaplaneError::ConflictingRequirements);
+            Err(RestrictError::ConflictingRequirements)?
         }
 
         Ok(RestrictionDetails {

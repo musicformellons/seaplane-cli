@@ -1,5 +1,4 @@
-mod error;
-
+pub mod error;
 #[cfg(feature = "compute_api_v2")]
 pub mod v2;
 

@@ -5,8 +5,11 @@ use url::Url;
 #[cfg(doc)]
 use crate::api::compute::v2::FormationsRequest;
 use crate::{
-    api::compute::v2::validate_formation_name,
-    error::{Result, SeaplaneError},
+    api::compute::{
+        error::{ComputeError, FormationValidation},
+        v2::validate_formation_name,
+    },
+    error::Result,
     rexports::{
         container_image_ref::ImageReference,
         seaplane_oid::{OidPrefix, TypedOid},
@@ -117,8 +120,9 @@ impl FormationBuilder {
 
     /// Performs validation checks, and builds the instance of [`Formation`]
     pub fn build(self) -> Result<Formation> {
+        use FormationValidation::*;
         if self.flights.is_empty() {
-            return Err(SeaplaneError::EmptyFlights);
+            return Err(ComputeError::FormationValidation(EmptyFlights).into());
         }
 
         // Ensure gateway_flight was defined
@@ -128,10 +132,10 @@ impl FormationBuilder {
             .map(|gw_f| self.flights.iter().any(|f| &f.name == gw_f))
             == Some(false)
         {
-            return Err(SeaplaneError::InvalidGatewayFlight);
+            return Err(ComputeError::FormationValidation(InvalidGatewayFlight).into());
         }
 
-        validate_formation_name(&self.name)?;
+        validate_formation_name(&self.name).map_err(ComputeError::FormationValidation)?;
 
         Ok(Formation {
             name: self.name,
@@ -319,10 +323,11 @@ impl FlightBuilder {
 
     /// Perform validation checks and construct a [`Flight`]
     pub fn build(self) -> Result<Flight> {
+        use FormationValidation::*;
         if self.name.is_none() {
-            return Err(SeaplaneError::MissingFlightName);
+            return Err(ComputeError::FormationValidation(MissingFlightName).into());
         } else if self.image.is_none() {
-            return Err(SeaplaneError::MissingFlightImageReference);
+            return Err(ComputeError::FormationValidation(MissingFlightImageReference).into());
         }
 
         Ok(Flight {

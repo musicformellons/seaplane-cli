@@ -1,16 +1,19 @@
 //! The `/locks` endpoint APIs which allows working with [`HeldLock`]s
 mod models;
-pub use models::*;
+
 use reqwest::Url;
 use serde::Deserialize;
 
+pub use self::models::*;
 use crate::{
     api::{
-        locks::LOCKS_API_URL, map_api_error, shared::v1::RangeQueryContext, ApiRequest,
-        RequestBuilder,
+        locks::{error::LocksError, LOCKS_API_URL},
+        map_api_error,
+        shared::v1::RangeQueryContext,
+        ApiRequest, RequestBuilder,
     },
     base64::add_base64_path_segment,
-    error::{Result, SeaplaneError},
+    error::Result,
 };
 
 static LOCKS_API_BASE_PATH: &str = "v1/locks/";
@@ -114,7 +117,7 @@ impl LocksRequest {
     fn single_lock_url(&self) -> Result<Url> {
         match &self.request.target {
             None | Some(RequestTarget::HeldLock(_) | RequestTarget::Range(_)) => {
-                Err(SeaplaneError::IncorrectLocksRequestTarget)
+                Err(LocksError::IncorrectLocksRequestTarget)?
             }
             Some(RequestTarget::SingleLock(l)) => {
                 Ok(add_base64_path_segment(self.request.endpoint_url.clone(), l.encoded()))
@@ -126,7 +129,7 @@ impl LocksRequest {
     fn held_lock_url(&self) -> Result<Url> {
         match &self.request.target {
             None | Some(RequestTarget::SingleLock(_) | RequestTarget::Range(_)) => {
-                Err(SeaplaneError::IncorrectLocksRequestTarget)
+                Err(LocksError::IncorrectLocksRequestTarget)?
             }
 
             Some(RequestTarget::HeldLock(HeldLock { name, id, .. })) => {
@@ -142,7 +145,7 @@ impl LocksRequest {
     fn range_url(&self) -> Result<Url> {
         match &self.request.target {
             None | Some(RequestTarget::SingleLock(_) | RequestTarget::HeldLock(_)) => {
-                Err(SeaplaneError::IncorrectLocksRequestTarget)
+                Err(LocksError::IncorrectLocksRequestTarget)?
             }
             Some(RequestTarget::Range(context)) => {
                 let mut url = self.request.endpoint_url.clone();
@@ -166,7 +169,7 @@ impl LocksRequest {
     fn lock_name(&self) -> Result<LockName> {
         match &self.request.target {
             None | Some(RequestTarget::HeldLock(_) | RequestTarget::Range(_)) => {
-                Err(SeaplaneError::IncorrectLocksRequestTarget)
+                Err(LocksError::IncorrectLocksRequestTarget)?
             }
             Some(RequestTarget::SingleLock(l)) => Ok(l.clone()),
         }
@@ -372,7 +375,7 @@ impl LocksRequest {
     pub fn get_page(&self) -> Result<LockInfoRange> {
         match &self.request.target {
             None | Some(RequestTarget::SingleLock(_) | RequestTarget::HeldLock(_)) => {
-                Err(SeaplaneError::IncorrectLocksRequestTarget)
+                Err(LocksError::IncorrectLocksRequestTarget)?
             }
             Some(RequestTarget::Range(_)) => {
                 let url = self.range_url()?;
@@ -427,7 +430,7 @@ impl LocksRequest {
                 if let Some(RequestTarget::Range(ref mut context)) = self.request.target {
                     context.set_from(next_key);
                 } else {
-                    return Err(SeaplaneError::IncorrectLocksRequestTarget);
+                    Err(LocksError::IncorrectLocksRequestTarget)?
                 }
             } else {
                 break;

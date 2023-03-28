@@ -1,18 +1,21 @@
 //! The `/config` endpoint APIs which allows working with [`KeyValue`]s
 mod models;
-pub use models::*;
+
 use reqwest::{
     header::{self, CONTENT_TYPE},
     Url,
 };
 
+pub use self::models::*;
 use crate::{
     api::{
-        map_api_error, metadata::METADATA_API_URL, shared::v1::RangeQueryContext, ApiRequest,
-        RequestBuilder,
+        map_api_error,
+        metadata::{error::MetadataError, METADATA_API_URL},
+        shared::v1::RangeQueryContext,
+        ApiRequest, RequestBuilder,
     },
     base64::add_base64_path_segment,
-    error::{Result, SeaplaneError},
+    error::Result,
 };
 
 const METADATA_API_BASE_PATH: &str = "v1/config/";
@@ -98,7 +101,7 @@ impl MetadataRequest {
     fn single_key_url(&self) -> Result<Url> {
         match &self.request.target {
             None | Some(RequestTarget::Range(_)) => {
-                Err(SeaplaneError::IncorrectMetadataRequestTarget)
+                Err(MetadataError::IncorrectMetadataRequestTarget)?
             }
             Some(RequestTarget::Key(k)) => {
                 Ok(add_base64_path_segment(self.request.endpoint_url.clone(), k.encoded()))
@@ -110,7 +113,7 @@ impl MetadataRequest {
     fn range_url(&self) -> Result<Url> {
         match &self.request.target {
             None | Some(RequestTarget::Key(_)) => {
-                Err(SeaplaneError::IncorrectMetadataRequestTarget)
+                Err(MetadataError::IncorrectMetadataRequestTarget)?
             }
             Some(RequestTarget::Range(context)) => {
                 let mut url = self.request.endpoint_url.clone();
@@ -292,7 +295,7 @@ impl MetadataRequest {
     pub fn get_page(&self) -> Result<KeyValueRange> {
         match &self.request.target {
             None | Some(RequestTarget::Key(_)) => {
-                Err(SeaplaneError::IncorrectMetadataRequestTarget)
+                Err(MetadataError::IncorrectMetadataRequestTarget)?
             }
             Some(RequestTarget::Range(_)) => {
                 let url = self.range_url()?;
@@ -347,7 +350,7 @@ impl MetadataRequest {
                 if let Some(RequestTarget::Range(ref mut context)) = self.request.target {
                     context.set_from(next_key);
                 } else {
-                    return Err(SeaplaneError::IncorrectMetadataRequestTarget);
+                    Err(MetadataError::IncorrectMetadataRequestTarget)?
                 }
             } else {
                 break;
