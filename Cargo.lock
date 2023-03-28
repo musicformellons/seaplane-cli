@@ -447,6 +447,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "container-image-ref"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "567feecd334c97fe7684657880343585d41197feaf18aa5723554ead2607896a"
+dependencies = [
+ "nom",
+ "serde",
+ "thiserror",
+]
+
+[[package]]
 name = "content_inspector"
 version = "0.2.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1849,7 +1860,7 @@ dependencies = [
  "base64 0.21.0",
  "cfg-if",
  "chrono",
- "container-image-ref",
+ "container-image-ref 0.1.0",
  "httpmock",
  "nom",
  "once_cell",
@@ -1865,8 +1876,31 @@ dependencies = [
 ]
 
 [[package]]
+name = "seaplane"
+version = "0.8.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "cf543bd8620be7c076139e53a21ceab836714dce0cfe552818e09d92a98f7766"
+dependencies = [
+ "base64 0.21.0",
+ "cfg-if",
+ "chrono",
+ "container-image-ref 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "nom",
+ "once_cell",
+ "regex",
+ "reqwest",
+ "seaplane-oid 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "serde",
+ "serde_json",
+ "strum",
+ "thiserror",
+ "url",
+ "uuid",
+]
+
+[[package]]
 name = "seaplane-cli"
-version = "0.6.0-beta.3"
+version = "0.6.0-beta.4"
 dependencies = [
  "atty",
  "base64 0.21.0",
@@ -1882,7 +1916,7 @@ dependencies = [
  "once_cell",
  "rand",
  "reqwest",
- "seaplane",
+ "seaplane 0.8.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde",
  "serde_json",
  "stfu8",
