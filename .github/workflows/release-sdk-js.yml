@@ -6,6 +6,8 @@ on:
   workflow_dispatch:
 
 name: Publish Javascript to NPMjs
+runs:
+  using: 'node16'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
