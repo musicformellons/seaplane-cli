@@ -16,7 +16,7 @@ class ComputeAPI:
         self.url = f"{configuration.compute_endpoint}/formations"
         self.req = provision_req(configuration._token_api)
 
-    def create(self, formation: Formation) -> bool:
+    def create(self, formation: Formation) -> None:
         """Create a new Formation and returns the IDs of the created Formation.
 
         Parameters
@@ -44,7 +44,7 @@ class ComputeAPI:
                     headers=headers(access_token),
                 )
             )
-        )        
+        )
 
     def get(self, formation_id: str) -> Formation:
         """Returns the Formation associated with the created Formation OID.
@@ -67,19 +67,17 @@ class ComputeAPI:
             )
         )
 
-    def delete(self, formation_id: str) -> bool:
+    def delete(self, formation_id: str) -> None:
         """Deletes the Formation from a given oid.
 
         Parameters
         ----------
         formation_id : str
-            The oid from a Formation previously created.        
+            The oid from a Formation previously created.
         """
         url = f"{self.url}/{formation_id}"
 
-        delete_result = unwrap(
-            self.req(lambda access_token: requests.delete(url, headers=headers(access_token)))
-        )        
+        unwrap(self.req(lambda access_token: requests.delete(url, headers=headers(access_token))))
 
     def get_page(
         self,

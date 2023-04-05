@@ -1,5 +1,6 @@
 from typing import Any, Dict, List, NamedTuple, Optional
 
+
 class Flight(NamedTuple):
     """
     Flight class.
@@ -40,14 +41,15 @@ class FormationPage(NamedTuple):
 
 def to_formation_page(formation_page: Dict[str, Any]) -> FormationPage:
     return FormationPage(
-        formations=to_formations(formation_page["objects"]), meta=MetaPage(**formation_page["meta"])
+        formations=to_formations(formation_page["objects"]),
+        meta=MetaPage(**formation_page["meta"]),
     )
 
 
-def to_formation(formation: Dict[str, Any]) -> Formation:    
+def to_formation(formation: Dict[str, Any]) -> Formation:
     gateway = formation.pop("gateway-flight")
     flights = to_flights(formation.pop("flights"))
-    formation_modified = {**formation, "flights": flights, "gateway_flight": gateway}    
+    formation_modified = {**formation, "flights": flights, "gateway_flight": gateway}
     return Formation(**formation_modified)
 
 

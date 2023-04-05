@@ -1,7 +1,8 @@
+from .api.compute_api import ComputeAPI
 from .api.lock_api import LockAPI
 from .api.metadata_api import MetadataAPI
 from .api.restrict_api import RestrictAPI
-from .api.compute_api import ComputeAPI
+from .api.sql_api import GlobalSQL
 from .api.token_api import TokenAPI
 from .configuration import Configuration, config
 
@@ -30,5 +31,10 @@ class Seaplane:
     @property
     def compute(self) -> ComputeAPI:
         return ComputeAPI(config)
+
+    @property
+    def global_sql(self) -> GlobalSQL:
+        return GlobalSQL(config)
+
 
 sea = Seaplane()

@@ -31,9 +31,7 @@ def success_token_post() -> Generator[None, None, None]:
 @pytest.fixture
 def fail_token_post() -> Generator[None, None, None]:
     with requests_mock.Mocker() as requests_mocker:
-        requests_mocker.post(
-            "https://flightdeck.cplane.cloud/v1/token", status_code=400, json=""
-        )
+        requests_mocker.post("https://flightdeck.cplane.cloud/v1/token", status_code=400, json="")
 
         yield
 

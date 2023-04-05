@@ -47,7 +47,7 @@ def fails_get_page_root_directory() -> Generator[None, None, None]:
         requests_mocker.get(
             "https://metadata.cplane.cloud/v1/locks",
             status_code=400,
-            json="Some error",
+            text="Some error",
         )
 
         yield
@@ -152,7 +152,7 @@ def fails_release_lock() -> Generator[None, None, None]:
         requests_mocker.delete(
             "https://metadata.cplane.cloud/v1/locks/base64:Zm9vL2Jhcg",
             status_code=400,
-            json="Some error",
+            text="Some error",
         )
 
         yield

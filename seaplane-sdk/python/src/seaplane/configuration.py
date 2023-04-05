@@ -6,6 +6,7 @@ from .logging import log
 _SEAPLANE_COMPUTE_API_ENDPOINT = "https://compute.cplane.cloud/v2beta"
 _SEAPLANE_COORDINATION_API_ENDPOINT = "https://metadata.cplane.cloud/v1"
 _SEAPLANE_IDENTIFY_API_ENDPOINT = "https://flightdeck.cplane.cloud/v1"
+_SEAPLANE_GLOBAL_SQL_API_ENDPOINT = "https://sql.cplane.cloud/v1"
 
 
 class Configuration:
@@ -21,6 +22,7 @@ class Configuration:
         self.identify_endpoint = _SEAPLANE_IDENTIFY_API_ENDPOINT
         self.compute_endpoint = _SEAPLANE_COMPUTE_API_ENDPOINT
         self.coordination_endpoint = _SEAPLANE_COORDINATION_API_ENDPOINT
+        self.global_sql_endpoint = _SEAPLANE_GLOBAL_SQL_API_ENDPOINT
         self._current_access_token: Optional[str] = None
         self._token_auto_renew = True
         self._update_token_api()
@@ -111,6 +113,14 @@ class Configuration:
             self.identify_endpoint = endpoint.rstrip(endpoint[-1])
         else:
             self.identify_endpoint = endpoint
+
+        self._update_token_api()
+
+    def set_global_sql_endpoint(self, endpoint: str) -> None:
+        if endpoint[-1] == "/":
+            self.global_sql_endpoint = endpoint.rstrip(endpoint[-1])
+        else:
+            self.global_sql_endpoint = endpoint
 
         self._update_token_api()
 

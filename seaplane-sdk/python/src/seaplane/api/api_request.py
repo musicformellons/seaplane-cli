@@ -24,7 +24,7 @@ def provision_req(
             if response.ok:
                 return Success(response.json())
             else:
-                body_error = response.json()
+                body_error = response.text
                 log.error(f"Request Error: {body_error}")
                 return Failure(HTTPError(response.status_code, body_error))
         except requests.exceptions.RequestException as err:
