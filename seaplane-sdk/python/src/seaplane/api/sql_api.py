@@ -1,3 +1,5 @@
+from typing import List
+
 import requests
 
 from ..configuration import Configuration, config
@@ -31,4 +33,19 @@ class GlobalSQL:
                     self.url, data="{}", headers=headers(access_token)
                 )
             ).map(lambda database: to_created_database(database))
+        )
+
+    def list_databases(self) -> List[str]:
+        """List all Global Seaplane Databases.
+
+        Returns
+        -------
+        list[database_name: str]
+            Returns a list of database names if successful or it will raise an HTTPError otherwise.
+        """
+
+        return unwrap(
+            self.req(
+                lambda access_token: requests.get(self.url, headers=headers(access_token))
+            ).map(lambda databases: list(databases))
         )

@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "seaplane"
-version = "0.2.5"
+version = "0.2.6"
 description = "Seaplane Python SDK"
 authors = ["Seaplane IO, Inc."]
 license = "Apache License"
@@ -10,7 +10,7 @@ documentation = "https://github.com/seaplane-io/seaplane/tree/main/seaplane-sdk/
 
 
 [tool.poetry.dependencies]
-python = ">=3.8.*"
+python = ">=3.8.*,<4.0"
 attrs = "21.4.0"
 certifi = "2022.6.15"
 charset-normalizer = "2.1.0"
@@ -21,7 +21,7 @@ pluggy = "1.0.0"
 py = "1.11.0"
 pyparsing = "3.0.9"
 requests = "2.28.1"
-tomli= "2.0.1"
+tomli = "2.0.1"
 urllib3 = "1.26.9"
 types-requests = "^2.28.0"
 returns = "^0.19.0"
@@ -93,7 +93,7 @@ skip_gitignore = true
 filterwarnings = [
     # When running tests, treat warnings as errors (e.g. -Werror).
     # See: https://docs.pytest.org/en/latest/reference/reference.html#confval-filterwarnings
-    "error",  
+    "error",
 ]
 log_cli = 1
 

@@ -44,6 +44,24 @@ def create_database() -> Generator[None, None, None]:
         yield
 
 
+@pytest.fixture
+def list_databases() -> Generator[None, None, None]:
+    with requests_mock.Mocker() as requests_mocker:
+        add_token_request(requests_mocker)
+
+        def match_authorization(request: Any) -> Any:
+            return request.headers["Authorization"] == "Bearer This is a token"  # noqa
+
+        requests_mocker.get(
+            "https://sql.cplane.cloud/v1/databases",
+            additional_matcher=match_authorization,
+            status_code=200,
+            json=["another-one", "hinges-hands"],
+        )
+
+        yield
+
+
 def test_create_database_should_returns_a_created_database(  # type: ignore
     sql_api, create_database
 ) -> None:
@@ -52,3 +70,9 @@ def test_create_database_should_returns_a_created_database(  # type: ignore
         username="cute-dress",
         password="_password_",
     )
+
+
+def test_list_databases_should_returns_a_list_of_databases(  # type: ignore
+    sql_api, list_databases
+) -> None:
+    assert sql_api.list_databases() == ["another-one", "hinges-hands"]
