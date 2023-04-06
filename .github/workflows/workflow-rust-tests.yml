@@ -8,10 +8,6 @@ on:
         type: boolean
         required: false
         default: true
-      test_cli:
-          type: boolean
-          required: false
-          default: true
       test_lib_container_image_ref:
           type: boolean
           required: false
@@ -58,11 +54,6 @@ jobs:
       if: ${{ inputs.test_sdk }}
       run: |
         just lint-sdk-rust
-
-    - name: Lint the CLI
-      if: ${{ inputs.test_cli }}
-      run: |
-        just lint-cli
 
     - name: Lint the container-image-ref lib
       if: ${{ inputs.test_lib_container_image_ref }}
@@ -111,16 +102,6 @@ jobs:
       if: ${{ inputs.test_sdk }}
       run: |
         just _doc-rust-crate
-
-    - name: Test the CLI
-      if: ${{ inputs.test_cli }}
-      run: |
-        just test-cli
-
-    - name: Build CLI Docs
-      if: ${{ inputs.test_cli }}
-      run: |
-        just doc-cli
 
     - name: Test the library container-image-ref
       if: ${{ inputs.test_lib_container_image_ref }}
@@ -176,11 +157,6 @@ jobs:
       if: ${{ inputs.test_sdk }}
       run: |
         just test-sdk-rust
-
-    - name: Test the CLI
-      if: ${{ inputs.test_cli }}
-      run: |
-        just test-cli
 
     - name: Test the library container-image-ref
       if: ${{ inputs.test_lib_container_image_ref }}

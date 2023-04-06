@@ -125,44 +125,9 @@ To see the full list of recipes use `just` by itself:
 $ just
 Available recipes:
     about
-    audit                    # Run cargo-audit to scan for vulnerable crates
-    ci                       # Run the full CI suite (only runs for your native os/arch!)
-    ci-cli                   # Run the CI suite for the CLI (only runs for your native os/arch!)
-    ci-sdk                   # Run the CI suite for all SDKs (only runs for your native os/arch!)
-    ci-sdk-javascript        # Run the CI suite for the JavaScript SDK (only runs for your native os/arch!)
-    ci-sdk-python            # Run the CI suite for the Python SDK (only runs for your native os/arch!)
-    ci-sdk-rust              # Run the CI suite for the Rust SDK (only runs for your native os/arch!)
-    doc                      # Build all documentation
-    doc-javascript           # Build JavaScript documentation
-    doc-python               # Build Python documentation
-    doc-rust                 # Build Rust documentation
-    fmt                      # Format all the code
-    fmt-check                # Check if code formatter would make changes
-    fmt-check-cli            # Check if code formatter would make changes to the CLI
-    fmt-check-sdk-javascript # Check if code formatter would make changes to the JavaScript SDK
-    fmt-check-sdk-python     # Check if code formatter would make changes to the Python SDK
-    fmt-check-sdk-rust       # Check if code formatter would make changes to the Rust SDK
-    fmt-cli                  # Format the CLI code
-    fmt-sdk-javascript       # Format the JavaScript SDK code
-    fmt-sdk-python           # Format the Python SDK code
-    fmt-sdk-rust             # Format the Rust SDK code
-    lint                     # Run all checks and lints
-    lint-cli                 # Run all lint checks against the CLI
-    lint-sdk-javascript      # Run all lint checks against the JavaScript SDK
-    lint-sdk-python          # Run all lint checks against the Python SDK
-    lint-sdk-rust            # Run all lint checks against the Rust SDK
-    package-nightly          # Create a nightly CLI release package (latest commit)
-    package-release          # Create a CLI release package (latest 'cli-v*' tag)
-    setup                    # Install all needed components and tools
-    spell-check              # Spell check the entire repo
-    test-rust                # Run basic integration and unit tests for all Rust crates
-    test-sdk-javascript      # Run basic integration and unit tests for the JavaScript SDK
-    test-sdk-python          # Run basic integration and unit tests for the Python SDK
-    test-sdk-rust            # Run basic integration and unit tests for the Rust SDK
-    test-ui $RUSTFLAGS='-D warnings' # Run UI tests
-    todos                    # List 'TODO:' items
-    todos-in-branch          # List TODO items in current branch only
-    update-licenses          # Update all third party licenses
+    audit                         # Run cargo-audit to scan for vulnerable crates
+    ci                            # Run the full CI suite (only runs for your native os/arch!)
+...
 ```
 
 If you've made changes to any of the `Cargo.toml` files it's probably a good idea to also update

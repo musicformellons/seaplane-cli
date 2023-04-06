@@ -1,10 +1,5 @@
-set windows-shell := ["powershell.exe", "-NoLogo", "-Command"]
-
 SELF := justfile_directory()
 DIST := SELF / 'dist'
-BIN_EXE := if os() == 'windows' { '.exe' } else { '' }
-CLI_DIR := 'seaplane-cli'
-CLI_MANIFEST := CLI_DIR / 'Cargo.toml'
 SDK_RUST_DIR := 'seaplane-sdk/rust'
 SDK_RUST_MANIFEST := SDK_RUST_DIR / 'Cargo.toml'
 IMAGE_REF_MANIFEST := 'crates/container-image-ref/Cargo.toml'
@@ -33,7 +28,7 @@ ARG_SEP := if TEST_RUNNER == "cargo nextest run" { '' } else { '--' }
     echo "Cargo: $(cargo --version)"
     echo "Invocation Dir: {{ invocation_directory() }}"
 
-_setup-internal: (_cargo-install 'httpmock --features standalone') (_cargo-install 'cargo-lichking' 'cargo-audit' 'typos-cli')
+_setup-internal: (_cargo-install 'httpmock --features standalone') (_cargo-install 'cargo-lichking' 'cargo-audit')
 
 # Install all needed components and tools
 [linux]
@@ -64,11 +59,8 @@ ci-sdk-python: lint-sdk-python test-sdk-python doc-python
 ci-sdk-javascript: lint-sdk-javascript test-sdk-javascript doc-javascript
     cd seaplane-sdk/javascript; npm ci
 
-# Run the CI suite for the CLI (only runs for your native os/arch!)
-ci-cli: lint-cli test-cli
-
 # Run the full CI suite (only runs for your native os/arch!)
-ci: audit ci-cli ci-sdk ci-libs-container-image-ref ci-libs-oid
+ci: audit ci-sdk ci-libs-container-image-ref ci-libs-oid
 
 # Run the CI suite for the container-image-ref library
 ci-libs-container-image-ref: lint-libs-container-image-ref test-libs-oid (_doc-rust-crate IMAGE_REF_MANIFEST)
@@ -80,10 +72,7 @@ ci-libs-oid: lint-libs-oid test-libs-oid (_doc-rust-crate OID_MANIFEST)
 doc: doc-rust doc-python doc-javascript
 
 # Build All Rust documentation
-doc-rust: doc-cli _doc-rust-crate (_doc-rust-crate IMAGE_REF_MANIFEST) (_doc-rust-crate OID_MANIFEST)
-
-# Build Rust documentation for the CLI
-doc-cli: (_doc-rust-crate CLI_MANIFEST)
+doc-rust: _doc-rust-crate (_doc-rust-crate IMAGE_REF_MANIFEST) (_doc-rust-crate OID_MANIFEST)
 
 # Build Python documentation
 doc-python:
@@ -94,11 +83,7 @@ doc-javascript:
     @echo "doc-javascript: NOT YET IMPLEMENTED"
 
 # Check if code formatter would make changes
-fmt-check: fmt-check-cli fmt-check-sdk-rust fmt-check-sdk-python fmt-check-sdk-javascript
-
-# Check if code formatter would make changes to the CLI
-fmt-check-cli:
-    cargo fmt --manifest-path {{ CLI_DIR / 'Cargo.toml' }} --check
+fmt-check: fmt-check-sdk-rust fmt-check-sdk-python fmt-check-sdk-javascript
 
 # Check if code formatter would make changes to the Rust SDK
 fmt-check-sdk-rust:
@@ -121,11 +106,7 @@ fmt-check-sdk-javascript:
     @echo "fmt-check-sdk-javascript: NOT YET IMPLEMENTED"
 
 # Format all the code
-fmt: fmt-sdk-rust fmt-cli fmt-sdk-python fmt-sdk-javascript
-
-# Format the CLI code
-fmt-cli:
-    cargo fmt --manifest-path {{ CLI_MANIFEST }}
+fmt: fmt-sdk-rust fmt-sdk-python fmt-sdk-javascript
 
 # Format the Rust SDK code
 fmt-sdk-rust:
@@ -148,10 +129,7 @@ fmt-sdk-javascript:
     @echo "fmt-sdk-javascript: NOT YET IMPLEMENTED"
 
 # Run all checks and lints
-lint: lint-sdk-rust lint-sdk-python lint-sdk-javascript lint-cli lint-libs-oid lint-libs-container-image-ref
-
-# Run all lint checks against the CLI
-lint-cli: spell-check fmt-check-cli (_lint-rust-crate CLI_MANIFEST '--no-default-features')
+lint: lint-sdk-rust lint-sdk-python lint-sdk-javascript lint-libs-oid lint-libs-container-image-ref
 
 # Run all lint checks against the Rust SDK
 lint-sdk-rust: spell-check fmt-check-sdk-rust _lint-rust-crate (_lint-rust-crate SDK_RUST_MANIFEST '--features unstable')
@@ -172,10 +150,7 @@ lint-libs-container-image-ref: fmt-check-libs-container-image-ref (_lint-rust-cr
 lint-libs-oid: fmt-check-libs-oid (_lint-rust-crate OID_MANIFEST)
 
 # Run basic integration and unit tests for all Rust crates
-test-rust: test-sdk-rust (_test-rust-crate CLI_MANIFEST) (_test-rust-api-crate CLI_MANIFEST)
-
-# Run basic integration and unit tests for the CLI
-test-cli: (_doc-rust-crate CLI_MANIFEST) (_test-rust-crate CLI_MANIFEST) (_test-rust-api-crate CLI_MANIFEST) test-ui
+test-rust: test-sdk-rust
 
 # Run basic integration and unit tests for the Rust SDK
 test-sdk-rust: _test-rust-crate _test-rust-api-crate (_test-rust-api-crate SDK_RUST_MANIFEST ',locks_api_v1,compute_api_v2,restrict_api_v1,identity_api_v1,metadata_api_v1') _test-rust-doc-crate _doc-rust-crate
@@ -194,14 +169,9 @@ test-sdk-python: _python-setup
 test-sdk-javascript:
     cd seaplane-sdk/javascript/; npm test
 
-# Run UI tests
-test-ui $RUSTFLAGS='-D warnings':
-    {{ TEST_RUNNER }}  --features ui_tests --manifest-path {{ CLI_MANIFEST }}
-    {{ TEST_RUNNER }}  --features unstable,semantic_ui_tests --manifest-path {{ CLI_MANIFEST }}
-
 # Update all third party licenses
 update-licenses: (_cargo-install 'cargo-lichking')
-    cargo lichking bundle --variant name-only > {{ CLI_DIR / 'share/third_party_licenses.md' }}
+    cargo lichking bundle --variant name-only > third_party_licenses.md
 
 # Spell check the entire repo
 spell-check: _install-spell-check
@@ -272,64 +242,9 @@ todos-in-branch:
 todos:
     rg -o 'TODO:.*$' -g '!justfile'
 
-# Create a nightly CLI release package (latest commit)
-package-nightly:
-    just _package-build "cli-{{ SHORTSHA }}"
-
-# Create a CLI release package (latest 'cli-v*' tag)
-[unix]
-package-release:
-    just _package-build "$(git tag --list | grep cli-v | sort | tail -n1)"
-
-# Create a CLI release package (latest 'cli-v*' tag)
-[windows]
-package-release:
-    just _package-build "$(git tag --list | findstr cli-v | sort | select -last 1)"
-
 #
 # Private/Internal Items
 #
-
-# Get the latest short SHA commit for the just CLI directory
-_git-shortsha-cli:
-    @git --no-pager log -n1 --pretty=format:%h $(dirname {{ CLI_DIR }})
-
-[windows]
-_package-build TAG=SHORTSHA:
-    #!powershell.exe
-    $BUILDDIR = "target/release/".trim()
-    $DISTDIR = "dist/".trim()
-    cargo build --release --manifest-path {{ CLI_MANIFEST }}
-    Remove-Item -Force -Recurse "$DISTDIR/" 2>$null
-    New-Item -ItemType Directory -Force -Path "$DISTDIR/bin/" >$null
-    New-Item -ItemType Directory -Force -Path "$DISTDIR/share/" >$null
-    New-Item -ItemType Directory -Force -Path "$DISTDIR/share/doc/" >$null
-    New-Item -ItemType Directory -Force -Path "$DISTDIR/share/doc/seaplane/" >$null
-    Remove-Item -Force "$DISTDIR/bin/*"
-    Copy-Item "$BUILDDIR/seaplane{{ BIN_EXE }}" "$DISTDIR/bin/"
-    Copy-Item seaplane-cli/share/third_party_licenses.md "$DISTDIR/share/doc/seaplane/"
-    Copy-Item LICENSE "$DISTDIR/share/doc/seaplane/"
-    cd "$DISTDIR"
-    $compress = @{
-        Path = ".\bin\", ".\share\"
-        DestinationPath = "..\seaplane-{{ TAG }}-$("$($Env:PROCESSOR_ARCHITECTURE)".ToLower())-windows.zip"
-    }
-    Compress-Archive @compress
-
-[unix]
-_package-build TAG=SHORTSHA:
-    #!/usr/bin/env bash
-    set -euo pipefail
-    BUILDDIR=target/release/
-    DISTDIR=dist/
-    cargo build --release --manifest-path {{ CLI_MANIFEST }}
-    mkdir -p ${DISTDIR}/{bin,share/doc/seaplane/}
-    rm -rf ${DISTDIR}/bin/*
-    cp ${BUILDDIR}/seaplane{{ BIN_EXE }} ${DISTDIR}/bin/
-    cp seaplane-cli/share/third_party_licenses.md ${DISTDIR}/share/doc/seaplane/
-    cp LICENSE ${DISTDIR}/share/doc/seaplane/
-    cd ${DISTDIR}
-    tar czf ../seaplane-{{ TAG }}-$(uname -m)-{{ os() }}.tar.gz ./*
 
 _cargo-install +TOOLS:
     cargo install {{ TOOLS }}
