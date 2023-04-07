@@ -4,10 +4,14 @@ on:
     paths:
       - '**/Cargo.toml'
       - '**/Cargo.lock'
+      - '.github/workflows/audit.yml'
   push:
     paths:
       - '**/Cargo.toml'
       - '**/Cargo.lock'
+      - '.github/workflows/audit.yml'
+    branches:
+      - 'main'
   schedule:
   - cron: '42 4 * * 2'
   workflow_dispatch:
@@ -15,7 +19,7 @@ on:
 jobs:
   security_audit:
     name: Run a rust security audit
-    runs-on: [self-hosted, linux, arm64, lxc]
+    runs-on: ubuntu-22.04
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
