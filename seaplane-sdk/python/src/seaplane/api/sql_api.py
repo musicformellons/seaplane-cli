@@ -3,7 +3,7 @@ from typing import List
 import requests
 
 from ..configuration import Configuration, config
-from ..model.sql import CreatedDatabase, to_created_database
+from ..model.sql import CreatedDatabase, to_created_database, to_list_databases
 from ..util import unwrap
 from .api_http import headers
 from .api_request import provision_req
@@ -47,5 +47,5 @@ class GlobalSQL:
         return unwrap(
             self.req(
                 lambda access_token: requests.get(self.url, headers=headers(access_token))
-            ).map(lambda databases: list(databases))
+            ).map(lambda databases: to_list_databases(databases))
         )

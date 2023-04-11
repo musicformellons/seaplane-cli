@@ -56,7 +56,13 @@ def list_databases() -> Generator[None, None, None]:
             "https://sql.cplane.cloud/v1/databases",
             additional_matcher=match_authorization,
             status_code=200,
-            json=["another-one", "hinges-hands"],
+            json={
+                "databases": [
+                    {"database": "another-one"},
+                    {"database": "hinges-hands"},
+                ],
+                "more": False,
+            },
         )
 
         yield
