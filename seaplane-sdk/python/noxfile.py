@@ -33,8 +33,7 @@ def e2e(s: Session) -> None:
         "--cov=fact",
         "--cov-report=html",
         "--cov-report=term",
-        "tests/end_to_end/e2e_locks_api.py",
-        "tests/end_to_end/e2e_restrict_api.py",
+        "tests/end_to_end/e2e_sql_api.py",      
         *s.posargs,
     )
 
