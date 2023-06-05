@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "seaplane"
-version = "0.2.7"
+version = "0.3.2"
 description = "Seaplane Python SDK"
 authors = ["Seaplane IO, Inc."]
 license = "Apache License"
@@ -28,6 +28,8 @@ returns = "^0.19.0"
 requests-mock = "^1.9.3"
 simplejson = "^3.17.6"
 types-simplejson = "^3.17.7"
+Flask-Cors = "^3.0.10"
+Flask-SocketIO = "^5.3.4"
 
 [tool.poetry.dev-dependencies]
 nox-poetry = "*"
@@ -63,6 +65,7 @@ build-backend = "poetry.core.masonry.api"
 [tool.mypy]
 ignore_missing_imports = true
 strict = true
+implicit_reexport = true
 # If certain strict config options are too pedantic for a project,
 # disable them selectively here by setting to false.
 
@@ -75,7 +78,7 @@ extend-ignore = ["E203"]
 # flake8-bugbear config.
 # TODO: Remove this once flake8 > 4.0.1 is released as this has been fixed
 #   upstream: https://github.com/PyCQA/flake8/pull/1443
-extend-exclude = [".nox", ".env"]
+extend-exclude = [".nox", ".env", "examples"]
 
 [tool.black]
 line-length = 99

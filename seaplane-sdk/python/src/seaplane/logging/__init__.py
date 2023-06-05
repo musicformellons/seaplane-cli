@@ -7,7 +7,7 @@ class SeaLogger:
     """
 
     PREFIX = "[Seaplane] "
-    FORMAT = "%(asctime)s [Seaplane] %(message)s"
+    FORMAT = "[Seaplane] %(message)s"
 
     CRITICAL = logging.CRITICAL
     FATAL = logging.FATAL

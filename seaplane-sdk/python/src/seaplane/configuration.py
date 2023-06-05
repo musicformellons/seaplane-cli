@@ -1,12 +1,16 @@
-from typing import Optional
+import os
+from typing import Dict, Optional
 
 from .api.token_api import TokenAPI
 from .logging import log
+from .model.errors import SeaplaneError
 
 _SEAPLANE_COMPUTE_API_ENDPOINT = "https://compute.cplane.cloud/v2beta"
 _SEAPLANE_COORDINATION_API_ENDPOINT = "https://metadata.cplane.cloud/v1"
 _SEAPLANE_IDENTIFY_API_ENDPOINT = "https://flightdeck.cplane.cloud/v1"
 _SEAPLANE_GLOBAL_SQL_API_ENDPOINT = "https://sql.cplane.cloud/v1"
+
+_SEAPLANE_ENV_VAR_PRODUCTION = "SEAPLANE_PRODUCTION"
 
 
 class Configuration:
@@ -25,6 +29,8 @@ class Configuration:
         self.global_sql_endpoint = _SEAPLANE_GLOBAL_SQL_API_ENDPOINT
         self._current_access_token: Optional[str] = None
         self._token_auto_renew = True
+        self._api_keys: Dict[str, str] = {}
+        self._production = False
         self._update_token_api()
 
     def set_api_key(self, api_key: str) -> None:
@@ -38,6 +44,39 @@ class Configuration:
             Seaplane API Key.
         """
         self.seaplane_api_key = api_key
+        self._update_token_api()
+
+    def set_api_keys(self, api_keys: Dict[str, str]) -> None:
+        """Set the Seaplane API Keys for SmartPipes.
+
+        The API Keys is needed for some of the Coprocessors.
+
+        Supported Coprocessors API Keys:
+
+        Seaplane: SEA_API_KEY
+        Open AI: OPENAI_API_KEY
+        Replicate: RE_API_KEY
+
+        For example, for use an OpenAI Coprocessor,
+        you need to provide the Key - Value, of the API Key.
+
+            $ from seaplane import sea
+
+            $ api_keys = {"OPENAI_API_KEY": "sp-api-key-test" }
+            $ sea.config.set_api_keys(api_keys)
+
+        Parameters
+        ----------
+        api_keys : object
+            API Keys and values.
+        """
+        self._api_keys = api_keys
+
+        if api_keys is None:
+            raise SeaplaneError("api_keys parameters can't be None")
+        elif api_keys.get("SEA_API_KEY", None) is not None:
+            self.seaplane_api_key = api_keys["SEA_API_KEY"]
+
         self._update_token_api()
 
     def set_token(self, access_token: Optional[str]) -> None:
@@ -164,6 +203,15 @@ class Configuration:
             log.enable()
         else:
             log.disable()
+
+    def is_production(self) -> bool:
+        if not self._production:
+            return os.getenv(_SEAPLANE_ENV_VAR_PRODUCTION) is not None
+
+        return self._production
+
+    def set_production(self, is_production: bool) -> None:
+        self._production = is_production
 
 
 config = Configuration()

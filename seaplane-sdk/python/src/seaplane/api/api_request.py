@@ -10,6 +10,21 @@ from .api_http import SDK_HTTP_ERROR_CODE
 from .token_api import TokenAPI
 
 
+def handle_request(request: Callable[[], Response]) -> Result[Any, HTTPError]:
+    try:
+        response = request()
+
+        if response.ok:
+            return Success(response.json())
+        else:
+            body_error = response.text
+            log.error(f"Request Error: {body_error}")
+            return Failure(HTTPError(response.status_code, body_error))
+    except requests.exceptions.RequestException as err:
+        log.error(f"Request exception: {str(err)}")
+        return Failure(HTTPError(SDK_HTTP_ERROR_CODE, str(err)))
+
+
 def provision_req(
     token_api: TokenAPI,
 ) -> Callable[[Callable[[str], Response]], Result[Any, HTTPError]]:
