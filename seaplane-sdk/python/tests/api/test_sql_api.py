@@ -26,7 +26,7 @@ def create_database() -> Generator[None, None, None]:
 
         def match_authorization(request: Any) -> Any:
             return (
-                request.headers["Authorization"] == "Bearer This is a token"  # noqa
+                request.headers["Authorization"] == "Bearer This is a token"
                 and request.text == "{}"
             )
 
@@ -50,7 +50,7 @@ def list_databases() -> Generator[None, None, None]:
         add_token_request(requests_mocker)
 
         def match_authorization(request: Any) -> Any:
-            return request.headers["Authorization"] == "Bearer This is a token"  # noqa
+            return request.headers["Authorization"] == "Bearer This is a token"
 
         requests_mocker.get(
             "https://sql.cplane.cloud/v1/databases",

@@ -5,8 +5,8 @@ from .api.restrict_api import RestrictAPI
 from .api.sql_api import GlobalSQL
 from .api.token_api import TokenAPI
 from .configuration import Configuration, config
-from .smartpipes import Coprocessor, SmartPipe, coprocessor, smartpipe, start  # noqa
 from .logging import log
+from .smartpipes import Coprocessor, SmartPipe, context, coprocessor, smartpipe, start
 
 
 class Seaplane:
@@ -41,11 +41,4 @@ class Seaplane:
 
 sea = Seaplane()
 
-__all__ = [
-    "SmartPipe",
-    "Coprocessor",
-    "coprocessor",
-    "smartpipe",
-    "start",
-    "log"
-]
+__all__ = ["SmartPipe", "Coprocessor", "coprocessor", "smartpipe", "start", "log", "context"]

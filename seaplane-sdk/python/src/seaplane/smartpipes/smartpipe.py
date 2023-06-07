@@ -2,6 +2,7 @@ import secrets
 import string
 from typing import Any, Callable, List, Optional
 
+from ..logging import log
 from .coprocessor import Coprocessor, CoprocessorEvent
 
 
@@ -38,11 +39,19 @@ class SmartPipeEvent:
 
 
 class SmartPipe:
-    def __init__(self, func: Callable[[Any], Any], path: str, method: str, id: str) -> None:
+    def __init__(
+        self,
+        func: Callable[[Any], Any],
+        path: str,
+        method: str,
+        id: str,
+        parameters: Optional[List[str]],
+    ) -> None:
         self.func = func
         self.path = path
         self.method = method
         self.id = id
+        self.parameters = parameters
         self.coprocessors: List[Coprocessor] = []
         self.events: List[SmartPipeEvent] = []
 
@@ -52,3 +61,6 @@ class SmartPipe:
                 self.coprocessors[i] = coprocessor
                 return
         self.coprocessors.append(coprocessor)
+
+    def print(self) -> None:
+        log.info(f"id: {self.id}, path: {self.path}, method: {self.method}")

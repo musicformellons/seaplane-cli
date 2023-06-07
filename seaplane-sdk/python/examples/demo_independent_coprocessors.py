@@ -1,13 +1,4 @@
-from seaplane import (
-    Coprocessor,
-    config,
-    context,
-    coprocessor,
-    import_coprocessor,
-    log,
-    smartpipe,
-    start,
-)
+from seaplane import Coprocessor, config, context, coprocessor, log, smartpipe, start
 from seaplane.logging import SeaLogger
 
 log.level(SeaLogger.DEBUG)
@@ -47,10 +38,5 @@ def other_smart_pipe(input):
     temp_times_1_8 = multiply_by_1_8(number)
     return temp_times_1_8
 
-
-# print(len(context.smart_pipes[0].coprocessors))
-# [print(coprocessor.print()) for coprocessor in context.smart_pipes[0].coprocessors]
-
-# print(len(context.smart_pipes))
 
 start()

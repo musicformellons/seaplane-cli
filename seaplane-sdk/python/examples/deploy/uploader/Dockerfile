@@ -21,7 +21,7 @@ RUN apk add --no-cache python3 python3-dev
 #ENV DOCKER_TLS_CERTDIR=""
 #ENV DOCKER_HOST="unix:///var/run/docker.sock"
 
-ENV SEAPLANE_PRODUCTION True
+ENV SMARTPIPES_PRODUCTION True
 
 WORKDIR /app
 COPY . . 

@@ -143,7 +143,8 @@ class Context:
             log.info(f"⌛️ Assign Coprocessor {coprocessor.id} to Smart Pipe: {smart_pipe.id}")
         else:
             log.info(
-                f"🔥 Actual Smart Pipe is None, can't assign Coprocessor {coprocessor.id} to Smart Pipe"  # noqa
+                f"🔥 Actual Smart Pipe is None, can't assign \
+                    Coprocessor {coprocessor.id} to Smart Pipe"
             )
         self.on_change(smart_pipes_json(self.smart_pipes))
 
@@ -152,12 +153,16 @@ context = Context()
 
 
 def smartpipe(
-    path: str, method: str, id: str, _func: Optional[Callable[[Any], Any]] = None
+    path: str,
+    method: str,
+    id: str,
+    parameters: Optional[List[str]] = None,
+    _func: Optional[Callable[[Any], Any]] = None,
 ) -> Callable[[Any, Any], Any]:
     def decorator_smartpipes(func: Callable[[Any], Any]) -> Callable[[Any, Any], Any]:
         @functools.wraps(func)
         def wrapper(*args: Any, **kwargs: Any) -> Any:
-            print(f"SmartPipe Path: {path}, Method: {method}, ID: {id}")
+            log.info(f"SmartPipe Path: {path}, Method: {method}, ID: {id}")
             context.active_smart_pipe(id)
 
             args_str = tuple(arg.decode() if isinstance(arg, bytes) else arg for arg in args)
@@ -177,7 +182,7 @@ def smartpipe(
             context.update_event(event)
             return result
 
-        smart_pipe = SmartPipe(wrapper, path, method, id)
+        smart_pipe = SmartPipe(wrapper, path, method, id, parameters)
         context.add_smart_pipe(smart_pipe)
         return wrapper
 
@@ -217,11 +222,14 @@ def import_coprocessor(
 
 
 def coprocessor(
-    type: str, id: str, model: Optional[str] = None, _func: Optional[Callable[[Any], Any]] = None,
+    type: str,
+    id: str,
+    model: Optional[str] = None,
+    _func: Optional[Callable[[Any], Any]] = None,
 ) -> Callable[[Any, Any], Any]:
     def decorator_coprocessor(func: Callable[[Any], Any]) -> Callable[[Any, Any], Any]:
 
-        coprocessor = Coprocessor(func, type, model, id)
+        coprocessor = Coprocessor(func=func, type=type, model=model, id=id)
         context.add_coprocessor(coprocessor)
 
         @functools.wraps(func)

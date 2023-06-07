@@ -18,7 +18,7 @@ def get_contents_of_root_directory() -> Generator[None, None, None]:
         add_token_request(requests_mocker)
 
         def match_authorization(request: Any) -> Any:
-            return request.headers["Authorization"] == "Bearer This is a token"  # noqa
+            return request.headers["Authorization"] == "Bearer This is a token"
 
         requests_mocker.get(
             "https://metadata.cplane.cloud/v1/config",
@@ -36,7 +36,7 @@ def get_page_of_directory() -> Generator[None, None, None]:
         add_token_request(requests_mocker)
 
         def match_authorization(request: Any) -> Any:
-            return request.headers["Authorization"] == "Bearer This is a token"  # noqa
+            return request.headers["Authorization"] == "Bearer This is a token"
 
         requests_mocker.get(
             "https://metadata.cplane.cloud/v1/config/base64:Zm9v/",
@@ -54,7 +54,7 @@ def get_key_value_pair_decoding_in_base64url() -> Generator[None, None, None]:
         add_token_request(requests_mocker)
 
         def match_authorization(request: Any) -> Any:
-            return request.headers["Authorization"] == "Bearer This is a token"  # noqa
+            return request.headers["Authorization"] == "Bearer This is a token"
 
         requests_mocker.get(
             "https://metadata.cplane.cloud/v1/config/base64:Zm9vL2Jhcg",
@@ -72,7 +72,7 @@ def delete_key_value_pair_decoding_in_base64url() -> Generator[None, None, None]
         add_token_request(requests_mocker)
 
         def match_authorization(request: Any) -> Any:
-            return request.headers["Authorization"] == "Bearer This is a token"  # noqa
+            return request.headers["Authorization"] == "Bearer This is a token"
 
         requests_mocker.delete(
             "https://metadata.cplane.cloud/v1/config/base64:Zm9vL2Jhcg",
@@ -91,7 +91,7 @@ def set_key_value_pair() -> Generator[None, None, None]:
 
         def match_authorization(request: Any) -> Any:
             return (
-                request.headers["Authorization"] == "Bearer This is a token"  # noqa
+                request.headers["Authorization"] == "Bearer This is a token"
                 and request.text == "ZW1wdHk"
             )
 
@@ -116,7 +116,7 @@ def set_key_binary_value_pair() -> Generator[None, None, None]:
             ).decode("utf-8")
 
             return (
-                request.headers["Authorization"] == "Bearer This is a token"  # noqa
+                request.headers["Authorization"] == "Bearer This is a token"
                 and request.text == lena_base64
             )
 

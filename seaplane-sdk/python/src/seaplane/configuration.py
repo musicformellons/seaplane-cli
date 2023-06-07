@@ -9,8 +9,18 @@ _SEAPLANE_COMPUTE_API_ENDPOINT = "https://compute.cplane.cloud/v2beta"
 _SEAPLANE_COORDINATION_API_ENDPOINT = "https://metadata.cplane.cloud/v1"
 _SEAPLANE_IDENTIFY_API_ENDPOINT = "https://flightdeck.cplane.cloud/v1"
 _SEAPLANE_GLOBAL_SQL_API_ENDPOINT = "https://sql.cplane.cloud/v1"
+_SEAPLANE_SUBSTATION_API_ENDPOINT = "https://substation.dev.cplane.cloud/v1"
 
-_SEAPLANE_ENV_VAR_PRODUCTION = "SEAPLANE_PRODUCTION"
+_SEAPLANE_ENV_VAR_PRODUCTION = "SMARTPIPES_PRODUCTION"
+
+
+def get_env(key: str) -> str:
+    env = os.getenv(key)
+
+    if not env:
+        return ""
+    else:
+        return env
 
 
 class Configuration:
@@ -27,9 +37,16 @@ class Configuration:
         self.compute_endpoint = _SEAPLANE_COMPUTE_API_ENDPOINT
         self.coordination_endpoint = _SEAPLANE_COORDINATION_API_ENDPOINT
         self.global_sql_endpoint = _SEAPLANE_GLOBAL_SQL_API_ENDPOINT
+        self.substation_endpoint = _SEAPLANE_SUBSTATION_API_ENDPOINT
         self._current_access_token: Optional[str] = None
         self._token_auto_renew = True
-        self._api_keys: Dict[str, str] = {}
+        self._api_keys: Dict[str, str] = {
+            "SEAPLANE_API_KEY": get_env("SEAPLANE_API_KEY"),
+            "OPENAI_API_KEY": get_env("OPENAI_API_KEY"),
+            "REPLICATE_API_KEY": get_env("REPLICATE_API_KEY"),
+            "PINECONE_API_KEY": get_env("PINECONE_API_KEY"),
+            "PINECONE_API_ENV": get_env("PINECONE_API_ENV"),
+        }
         self._production = False
         self._update_token_api()
 
@@ -53,9 +70,9 @@ class Configuration:
 
         Supported Coprocessors API Keys:
 
-        Seaplane: SEA_API_KEY
+        Seaplane: SEAPLANE_API_KEY
         Open AI: OPENAI_API_KEY
-        Replicate: RE_API_KEY
+        Replicate: REPLICATE_API_KEY
 
         For example, for use an OpenAI Coprocessor,
         you need to provide the Key - Value, of the API Key.
@@ -74,8 +91,8 @@ class Configuration:
 
         if api_keys is None:
             raise SeaplaneError("api_keys parameters can't be None")
-        elif api_keys.get("SEA_API_KEY", None) is not None:
-            self.seaplane_api_key = api_keys["SEA_API_KEY"]
+        elif api_keys.get("SEAPLANE_API_KEY", None) is not None:
+            self.seaplane_api_key = api_keys["SEAPLANE_API_KEY"]
 
         self._update_token_api()
 
@@ -160,6 +177,14 @@ class Configuration:
             self.global_sql_endpoint = endpoint.rstrip(endpoint[-1])
         else:
             self.global_sql_endpoint = endpoint
+
+        self._update_token_api()
+
+    def set_substation_endpoint(self, endpoint: str) -> None:
+        if endpoint[-1] == "/":
+            self.substation_endpoint = endpoint.rstrip(endpoint[-1])
+        else:
+            self.substation_endpoint = endpoint
 
         self._update_token_api()
 

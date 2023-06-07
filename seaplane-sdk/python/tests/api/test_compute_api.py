@@ -17,7 +17,7 @@ def get_formations_page() -> Generator[None, None, None]:
         add_token_request(requests_mocker)
 
         def match_authorization(request: Any) -> Any:
-            return request.headers["Authorization"] == "Bearer This is a token"  # noqa
+            return request.headers["Authorization"] == "Bearer This is a token"
 
         requests_mocker.get(
             "https://compute.cplane.cloud/v2beta/formations",
@@ -58,7 +58,7 @@ def get_formation() -> Generator[None, None, None]:
         add_token_request(requests_mocker)
 
         def match_authorization(request: Any) -> Any:
-            return request.headers["Authorization"] == "Bearer This is a token"  # noqa
+            return request.headers["Authorization"] == "Bearer This is a token"
 
         requests_mocker.get(
             "https://compute.cplane.cloud/v2beta/formations/frm-0oug6ng05tvll000e14k2sd3og",
@@ -89,7 +89,7 @@ def delete_formation() -> Generator[None, None, None]:
         add_token_request(requests_mocker)
 
         def match_authorization(request: Any) -> Any:
-            return request.headers["Authorization"] == "Bearer This is a token"  # noqa
+            return request.headers["Authorization"] == "Bearer This is a token"
 
         requests_mocker.delete(
             "https://compute.cplane.cloud/v2beta/formations/frm-0oug6ng05tvll000e14k2sd3og",
@@ -107,7 +107,7 @@ def create_formation() -> Generator[None, None, None]:
         add_token_request(requests_mocker)
 
         def match_authorization(request: Any) -> Any:
-            return request.headers["Authorization"] == "Bearer This is a token"  # noqa
+            return request.headers["Authorization"] == "Bearer This is a token"
 
         requests_mocker.post(
             "https://metadata.cplane.cloud/v1/locks/base64:Zm9vL2Jhcg",

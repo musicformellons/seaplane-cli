@@ -16,7 +16,7 @@ RUN \
 	&& wget https://releases.hashicorp.com/vault/1.6.2/vault_1.6.2_linux_amd64.zip \
 	&& unzip vault_1.6.2_linux_amd64.zip	
 
-ENV SEAPLANE_PRODUCTION True
+ENV SMARTPIPES_PRODUCTION True
 
 WORKDIR /app
 COPY . . 

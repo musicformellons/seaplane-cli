@@ -18,7 +18,7 @@ def locks_get_page_root_directory() -> Generator[None, None, None]:
         add_token_request(requests_mocker)
 
         def match_authorization(request: Any) -> Any:
-            return request.headers["Authorization"] == "Bearer This is a token"  # noqa
+            return request.headers["Authorization"] == "Bearer This is a token"
 
         requests_mocker.get(
             "https://metadata.cplane.cloud/v1/locks",
@@ -59,7 +59,7 @@ def locks_get_page_another_directory() -> Generator[None, None, None]:
         add_token_request(requests_mocker)
 
         def match_authorization(request: Any) -> Any:
-            return request.headers["Authorization"] == "Bearer This is a token"  # noqa
+            return request.headers["Authorization"] == "Bearer This is a token"
 
         requests_mocker.get(
             "https://metadata.cplane.cloud/v1/locks/base64:Zm9v/",
@@ -86,7 +86,7 @@ def get_lock() -> Generator[None, None, None]:
         add_token_request(requests_mocker)
 
         def match_authorization(request: Any) -> Any:
-            return request.headers["Authorization"] == "Bearer This is a token"  # noqa
+            return request.headers["Authorization"] == "Bearer This is a token"
 
         requests_mocker.get(
             "https://metadata.cplane.cloud/v1/locks/base64:Zm9vL2Jhcg",
@@ -109,7 +109,7 @@ def acquire_lock() -> Generator[None, None, None]:
 
         def match_authorization(request: Any) -> Any:
             return (
-                request.headers["Authorization"] == "Bearer This is a token"  # noqa
+                request.headers["Authorization"] == "Bearer This is a token"
                 and request.query == "client-id=client-id&ttl=60"
             )
 
@@ -130,7 +130,7 @@ def release_lock() -> Generator[None, None, None]:
 
         def match_authorization(request: Any) -> Any:
             return (
-                request.headers["Authorization"] == "Bearer This is a token"  # noqa
+                request.headers["Authorization"] == "Bearer This is a token"
                 and request.query == "id=aoehfra4ayg"
             )
 
@@ -165,7 +165,7 @@ def renew_lock() -> Generator[None, None, None]:
 
         def match_authorization(request: Any) -> Any:
             return (
-                request.headers["Authorization"] == "Bearer This is a token"  # noqa
+                request.headers["Authorization"] == "Bearer This is a token"
                 and request.query == "id=aoehfra4ayg&ttl=60"
             )
 

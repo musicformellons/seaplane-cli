@@ -15,6 +15,8 @@ def test(s: Session) -> None:
         "python",
         "-m",
         "pytest",
+        "-W",
+        "ignore",
         "--cov=fact",
         "--cov-report=html",
         "--cov-report=term",
@@ -33,7 +35,7 @@ def e2e(s: Session) -> None:
         "--cov=fact",
         "--cov-report=html",
         "--cov-report=term",
-        "tests/end_to_end/e2e_sql_api.py",      
+        "tests/end_to_end/e2e_sql_api.py",
         *s.posargs,
     )
 

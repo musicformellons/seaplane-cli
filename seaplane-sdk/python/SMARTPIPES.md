@@ -146,9 +146,9 @@ For using some of the available Coprocessors, you have to provide some of the AP
 from seaplane import sea
 
 api_keys = {
-    "SEA_API_KEY": "...",  # Seaplane Coprocessors
+    "SEAPLANE_API_KEY": "...",  # Seaplane Coprocessors
     "OPENAI_API_KEY": "...", # OpenAI Coprocessor
-    "RE_API_KEY": "...",  # Replicate Coprocessor
+    "REPLICATE_API_KEY": "...",  # Replicate Coprocessor
 }
 
 config.set_api_keys(api_keys)
@@ -177,7 +177,7 @@ demo.py:
 from seaplane import config, smartpipe, coprocessor, start
 
 api_keys = {
-    "SEA_API_KEY": "sp-test-api-key",  # Seaplane Coprocessors
+    "SEAPLANE_API_KEY": "sp-test-api-key",  # Seaplane Coprocessors
 }
 
 config.set_api_keys(api_keys)

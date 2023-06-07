@@ -1,2 +1,4 @@
-from .lock_api import LockAPI  # noqa
-from .metadata_api import MetadataAPI  # noqa
+from .lock_api import LockAPI
+from .metadata_api import MetadataAPI
+
+__all__ = ("LockAPI", "MetadataAPI")
