@@ -1,43 +1,13 @@
 import functools
 import json
-import traceback
 from typing import Any, Callable, Dict, List, Optional
 
 from ..logging import log
 from ..model.errors import HTTPError
 from .coprocessor import Coprocessor, CoprocessorEvent
+from .event_handler import EventHandler
+from .executor import CoprocessorExecutor, RealCoProcessorExecutor
 from .smartpipe import SmartPipe, SmartPipeEvent
-
-
-def format_exception(e: Optional[Exception]) -> Optional[List[str]]:
-    if e is None:
-        return None
-
-    return traceback.format_exception(type(e), e, e.__traceback__)
-
-
-def event_json(event: SmartPipeEvent) -> Dict[str, Any]:
-    return {
-        "id": event.id,
-        "smart_pipe_id": event.smart_pipe_id,
-        "input": event.input,
-        "status": event.status,
-        "output": event.output,
-        "error": format_exception(event.error),
-        "coprocessors": [
-            coprocessor_event_json(coprocessor) for coprocessor in event.coprocessors
-        ],
-    }
-
-
-def coprocessor_event_json(event: CoprocessorEvent) -> Dict[str, Any]:
-    return {
-        "id": event.id,
-        "input": event.input,
-        "status": event.status,
-        "output": event.output,
-        "error": format_exception(event.error),
-    }
 
 
 def coprocessor_to_json(coprocessor: Coprocessor) -> Dict[str, Any]:
@@ -69,9 +39,10 @@ class Context:
         coprocessors: Optional[List[Coprocessor]] = None,
     ) -> None:
         self.actual_smart_pipe_index = -1
-        self.on_change: Callable[[Dict[str, Any]], None] = lambda x: None
-        self.events: List[SmartPipeEvent] = []
-        self.active_event: List[str] = ["none"]
+        self.event_handler = EventHandler()
+        self.coprocessor_executor: CoprocessorExecutor = RealCoProcessorExecutor(
+            self.event_handler
+        )
 
         if smart_pipes is None:
             self.smart_pipes = []
@@ -90,31 +61,16 @@ class Context:
                 break
 
     def set_event(self, callback: Callable[[Dict[str, Any]], None]) -> None:
-        self.on_change = callback
+        self.event_handler.set_event(callback)
 
     def add_event(self, event: SmartPipeEvent) -> None:
-        self.active_event[0] = event.id
-        self.events.append(event)
-
-        self.on_change({"type": "add_request", "payload": event_json(event)})
+        self.event_handler.add_event(event)
 
     def update_event(self, event: SmartPipeEvent) -> None:
-        for i, e in enumerate(self.events):
-            if e.id == self.active_event[0]:
-                self.events[i] = event
-
-                self.on_change({"type": "update_request", "payload": event_json(event)})
-                break
+        self.event_handler.update_event(event)
 
     def coprocessor_event(self, coprocessor_event: CoprocessorEvent) -> None:
-        for i, event in enumerate(self.events):
-            if event.id == self.active_event[0]:
-                event.add_coprocessor_event(coprocessor_event)
-
-                self.events[i] = event
-
-                self.on_change({"type": "update_request", "payload": event_json(event)})
-                break
+        self.event_handler.coprocessor_event(coprocessor_event)
 
     def get_actual_smart_pipe(self) -> Optional[SmartPipe]:
         if self.actual_smart_pipe_index == -1:
@@ -130,7 +86,7 @@ class Context:
             self.smart_pipes.append(smart_pipe)
 
         log.info(f"🧠 Smart Pipe: {smart_pipe.id}, Path: {smart_pipe.path}")
-        self.on_change(smart_pipes_json(self.smart_pipes))
+        self.event_handler.on_change(smart_pipes_json(self.smart_pipes))
 
     def add_coprocessor(self, coprocessor: Coprocessor) -> None:
         log.info(f"⌛️ Coprocessor {coprocessor.id} of type: {coprocessor.type}")
@@ -146,7 +102,10 @@ class Context:
                 f"🔥 Actual Smart Pipe is None, can't assign \
                     Coprocessor {coprocessor.id} to Smart Pipe"
             )
-        self.on_change(smart_pipes_json(self.smart_pipes))
+        self.event_handler.on_change(smart_pipes_json(self.smart_pipes))
+
+    def set_executor(self, executor: CoprocessorExecutor) -> None:
+        self.coprocessor_executor = executor
 
 
 context = Context()
@@ -236,29 +195,7 @@ def coprocessor(
         def wrapper(*args: Any, **kwargs: Any) -> Any:
             context.assign_to_active_smart_pipe(coprocessor)
 
-            args_str = tuple(arg.decode() if isinstance(arg, bytes) else arg for arg in args)
-            args_json = json.dumps(args_str)
-
-            event = CoprocessorEvent(coprocessor.id, args_json)
-            context.coprocessor_event(event)
-            result = None
-
-            try:
-                result = coprocessor.process(*args, **kwargs)
-                event.set_ouput(result)
-            except HTTPError as err:
-                log.error(f"Coprocessor HTTPError: {err}")
-                event.set_error(err)
-            except Exception as e:
-                log.error(f"Coprocessor error: {e}")
-                event.set_error(e)
-
-            context.coprocessor_event(event)
-
-            if event.error is not None:
-                raise event.error
-
-            return result
+            return context.coprocessor_executor.execute(coprocessor, *args, **kwargs)
 
         return wrapper
 

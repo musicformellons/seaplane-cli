@@ -1,4 +1,4 @@
-from typing import Any, Callable, Dict, Optional, Tuple
+from typing import Any, Callable, Dict, List, Optional, Tuple
 
 from ..logging import log
 from .coprocessors import Bloom, OpenAI, Replicate, Store
@@ -28,14 +28,20 @@ REPLICATE_API_KEY_NAME = "REPLICATE_API_KEY"
 
 class Coprocessor:
     def __init__(
-        self, func: Callable[[Any], Any], type: str, id: str, model: Optional[str]
+        self, func: Callable[[Any], Any], type: str, id: Optional[str], model: Optional[str]
     ) -> None:
         self.func = func
         self.args: Optional[Tuple[Any, ...]] = None
         self.kwargs: Optional[Dict[str, Any]] = None
         self.type = type
         self.model = model
-        self.id = id
+        self.sources: List[str] = []
+        self.name = func.__name__
+
+        if id is not None:
+            self.id = id
+        else:
+            self.id = func.__name__
 
     def process(self, *args: Any, **kwargs: Any) -> Any:
         self.args = args
@@ -66,6 +72,9 @@ class Coprocessor:
         else:
             log.info("Unknown coprocessor...")
             return self.func(*self.args, **self.kwargs)
+
+    def called_from(self, sources: List[str]) -> None:
+        self.sources = sources
 
     def print(self) -> None:
         log.info(f"id: {self.id}, type: {self.type}, model: {self.model}")

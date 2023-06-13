@@ -6,7 +6,7 @@ from .api.sql_api import GlobalSQL
 from .api.token_api import TokenAPI
 from .configuration import Configuration, config
 from .logging import log
-from .smartpipes import Coprocessor, SmartPipe, context, coprocessor, smartpipe, start
+from .smartpipes import Coprocessor, SmartPipe, build, context, coprocessor, smartpipe, start
 
 
 class Seaplane:
@@ -41,4 +41,13 @@ class Seaplane:
 
 sea = Seaplane()
 
-__all__ = ["SmartPipe", "Coprocessor", "coprocessor", "smartpipe", "start", "log", "context"]
+__all__ = [
+    "SmartPipe",
+    "Coprocessor",
+    "coprocessor",
+    "smartpipe",
+    "start",
+    "log",
+    "context",
+    "build",
+]

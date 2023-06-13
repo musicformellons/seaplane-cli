@@ -55,6 +55,9 @@ class SmartPipe:
         self.coprocessors: List[Coprocessor] = []
         self.events: List[SmartPipeEvent] = []
 
+    def process(self, *args: Any, **kwargs: Any) -> Any:
+        self.func(*args, *kwargs)
+
     def add_coprocessor(self, coprocessor: Coprocessor) -> None:
         for i, cp in enumerate(self.coprocessors):
             if cp.id == coprocessor.id:

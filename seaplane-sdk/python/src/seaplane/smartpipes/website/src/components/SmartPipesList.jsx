@@ -72,7 +72,7 @@ export default function SmartPipeList({ smartPipes, currentRequest, currentSmart
           <div className="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">            
             <div className="mx-auto max-w-3xl">
-              { smartPipes.length === 0 ?  <div class="prose lg:prose-xl"><ReactMarkdown
+              { smartPipes.length === 0 ?  <div className="prose lg:prose-xl"><ReactMarkdown
     children={tutorial}
     components={{
       code({node, inline, className, children, ...props}) {
