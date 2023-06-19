@@ -24,6 +24,7 @@ def get_contents_of_root_directory() -> Generator[None, None, None]:
             "https://metadata.cplane.cloud/v1/config",
             additional_matcher=match_authorization,
             status_code=200,
+            headers={"content-type": "application/json"},
             json={"kvs": [{"key": "Zm9vL2Jhcgo", "value": "Ynll"}], "next_key": None},
         )
 
@@ -42,6 +43,7 @@ def get_page_of_directory() -> Generator[None, None, None]:
             "https://metadata.cplane.cloud/v1/config/base64:Zm9v/",
             additional_matcher=match_authorization,
             status_code=200,
+            headers={"content-type": "application/json"},
             json={"kvs": [{"key": "Zm9vL2Jhcgo", "value": "Ynll"}], "next_key": "Zm9vL2Zvbw"},
         )
 
@@ -60,6 +62,7 @@ def get_key_value_pair_decoding_in_base64url() -> Generator[None, None, None]:
             "https://metadata.cplane.cloud/v1/config/base64:Zm9vL2Jhcg",
             additional_matcher=match_authorization,
             status_code=200,
+            headers={"content-type": "application/json"},
             json={"key": "Zm9vL2Jhcg", "value": "Ynll"},
         )
 
@@ -78,6 +81,7 @@ def delete_key_value_pair_decoding_in_base64url() -> Generator[None, None, None]
             "https://metadata.cplane.cloud/v1/config/base64:Zm9vL2Jhcg",
             additional_matcher=match_authorization,
             status_code=200,
+            headers={"content-type": "application/json"},
             json="Ok",
         )
 
@@ -99,6 +103,7 @@ def set_key_value_pair() -> Generator[None, None, None]:
             "https://metadata.cplane.cloud/v1/config/base64:YmFyL2Zvbw",
             additional_matcher=match_authorization,
             status_code=200,
+            headers={"content-type": "application/json"},
             json="Ok",
         )
 
@@ -124,6 +129,7 @@ def set_key_binary_value_pair() -> Generator[None, None, None]:
             "https://metadata.cplane.cloud/v1/config/base64:YmFyL2Zvbw",
             additional_matcher=match_authorization,
             status_code=200,
+            headers={"content-type": "application/json"},
             json="Ok",
         )
 

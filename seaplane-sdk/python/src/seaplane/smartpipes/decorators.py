@@ -6,7 +6,7 @@ from ..logging import log
 from ..model.errors import HTTPError
 from .coprocessor import Coprocessor, CoprocessorEvent
 from .event_handler import EventHandler
-from .executor import CoprocessorExecutor, RealCoProcessorExecutor
+from .executor import CoprocessorExecutor, RealCoprocessorExecutor
 from .smartpipe import SmartPipe, SmartPipeEvent
 
 
@@ -40,7 +40,7 @@ class Context:
     ) -> None:
         self.actual_smart_pipe_index = -1
         self.event_handler = EventHandler()
-        self.coprocessor_executor: CoprocessorExecutor = RealCoProcessorExecutor(
+        self.coprocessor_executor: CoprocessorExecutor = RealCoprocessorExecutor(
             self.event_handler
         )
 
@@ -92,6 +92,13 @@ class Context:
         log.info(f"⌛️ Coprocessor {coprocessor.id} of type: {coprocessor.type}")
         self.coprocessors.append(coprocessor)
 
+    def get_coprocessor(self, id: str) -> Optional[Coprocessor]:
+        for c in self.coprocessors:
+            if c.id == id:
+                return c
+
+        return None
+
     def assign_to_active_smart_pipe(self, coprocessor: Coprocessor) -> None:
         self.smart_pipes[self.actual_smart_pipe_index].add_coprocessor(coprocessor)
         smart_pipe = context.get_actual_smart_pipe()
@@ -113,8 +120,8 @@ context = Context()
 
 def smartpipe(
     path: str,
-    method: str,
     id: str,
+    method: str = "POST",
     parameters: Optional[List[str]] = None,
     _func: Optional[Callable[[Any], Any]] = None,
 ) -> Callable[[Any, Any], Any]:
@@ -182,13 +189,14 @@ def import_coprocessor(
 
 def coprocessor(
     type: str,
-    id: str,
+    id: Optional[str] = None,
     model: Optional[str] = None,
+    sql: Optional[Dict[str, str]] = None,
     _func: Optional[Callable[[Any], Any]] = None,
 ) -> Callable[[Any, Any], Any]:
     def decorator_coprocessor(func: Callable[[Any], Any]) -> Callable[[Any, Any], Any]:
 
-        coprocessor = Coprocessor(func=func, type=type, model=model, id=id)
+        coprocessor = Coprocessor(func=func, type=type, model=model, id=id, sql=sql)
         context.add_coprocessor(coprocessor)
 
         @functools.wraps(func)

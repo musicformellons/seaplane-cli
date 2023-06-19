@@ -1,4 +1,4 @@
-from seaplane import Coprocessor, build, config, coprocessor, log, smartpipe, start
+from seaplane import Coprocessor, config, coprocessor, log, smartpipe, start
 from seaplane.logging import SeaLogger
 
 SEAPLANE_API_KEY = "..."
@@ -185,5 +185,4 @@ def stable_diffusion_smartpipe(input_data=None):
     return stable_diffusion(input_data)
 
 
-# start()
-build()
+app = start()

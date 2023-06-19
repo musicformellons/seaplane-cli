@@ -1,7 +1,8 @@
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
 from ..logging import log
-from .coprocessors import Bloom, OpenAI, Replicate, Store
+from ..model.errors import SeaplaneError
+from .coprocessors import Bloom, OpenAI, Replicate, Sql, Store
 
 
 class CoprocessorEvent:
@@ -28,7 +29,12 @@ REPLICATE_API_KEY_NAME = "REPLICATE_API_KEY"
 
 class Coprocessor:
     def __init__(
-        self, func: Callable[[Any], Any], type: str, id: Optional[str], model: Optional[str]
+        self,
+        func: Callable[[Any], Any],
+        type: str,
+        id: Optional[str] = None,
+        model: Optional[str] = None,
+        sql: Optional[Dict[str, str]] = None,
     ) -> None:
         self.func = func
         self.args: Optional[Tuple[Any, ...]] = None
@@ -36,6 +42,7 @@ class Coprocessor:
         self.type = type
         self.model = model
         self.sources: List[str] = []
+        self.sql = sql
         self.name = func.__name__
 
         if id is not None:
@@ -48,6 +55,13 @@ class Coprocessor:
         self.kwargs = kwargs
 
         log.info(f"Coprocessor type '{self.type}' Model ID {self.model}")
+
+        if self.type == "sql":
+            if self.sql is None:
+                raise SeaplaneError("Coprocessor of type SQL without sql attribute.")
+
+            sql = Sql(self.func, self.id, self.sql)
+            return sql.process(*self.args, **self.kwargs)
 
         if self.type == "vectordb":
             log.info("Accessing Vector DB coprocessor...")
@@ -70,7 +84,7 @@ class Coprocessor:
             replicate = Replicate(self.func, self.type, self.id, self.model)
             return replicate.process(*self.args, **self.kwargs)
         else:
-            log.info("Unknown coprocessor...")
+            log.info("Compute coprocessor type...")
             return self.func(*self.args, **self.kwargs)
 
     def called_from(self, sources: List[str]) -> None:

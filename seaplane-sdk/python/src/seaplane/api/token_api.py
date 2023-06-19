@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Dict, Optional
 
 import requests
 from returns.result import Failure, Result, Success
@@ -25,6 +25,7 @@ class TokenAPI:
         self.api_key = configuration.seaplane_api_key
         self.access_token = configuration._current_access_token
         self.auto_renew = configuration._token_auto_renew
+        self.tenant: Optional[str] = None
 
     def set_url(self, url: str) -> None:
         self.url = url
@@ -72,20 +73,34 @@ class TokenAPI:
         str
             Returns the token.
         """
-        return unwrap(self._request_access_token())
+        return unwrap(self._request_access_token())["token"]
 
-    def _request_access_token(self) -> Result[str, HTTPError]:
+    def get_tenant(self) -> str:
+        """Request the current tenant
+
+        Returns
+        -------
+        str
+            Returns the tenant.
+        """
+        return self.tenant if self.tenant else unwrap(self._request_access_token())["tenant"]
+
+    def _request_access_token(self) -> Result[Dict[str, str], HTTPError]:
         try:
             log.info("Requesting access token...")
+            if not self.api_key:
+                log.error("API KEY not set, use sea.config.set_api_key")
+
             response = requests.post(self.url, json={}, headers=headers(self.api_key))
 
             if response.ok:
-                token = response.json()["token"]
-                self.access_token = token
+                token = response.json()
+                self.access_token = token["token"]
+                self.tenant = token["tenant"]
                 return Success(token)
             else:
                 self._current_access_token = None
-                error_body = response.json()
+                error_body = response.text
                 log.error(
                     f"Bad Access token request code {response.status_code}, error {error_body}"
                 )
@@ -93,8 +108,5 @@ class TokenAPI:
 
         except requests.exceptions.RequestException as err:
             self._current_access_token = None
-            if not self.api_key:
-                log.error("API KEY not set, use sea.config.set_api_key")
-            else:
-                log.error(f"Request access token exception: {str(err)}")
+            log.error(f"Request access token exception: {str(err)}")
             return Failure(HTTPError(SDK_HTTP_ERROR_CODE, str(err)))

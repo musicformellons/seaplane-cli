@@ -12,7 +12,7 @@ class CoprocessorExecutor:
         pass
 
 
-class RealCoProcessorExecutor(CoprocessorExecutor):
+class RealCoprocessorExecutor(CoprocessorExecutor):
     def __init__(self, event_handler: EventHandler) -> None:
         self.event_handler = event_handler
 

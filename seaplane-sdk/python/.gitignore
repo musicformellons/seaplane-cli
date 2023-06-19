@@ -13,4 +13,4 @@ __pycache__
 poetry.lock
 docs/_build
 docs/generated
-examples/build
+**/build

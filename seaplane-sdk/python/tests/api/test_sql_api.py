@@ -34,6 +34,7 @@ def create_database() -> Generator[None, None, None]:
             "https://sql.cplane.cloud/v1/databases",
             additional_matcher=match_authorization,
             status_code=200,
+            headers={"content-type": "application/json"},
             json={
                 "database": "graceful-jewel",
                 "username": "cute-dress",
@@ -56,6 +57,7 @@ def list_databases() -> Generator[None, None, None]:
             "https://sql.cplane.cloud/v1/databases",
             additional_matcher=match_authorization,
             status_code=200,
+            headers={"content-type": "application/json"},
             json={
                 "databases": [
                     {"database": "another-one"},

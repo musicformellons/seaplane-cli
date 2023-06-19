@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "seaplane"
-version = "0.3.7"
+version = "0.3.34"
 description = "Seaplane Python SDK"
 authors = ["Seaplane IO, Inc."]
 license = "Apache License"
@@ -35,8 +35,11 @@ tqdm = "^4.65.0"
 pinecone-client = "^2.2.1"
 tiktoken = "^0.4.0"
 pypdf = "^3.9.0"
-langchain = "^0.0.183"
+langchain = "^0.0.195"
 boto3 = "^1.26.142"
+nats-py="^2.3.1"
+psycopg2-binary = "^2.9.6"
+nkeys = "^0.1.0"
 
 [tool.poetry.dev-dependencies]
 nox-poetry = "*"

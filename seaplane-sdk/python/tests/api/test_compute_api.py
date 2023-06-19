@@ -23,6 +23,7 @@ def get_formations_page() -> Generator[None, None, None]:
             "https://compute.cplane.cloud/v2beta/formations",
             additional_matcher=match_authorization,
             status_code=200,
+            headers={"content-type": "application/json"},
             json={
                 "objects": [
                     {
@@ -64,6 +65,7 @@ def get_formation() -> Generator[None, None, None]:
             "https://compute.cplane.cloud/v2beta/formations/frm-0oug6ng05tvll000e14k2sd3og",
             additional_matcher=match_authorization,
             status_code=200,
+            headers={"content-type": "application/json"},
             json={
                 "oid": "frm-0oug6ng05tvll000e14k2sd3og",
                 "name": "example-formation",

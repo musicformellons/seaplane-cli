@@ -29,7 +29,7 @@ def test_given_token_post_failure_call_returns_the_error_code(  # type: ignore
         token_api.get_token()
     except HTTPError as http_error:
         assert http_error.status == 400
-        assert http_error.message == ""
+        assert http_error.message == '""'
 
 
 def test_given_token_post_call_save_the_token_locally(  # type: ignore

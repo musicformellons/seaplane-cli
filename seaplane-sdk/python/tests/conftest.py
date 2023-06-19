@@ -16,7 +16,7 @@ def add_token_request(requests_mocker: Any) -> None:
         "https://flightdeck.cplane.cloud/v1/token",
         additional_matcher=match_authorization_and_body,
         status_code=200,
-        json={"token": "This is a token"},
+        json={"token": "This is a token", "tenant": "tnt-some-tenant", "subdomain": "sdk-test"},
     )
 
 

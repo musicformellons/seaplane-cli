@@ -24,6 +24,7 @@ def locks_get_page_root_directory() -> Generator[None, None, None]:
             "https://metadata.cplane.cloud/v1/locks",
             additional_matcher=match_authorization,
             status_code=200,
+            headers={"content-type": "application/json"},
             json={
                 "locks": [
                     {
@@ -65,6 +66,7 @@ def locks_get_page_another_directory() -> Generator[None, None, None]:
             "https://metadata.cplane.cloud/v1/locks/base64:Zm9v/",
             additional_matcher=match_authorization,
             status_code=200,
+            headers={"content-type": "application/json"},
             json={
                 "locks": [
                     {
@@ -92,6 +94,7 @@ def get_lock() -> Generator[None, None, None]:
             "https://metadata.cplane.cloud/v1/locks/base64:Zm9vL2Jhcg",
             additional_matcher=match_authorization,
             status_code=200,
+            headers={"content-type": "application/json"},
             json={
                 "name": "Zm9vL2Jhcg",
                 "id": "BiqhSv0tuAk",
@@ -117,6 +120,7 @@ def acquire_lock() -> Generator[None, None, None]:
             "https://metadata.cplane.cloud/v1/locks/base64:Zm9vL2Jhcg",
             additional_matcher=match_authorization,
             status_code=200,
+            headers={"content-type": "application/json"},
             json={"id": "AOEHFRa4Ayg", "sequencer": 3},
         )
 
@@ -138,6 +142,7 @@ def release_lock() -> Generator[None, None, None]:
             "https://metadata.cplane.cloud/v1/locks/base64:Zm9vL2Jhcg",
             additional_matcher=match_authorization,
             status_code=200,
+            headers={"content-type": "application/json"},
             json="OK",
         )
 
@@ -152,6 +157,7 @@ def fails_release_lock() -> Generator[None, None, None]:
         requests_mocker.delete(
             "https://metadata.cplane.cloud/v1/locks/base64:Zm9vL2Jhcg",
             status_code=400,
+            headers={"content-type": "application/json"},
             text="Some error",
         )
 
@@ -173,6 +179,7 @@ def renew_lock() -> Generator[None, None, None]:
             "https://metadata.cplane.cloud/v1/locks/base64:Zm9vL2Jhcg",
             additional_matcher=match_authorization,
             status_code=200,
+            headers={"content-type": "application/json"},
             json="OK",
         )
 

@@ -37,7 +37,13 @@ def provision_req(
             response = request(token)
 
             if response.ok:
-                return Success(response.json())
+                data = None
+                if response.headers.get("content-type") == "application/json":
+                    data = response.json()
+                else:
+                    data = response.text
+
+                return Success(data)
             else:
                 body_error = response.text
                 log.error(f"Request Error: {body_error}")
@@ -65,7 +71,7 @@ def provision_req(
         if token_api.access_token is not None:
             access_token = Success(token_api.access_token)
         else:
-            access_token = token_api._request_access_token()
+            access_token = token_api._request_access_token().map(lambda result: result["token"])
 
         return access_token.bind(lambda token: handle_request(request, token)).lash(
             lambda error: renew_if_fails(token_api, request, error)

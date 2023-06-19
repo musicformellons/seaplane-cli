@@ -9,16 +9,17 @@ _SEAPLANE_COMPUTE_API_ENDPOINT = "https://compute.cplane.cloud/v2beta"
 _SEAPLANE_COORDINATION_API_ENDPOINT = "https://metadata.cplane.cloud/v1"
 _SEAPLANE_IDENTIFY_API_ENDPOINT = "https://flightdeck.cplane.cloud/v1"
 _SEAPLANE_GLOBAL_SQL_API_ENDPOINT = "https://sql.cplane.cloud/v1"
+_SEAPLANE_CARRIER_API_ENDPOINT = "https://carrier.staging.cplane.dev/v1"
 _SEAPLANE_SUBSTATION_API_ENDPOINT = "https://substation.dev.cplane.cloud/v1"
 
 _SEAPLANE_ENV_VAR_PRODUCTION = "SMARTPIPES_PRODUCTION"
 
 
-def get_env(key: str) -> str:
+def get_env(key: str) -> Optional[str]:
     env = os.getenv(key)
 
     if not env:
-        return ""
+        return None
     else:
         return env
 
@@ -38,10 +39,12 @@ class Configuration:
         self.coordination_endpoint = _SEAPLANE_COORDINATION_API_ENDPOINT
         self.global_sql_endpoint = _SEAPLANE_GLOBAL_SQL_API_ENDPOINT
         self.substation_endpoint = _SEAPLANE_SUBSTATION_API_ENDPOINT
+        self.carrier_endpoint = _SEAPLANE_CARRIER_API_ENDPOINT
         self._current_access_token: Optional[str] = None
         self._token_auto_renew = True
-        self._api_keys: Dict[str, str] = {
-            "SEAPLANE_API_KEY": get_env("SEAPLANE_API_KEY"),
+        self.seaplane_api_key = get_env("SEAPLANE_API_KEY")
+        self._api_keys: Dict[str, Optional[str]] = {
+            "SEAPLANE_API_KEY": self.seaplane_api_key,
             "OPENAI_API_KEY": get_env("OPENAI_API_KEY"),
             "REPLICATE_API_KEY": get_env("REPLICATE_API_KEY"),
             "PINECONE_API_KEY": get_env("PINECONE_API_KEY"),
@@ -63,7 +66,7 @@ class Configuration:
         self.seaplane_api_key = api_key
         self._update_token_api()
 
-    def set_api_keys(self, api_keys: Dict[str, str]) -> None:
+    def set_api_keys(self, api_keys: Dict[str, Optional[str]]) -> None:
         """Set the Seaplane API Keys for SmartPipes.
 
         The API Keys is needed for some of the Coprocessors.
@@ -185,6 +188,14 @@ class Configuration:
             self.substation_endpoint = endpoint.rstrip(endpoint[-1])
         else:
             self.substation_endpoint = endpoint
+
+        self._update_token_api()
+
+    def set_carrier_endpoint(self, endpoint: str) -> None:
+        if endpoint[-1] == "/":
+            self.carrier_endpoint = endpoint.rstrip(endpoint[-1])
+        else:
+            self.carrier_endpoint = endpoint
 
         self._update_token_api()
 
