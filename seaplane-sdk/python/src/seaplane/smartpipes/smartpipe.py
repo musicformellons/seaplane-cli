@@ -29,7 +29,7 @@ class SmartPipeEvent:
                 return
         self.coprocessors.append(event)
 
-    def set_ouput(self, output: Any) -> None:
+    def set_output(self, output: Any) -> None:
         self.output = output
         self.status = "completed"
 

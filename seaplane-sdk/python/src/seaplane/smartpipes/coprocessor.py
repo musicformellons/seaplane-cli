@@ -13,7 +13,7 @@ class CoprocessorEvent:
         self.output: Optional[Any] = None
         self.error: Optional[Any] = None
 
-    def set_ouput(self, output: Any) -> None:
+    def set_output(self, output: Any) -> None:
         self.output = output
         self.status = "completed"
 

@@ -34,7 +34,7 @@ config.set_api_key("...")
 
 ### Usage
 
-For writing your frist Smart Pipe you have to import four elements from the Seaplane Python SDK, ***config***, ***smartpipe***, ***coprocessor*** and ***start***
+For writing your first Smart Pipe you have to import four elements from the Seaplane Python SDK, ***config***, ***smartpipe***, ***coprocessor*** and ***start***
 
 * ***config*** is the Configuration Object for setting the API Keys
 * ***smartpipe*** is the decorator for defining a Seaplane Smart Pipe

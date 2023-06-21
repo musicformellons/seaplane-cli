@@ -170,7 +170,7 @@ def start_coprocessor(coprocessor_id: str) -> None:
         try:
             log.info(f" Coprocessor {coprocessor.id}  waiting for getting data...")
             message = json.loads(processor.read())
-            log.debug(f" Message recieved: {message}")
+            log.debug(f" Message received: {message}")
 
             message["output"] = coprocessor.process(message["input"])
 

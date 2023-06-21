@@ -140,7 +140,7 @@ def smartpipe(
 
             try:
                 result = func(*args, **kwargs)
-                event.set_ouput(result)
+                event.set_output(result)
             except HTTPError as err:
                 log.error(f"Smart Pipe error: {err}")
                 event.set_error(err)
@@ -172,7 +172,7 @@ def import_coprocessor(
 
             result = coprocessor.process(*args, **kwargs)
 
-            event.set_ouput(result)
+            event.set_output(result)
             context.coprocessor_event(event)
 
             return func(result)

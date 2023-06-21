@@ -69,7 +69,7 @@ mod metadata_models_test {
 
     #[test]
     fn key_value_range_deserialize() {
-        let deserialzied = serde_json::from_str(
+        let deserialized = serde_json::from_str(
             "{\"next_key\":\"bmV4dCBrZX\",\"kvs\":[{\"key\":\"aGVsbG8\",\"value\":\"dmFsdWU\"}]}",
         )
         .unwrap();
@@ -82,7 +82,7 @@ mod metadata_models_test {
                     value: Value::from_encoded("dmFsdWU"),
                 },]
             },
-            deserialzied
+            deserialized
         );
     }
 

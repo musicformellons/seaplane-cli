@@ -26,7 +26,7 @@ class RealCoprocessorExecutor(CoprocessorExecutor):
 
         try:
             result = coprocessor.process(*args, **kwargs)
-            event.set_ouput(result)
+            event.set_output(result)
         except HTTPError as err:
             log.error(f"Coprocessor HTTPError: {err}")
             event.set_error(err)

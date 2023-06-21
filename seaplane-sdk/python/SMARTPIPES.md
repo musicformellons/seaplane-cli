@@ -32,7 +32,7 @@ def my_smartpipe(body):
 
 Coprocessors that run inside a Smart Pipe can contain any kind of code. Model coprocessors are specifically designed to run inference models and use a smart combination of CPU, GPU, and Memory to reduce inferencing costs. A coprocessor is defined through the @coprocessor decorator. 
 
-You can use external models as well throught Coprocessors to integrate it in your Smart Pipe, like OpenAI models and Open Source Stable Diffusion text-to-image LLMs.
+You can use external models as well through Coprocessors to integrate it in your Smart Pipe, like OpenAI models and Open Source Stable Diffusion text-to-image LLMs.
 
 we can define an **inference** model to run inside a Smart Pipes as follows. We mark the coprocessor as `type='inference'` to take advantage of the inference specific hardware (this allows us to reduce inferencing costs). We specify the model id. This model should match a model that you previously uploaded to the Seaplane Model Registry. The model is available through the model parameter object in your function. 
 

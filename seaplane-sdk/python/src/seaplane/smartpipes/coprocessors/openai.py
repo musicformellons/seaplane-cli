@@ -92,12 +92,12 @@ class OpenAI:
         self.kwargs = kwargs
 
         if self.model == "gpt-3.5":
-            log.info("Procesing GPT-3.5 Model...")
+            log.info("Processing GPT-3.5 Model...")
             self.args = self.args + (_gpt_3_5(),)
 
             return self.func(*self.args, **self.kwargs)
         elif self.model == "gpt-3":
-            log.info("Procesing GPT-3 Model...")
+            log.info("Processing GPT-3 Model...")
             self.args = self.args + (_gpt_3(),)
 
             return self.func(*self.args, **self.kwargs)
