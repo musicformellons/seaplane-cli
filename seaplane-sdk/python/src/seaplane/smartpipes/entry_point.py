@@ -178,6 +178,7 @@ def start_coprocessor(coprocessor_id: str) -> None:
 
             next_message = {"input": message["output"]}
             processor.write(str(json.dumps(next_message)).encode())
+            processor.flush()
         except Exception as e:
             log.error(
                 f"Error running Coprocessor:\
