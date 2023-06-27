@@ -18,7 +18,7 @@ def save_pdfs(input, store):
 def query_pdfs(input, store):
     print(input)
 
-    return store.query(input["filename"], input["query"])
+    return store.fetch_all(input["filename"], input["query"])
 
 
 @smartpipe(path="/save_pdfs", method="POST", parameters=["files"], id="save_files")

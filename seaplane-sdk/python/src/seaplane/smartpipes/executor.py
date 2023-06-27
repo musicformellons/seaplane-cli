@@ -5,6 +5,7 @@ from ..logging import log
 from ..model.errors import HTTPError
 from .coprocessor import Coprocessor, CoprocessorEvent
 from .event_handler import EventHandler
+from .smartpipe import SmartPipe
 
 
 class CoprocessorExecutor:
@@ -53,3 +54,24 @@ class SchemaExecutor(CoprocessorExecutor):
 
         coprocessor.called_from(arguments)
         return coprocessor.id
+
+
+class SmartPipeExecutor:
+    def execute(self, smartpipe: SmartPipe, *args: Any, **kwargs: Any) -> Any:
+        pass
+
+
+class ProductionSmartPipeExecutor(SmartPipeExecutor):
+    def __init__(self) -> None:
+        ...
+
+    def execute(self, smartpipe: SmartPipe, *args: Any, **kwargs: Any) -> Any:
+        pass
+
+
+class DevelopmentSmartPipeExecutor(SmartPipeExecutor):
+    def __init__(self) -> None:
+        ...
+
+    def execute(self, smartpipe: SmartPipe, *args: Any, **kwargs: Any) -> Any:
+        pass

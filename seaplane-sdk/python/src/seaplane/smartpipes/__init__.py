@@ -2,7 +2,7 @@ from .build import build
 from .coprocessor import Coprocessor
 from .decorators import context, coprocessor, smartpipe
 from .deploy import deploy
-from .entry_point import start
+from .entry_points import start
 from .smartpipe import SmartPipe
 
 __all__ = (

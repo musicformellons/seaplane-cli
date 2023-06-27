@@ -23,7 +23,8 @@ def build() -> Dict[str, Any]:
     context.set_executor(SchemaExecutor())
 
     for sm in context.smart_pipes:
-        sm.func("entry_point")
+        result = sm.func("entry_point")
+        sm.return_source = result
 
     for sm in context.smart_pipes:
         smartpipe: Dict[str, Any] = {
@@ -44,6 +45,7 @@ def build() -> Dict[str, Any]:
 
             smartpipe["coprocessors"].append(coprocessor)
 
+        smartpipe["io"]["returns"] = sm.return_source
         schema["smartpipes"][sm.id] = smartpipe
 
     persist_schema(schema)

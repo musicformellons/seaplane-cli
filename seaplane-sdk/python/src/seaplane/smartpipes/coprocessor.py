@@ -34,7 +34,7 @@ class Coprocessor:
         type: str,
         id: Optional[str] = None,
         model: Optional[str] = None,
-        sql: Optional[Dict[str, str]] = None,
+        sql_access: Optional[Dict[str, str]] = None,
     ) -> None:
         self.func = func
         self.args: Optional[Tuple[Any, ...]] = None
@@ -42,7 +42,8 @@ class Coprocessor:
         self.type = type
         self.model = model
         self.sources: List[str] = []
-        self.sql = sql
+        self.sql_access = sql_access
+        self.sql: Optional[Sql] = None
         self.name = func.__name__
 
         if id is not None:
@@ -57,11 +58,13 @@ class Coprocessor:
         log.info(f"Coprocessor type '{self.type}' Model ID {self.model}")
 
         if self.type == "sql":
-            if self.sql is None:
+            if self.sql_access is None:
                 raise SeaplaneError("Coprocessor of type SQL without sql attribute.")
 
-            sql = Sql(self.func, self.id, self.sql)
-            return sql.process(*self.args, **self.kwargs)
+            if not self.sql:
+                self.sql = Sql(self.func, self.id, self.sql_access)
+
+            return self.sql.process(*self.args, **self.kwargs)
 
         if self.type == "vectordb":
             log.info("Accessing Vector DB coprocessor...")

@@ -196,7 +196,7 @@ def coprocessor(
 ) -> Callable[[Any, Any], Any]:
     def decorator_coprocessor(func: Callable[[Any], Any]) -> Callable[[Any, Any], Any]:
 
-        coprocessor = Coprocessor(func=func, type=type, model=model, id=id, sql=sql)
+        coprocessor = Coprocessor(func=func, type=type, model=model, id=id, sql_access=sql)
         context.add_coprocessor(coprocessor)
 
         @functools.wraps(func)

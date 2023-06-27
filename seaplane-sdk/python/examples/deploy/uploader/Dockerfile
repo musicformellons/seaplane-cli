@@ -1,36 +1,14 @@
-FROM docker:stable-dind
+# Use a base image with Python installed
+FROM python:3.10
 
-# Install dependencies (if needed)
-RUN apk update && apk add --no-cache \
-  curl \
-  wget \ 
-  unzip \
-  gcc \
-  libc-dev \
-  libffi-dev \
-  openssl-dev
-
-RUN \	
-	wget https://releases.hashicorp.com/vault/1.6.2/vault_1.6.2_linux_amd64.zip \
-	&& unzip vault_1.6.2_linux_amd64.zip	
-
-# Install Python
-RUN apk add --no-cache python3 python3-dev
-
-# Set Docker environment variables (if needed)
-#ENV DOCKER_TLS_CERTDIR=""
-#ENV DOCKER_HOST="unix:///var/run/docker.sock"
-
-ENV SMARTPIPES_PRODUCTION True
-
+# Set the working directory in the container
 WORKDIR /app
-COPY . . 
 
-RUN pip install --no-cache-dir -r requirements.txt
-RUN pip install gunicorn
+# Copy the entrypoint script to the working directory
+COPY entrypoint.sh .
 
+# Set the entrypoint script as executable
+RUN chmod +x entrypoint.sh
 
-EXPOSE 1337
-
-#RUN ["python", "demo.py"]
-CMD ["gunicorn", "--config", "gunicorn_config.py", "demo:app"]
+# Set the entrypoint command
+ENTRYPOINT ["./entrypoint.sh"]

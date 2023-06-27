@@ -20,6 +20,7 @@ import logging
 import os
 import threading
 import time
+from typing import List, Optional
 
 
 class ProcessorIO:
@@ -41,7 +42,7 @@ class ProcessorIO:
         self._output_fifo: Optional[BufferedWriter] = None
         self._read_lock = threading.Lock()
         self._write_lock = threading.Lock()
-        self._messages = []
+        self._messages: List[bytes] = []
 
     def read(self) -> bytes:
         """
@@ -57,6 +58,8 @@ class ProcessorIO:
                 header = self._input_fifo.read(4)
                 frame_size = int.from_bytes(header, "big", signed=False)
                 return self._input_fifo.read(frame_size)
+
+        return bytes(0)
 
     def write(self, msg: bytes) -> None:
         """
@@ -101,8 +104,9 @@ class ProcessorIO:
                 msg_len = len(msg).to_bytes(4, "big")
                 output.extend(msg_len + msg)
             frame_size = len(output).to_bytes(4, "big")
-            self._output_fifo.write(frame_size + output)
-            self._output_fifo.flush()
+            if self._output_fifo:
+                self._output_fifo.write(frame_size + output)
+                self._output_fifo.flush()
             self._messages.clear()
 
     def start(self) -> None:

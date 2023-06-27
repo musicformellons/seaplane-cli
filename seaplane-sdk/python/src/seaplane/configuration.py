@@ -14,6 +14,14 @@ _SEAPLANE_SUBSTATION_API_ENDPOINT = "https://substation.dev.cplane.cloud/v1"
 
 _SEAPLANE_ENV_VAR_PRODUCTION = "SMARTPIPES_PRODUCTION"
 
+api_key_names = [
+    "SEAPLANE_API_KEY",
+    "OPENAI_API_KEY",
+    "REPLICATE_API_KEY",
+    "PINECONE_API_KEY",
+    "PINECONE_API_ENV",
+]
+
 
 def get_env(key: str) -> Optional[str]:
     env = os.getenv(key)
@@ -22,6 +30,17 @@ def get_env(key: str) -> Optional[str]:
         return None
     else:
         return env
+
+
+def get_api_keys() -> Dict[str, str]:
+    api_keys = {}
+
+    for api_key_env_name in api_key_names:
+        api_key = get_env(api_key_env_name)
+        if api_key:
+            api_keys[api_key_env_name] = api_key
+
+    return api_keys
 
 
 class Configuration:
@@ -43,13 +62,7 @@ class Configuration:
         self._current_access_token: Optional[str] = None
         self._token_auto_renew = True
         self.seaplane_api_key = get_env("SEAPLANE_API_KEY")
-        self._api_keys: Dict[str, Optional[str]] = {
-            "SEAPLANE_API_KEY": self.seaplane_api_key,
-            "OPENAI_API_KEY": get_env("OPENAI_API_KEY"),
-            "REPLICATE_API_KEY": get_env("REPLICATE_API_KEY"),
-            "PINECONE_API_KEY": get_env("PINECONE_API_KEY"),
-            "PINECONE_API_ENV": get_env("PINECONE_API_ENV"),
-        }
+        self._api_keys: Dict[str, str] = get_api_keys()
         self._production = False
         self._update_token_api()
 
@@ -66,7 +79,7 @@ class Configuration:
         self.seaplane_api_key = api_key
         self._update_token_api()
 
-    def set_api_keys(self, api_keys: Dict[str, Optional[str]]) -> None:
+    def set_api_keys(self, api_keys: Dict[str, str]) -> None:
         """Set the Seaplane API Keys for SmartPipes.
 
         The API Keys is needed for some of the Coprocessors.
@@ -242,7 +255,7 @@ class Configuration:
 
     def is_production(self) -> bool:
         if not self._production:
-            return os.getenv(_SEAPLANE_ENV_VAR_PRODUCTION) is not None
+            return os.getenv(_SEAPLANE_ENV_VAR_PRODUCTION, "").lower() == "true"
 
         return self._production
 

@@ -54,6 +54,7 @@ class SmartPipe:
         self.parameters = parameters
         self.coprocessors: List[Coprocessor] = []
         self.events: List[SmartPipeEvent] = []
+        self.return_source = None
 
     def process(self, *args: Any, **kwargs: Any) -> Any:
         self.func(*args, *kwargs)
