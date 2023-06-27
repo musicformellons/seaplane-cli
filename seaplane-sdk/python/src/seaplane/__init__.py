@@ -4,9 +4,9 @@ from .api.metadata_api import MetadataAPI
 from .api.restrict_api import RestrictAPI
 from .api.sql_api import GlobalSQL
 from .api.token_api import TokenAPI
+from .apps import App, Task, app, build, context, start, task
 from .configuration import Configuration, config
 from .logging import log
-from .smartpipes import Coprocessor, SmartPipe, build, context, coprocessor, smartpipe, start
 
 
 class Seaplane:
@@ -42,10 +42,10 @@ class Seaplane:
 sea = Seaplane()
 
 __all__ = [
-    "SmartPipe",
-    "Coprocessor",
-    "coprocessor",
-    "smartpipe",
+    "App",
+    "Task",
+    "task",
+    "app",
     "start",
     "log",
     "context",

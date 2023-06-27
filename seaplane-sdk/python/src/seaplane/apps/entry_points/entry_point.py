@@ -17,22 +17,22 @@ from ...carrier import processor
 from ...configuration import config
 from ...logging import log
 from ...model.errors import SeaplaneError
+from ..app import App
 from ..build import build
 from ..datasources import RequestDataSource
-from ..decorators import context, smart_pipes_json
+from ..decorators import apps_json, context
 from ..deploy import deploy, destroy
-from ..smartpipe import SmartPipe
 
-SMARTPIPES_CORS = list(os.getenv("SMARTPIPES_CORS", "http://localhost:3000").split(" "))
-AUTH_TOKEN = os.getenv("SMARTPIPES_AUTH_TOKEN")
+SEAPLANE_APPS_CORS = list(os.getenv("SEAPLANE_APPS_CORS", "http://localhost:3000").split(" "))
+AUTH_TOKEN = os.getenv("SEAPLANE_APPS_AUTH_TOKEN")
 
 app = Flask(__name__)
 
-CORS(app, origins=SMARTPIPES_CORS)
+CORS(app, origins=SEAPLANE_APPS_CORS)
 
 if not config.is_production():
 
-    sio = SocketIO(app, cors_allowed_origins=SMARTPIPES_CORS, async_mode="threading")
+    sio = SocketIO(app, cors_allowed_origins=SEAPLANE_APPS_CORS, async_mode="threading")
 
     @sio.on("message")  # type: ignore
     def handle_message(data: Any) -> None:
@@ -40,7 +40,7 @@ if not config.is_production():
 
     @sio.on("connect")  # type: ignore
     def on_connect() -> None:
-        emit("message", smart_pipes_json(context.smart_pipes))
+        emit("message", apps_json(context.apps))
 
 
 def send_something(data: Any) -> None:
@@ -62,20 +62,20 @@ def before_request() -> Any:
     if request.path == "/healthz":
         return
 
-    if os.getenv("SMARTPIPES_AUTH_TOKEN") is not None:
+    if os.getenv("SEAPLANE_APPS_AUTH_TOKEN") is not None:
         if not authenticate_token():
             return {"message": "Unauthorized"}, 401
 
 
 def dev_https_api_start() -> Flask:
-    log.debug(f"CORS enabled: {SMARTPIPES_CORS}")
+    log.debug(f"CORS enabled: {SEAPLANE_APPS_CORS}")
     context.set_event(lambda data: send_something(data))
 
-    smart_pipes = context.smart_pipes
+    apps = context.apps
 
-    for smart_pipe in smart_pipes:
+    for myapp in apps:
 
-        def endpoint_func(pipe: SmartPipe = smart_pipe) -> Any:
+        def endpoint_func(pipe: App = myapp) -> Any:
             if request.method == "POST" or request.method == "PUT":
                 data = request.get_json()
                 result = pipe.func(data)
@@ -83,20 +83,20 @@ def dev_https_api_start() -> Flask:
             elif request.method == "GET":
                 return pipe.func("nothing")  # current limitation, it needs to pass something
 
-        endpoint = functools.partial(endpoint_func, pipe=smart_pipe)
-        app.add_url_rule(smart_pipe.path, smart_pipe.id, endpoint, methods=[smart_pipe.method])
+        endpoint = functools.partial(endpoint_func, pipe=myapp)
+        app.add_url_rule(myapp.path, myapp.id, endpoint, methods=[myapp.method])
 
     def health() -> str:
         emit("message", {"data": "test"}, sid="lol", namespace="", broadcast=True)
-        return "Seaplane SmartPipes Demo"
+        return "Seaplane Apps Demo"
 
     app.add_url_rule("/", "healthz", health, methods=["GET"])
 
     if not config.is_production():
-        log.info("🚀 Smart Pipes DEVELOPMENT MODE")
+        log.info("🚀 Apps DEVELOPMENT MODE")
         sio.run(app, debug=False, port=1337)
     else:
-        log.info("🚀 Smart Pipes PRODUCTION MODE")
+        log.info("🚀 Apps PRODUCTION MODE")
 
     return app
 
@@ -105,7 +105,7 @@ loop = asyncio.get_event_loop()
 
 
 async def publish_message(
-    stream: str, id: str, message: Any, order: int, coprocessors: List[str]
+    stream: str, id: str, message: Any, order: int, tasks: List[str]
 ) -> None:
     nc = await nats.connect(
         ["nats://148.163.201.1:2003"],
@@ -115,9 +115,9 @@ async def publish_message(
 
     nats_message = {"id": id, "input": message, "order": order}
 
-    for coprocessor in coprocessors:
-        log.debug(f"Sending to {stream}.{coprocessor} coprocessor,  message: {nats_message}")
-        ack = await js.publish(f"{stream}.{coprocessor}", str(json.dumps(nats_message)).encode())
+    for task in tasks:
+        log.debug(f"Sending to {stream}.{task} task,  message: {nats_message}")
+        ack = await js.publish(f"{stream}.{task}", str(json.dumps(nats_message)).encode())
         log.debug(f"ACK: {ack}")
 
     await nc.close()
@@ -140,17 +140,17 @@ def build_requests_datasource() -> RequestDataSource:
 
 
 def prod_https_api_start() -> Flask:
-    log.debug(f"CORS enabled: {SMARTPIPES_CORS}")
+    log.debug(f"CORS enabled: {SEAPLANE_APPS_CORS}")
 
     schema = build()
     context.set_event(lambda data: send_something(data))
     requests_datasource = build_requests_datasource()
 
-    smart_pipes = context.smart_pipes
+    apps = context.apps
 
-    for smart_pipe in smart_pipes:
+    for myapp in apps:
 
-        def endpoint_func(pipe: SmartPipe = smart_pipe) -> Any:
+        def endpoint_func(pipe: App = myapp) -> Any:
             if request.method == "POST" or request.method == "PUT":
                 body = request.get_json()
 
@@ -158,7 +158,7 @@ def prod_https_api_start() -> Flask:
                     return jsonify({"error": "Invalid JSON"}), 401
 
                 id = generate_id()
-                smart_pipe_first_coprocessors = schema["smartpipes"][pipe.id]["io"]["entry_point"]
+                app_first_tasks = schema["apps"][pipe.id]["io"]["entry_point"]
                 metadata = body["params"]
 
                 batch = body["input"]
@@ -166,7 +166,7 @@ def prod_https_api_start() -> Flask:
                 for idx, content in enumerate(batch):
                     content["_params"] = metadata
                     loop.run_until_complete(
-                        publish_message(pipe.id, id, content, idx, smart_pipe_first_coprocessors)
+                        publish_message(pipe.id, id, content, idx, app_first_tasks)
                     )
 
                 requests_datasource.save_request(id, len(batch))
@@ -193,33 +193,31 @@ def prod_https_api_start() -> Flask:
 
             return jsonify({"id": id, "status": status, "output": output}), 200
 
-        endpoint = functools.partial(endpoint_func, pipe=smart_pipe)
-        app.add_url_rule(smart_pipe.path, smart_pipe.id, endpoint, methods=[smart_pipe.method])
-        app.add_url_rule(
-            f"{smart_pipe.path}/<id>", f"{smart_pipe.id}_query", get_result, methods=["GET"]
-        )
+        endpoint = functools.partial(endpoint_func, pipe=myapp)
+        app.add_url_rule(myapp.path, myapp.id, endpoint, methods=[myapp.method])
+        app.add_url_rule(f"{myapp.path}/<id>", f"{myapp.id}_query", get_result, methods=["GET"])
 
     def health() -> str:
-        return "Seaplane SmartPipes Demo"
+        return "Seaplane Apps Demo"
 
     app.add_url_rule("/", "healthz", health, methods=["GET"])
 
     if not config.is_production():
-        log.info("🚀 Smart Pipes DEVELOPMENT MODE")
+        log.info("🚀 Seaplane Apps DEVELOPMENT MODE")
         sio.run(app, debug=False, port=1337)
     else:
-        log.info("🚀 Smart Pipes PRODUCTION MODE")
+        log.info("🚀 Seaplane Apps PRODUCTION MODE")
 
     return app
 
 
-def start_coprocessor(coprocessor_id: str, save_result: bool) -> None:
-    coprocessor = context.get_coprocessor(coprocessor_id)
+def start_task(task_id: str, save_result: bool) -> None:
+    task = context.get_task(task_id)
 
-    if not coprocessor:
+    if not task:
         raise SeaplaneError(
-            f"Coprocessor {coprocessor_id} not found, \
-                            make sure the Coprocessor ID is correct."
+            f"Task {task_id} not found, \
+                            make sure the Task ID is correct."
         )
 
     processor.start()
@@ -229,7 +227,7 @@ def start_coprocessor(coprocessor_id: str, save_result: bool) -> None:
         requests_datasource = build_requests_datasource()
 
     while True:
-        log.info(f" Coprocessor {coprocessor.id}  waiting for getting data...")
+        log.info(f" Task {task.id}  waiting for getting data...")
         message = json.loads(processor.read())
         log.debug(f" Message recieved: {message}")
 
@@ -237,9 +235,9 @@ def start_coprocessor(coprocessor_id: str, save_result: bool) -> None:
         order = message["order"]
 
         try:
-            message["output"] = coprocessor.process(message["input"])
+            message["output"] = task.process(message["input"])
 
-            log.debug(f" Coprocessor Result: {message}")
+            log.debug(f" Task Result: {message}")
 
             next_message = {"input": message["output"], "id": id, "order": order}
             processor.write(str(json.dumps(next_message)).encode())
@@ -250,7 +248,7 @@ def start_coprocessor(coprocessor_id: str, save_result: bool) -> None:
         except Exception as e:
             error_str = "\n".join(traceback.format_exception(type(e), e, e.__traceback__))
             log.error(
-                f"Error running Coprocessor:\
+                f"Error running Task:\
                       \n {error_str}"
             )
             next_message = {"input": {"error": error_str}, "id": id, "order": order}
@@ -275,16 +273,16 @@ def start() -> Optional[Flask]:
             destroy()
             return None
 
-    coprocessor_id: Optional[str] = os.getenv("COPROCESSOR_ID")
+    task_id: Optional[str] = os.getenv("TASK_ID")
 
-    if not coprocessor_id:
+    if not task_id:
         log.info("Starting API Entry Point...")
         if not config.is_production():
             return dev_https_api_start()
         else:
             return prod_https_api_start()
     else:
-        log.info(f"Starting Coprocessor {coprocessor_id} ...")
-        save_result = os.getenv("SAVE_RESULT_COPROCESSOR", "").lower() == "true"
-        start_coprocessor(coprocessor_id, save_result)
+        log.info(f"Starting Task {task_id} ...")
+        save_result = os.getenv("SAVE_RESULT_TASK", "").lower() == "true"
+        start_task(task_id, save_result)
         return None

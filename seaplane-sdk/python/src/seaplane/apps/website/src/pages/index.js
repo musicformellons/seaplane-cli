@@ -1,14 +1,14 @@
 
 import { Inter } from 'next/font/google'
 import Head from 'next/head'
-import SmartPipeList from '@/components/SmartPipesList'
+import AppList from '@/components/AppsList'
 import React, { useState, useEffect } from 'react';
 import socketio from 'socket.io-client';
 
 export default function Home() {
-  const [smartPipes, setSmartPipes] = useState([])
+  const [apps, setApps] = useState([])
   const [socket, setSocket] = useState(null);
-  const [currentSmartPipe, setCurrentSmartPipe] = useState(undefined);
+  const [currentApp, setCurrentApp] = useState(undefined);
   const [currentRequest, setCurrentRequest] = useState(undefined);
 
   useEffect(() => {
@@ -29,12 +29,12 @@ export default function Home() {
     if (!socket) return;
     socket.on('message', message => {
       console.log(`Received message from server:`, message);
-      if(message.type === 'smart_pipes') {
-        setSmartPipes(message.payload)        
-        if(currentSmartPipe !== undefined) {          
+      if(message.type === 'apps') {
+        setApps(message.payload)        
+        if(currentApp !== undefined) {          
           message.payload.forEach(sp => {
-            if(sp.id === currentSmartPipe.id) {
-              setCurrentSmartPipe(sp)              
+            if(sp.id === currentApp.id) {
+              setCurrentApp(sp)              
             }
           })          
         }
@@ -44,15 +44,15 @@ export default function Home() {
         setCurrentRequest(message.payload)
       }
     });
-  }, [socket, currentSmartPipe]);
+  }, [socket, currentApp]);
 
   return (
     <>   
     <Head>
-        <title>SmartPipes - Seaplane</title>
+        <title>Apps - Seaplane</title>
     </Head>
       <div className="min-h-full">                                   
-        <SmartPipeList smartPipes={smartPipes} currentSmartPipe={currentSmartPipe} setCurrentSmartPipe={setCurrentSmartPipe} currentRequest={currentRequest}/>
+        <AppList apps={apps} currentApp={currentApp} setCurrentApp={setCurrentApp} currentRequest={currentRequest}/>
       </div>
     </>
   )

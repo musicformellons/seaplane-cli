@@ -1,21 +1,21 @@
-from seaplane import config, coprocessor, smartpipe, start
+from seaplane import app, config, start, task
 
 api_keys = {
-    "SEAPLANE_API_KEY": "...",  # Seaplane Coprocessors
+    "SEAPLANE_API_KEY": "...",  # Seaplane Tasks
 }
 
 config.set_api_keys(api_keys)
 
 
-@coprocessor(type="inference", model="bloom", id="my-bloom-coprocessor")
+@task(type="inference", model="bloom", id="my-bloom-task")
 def bloom_inference(input, model):
 
     # run your inference here
     return model(input)
 
 
-@smartpipe(path="/my-api-endpoint", method="POST", id="my-smart-pipe")
-def my_smartpipe(body):
+@app(path="/my-api-endpoint", method="POST", id="my-app")
+def my_app(body):
 
     return bloom_inference(body)
 

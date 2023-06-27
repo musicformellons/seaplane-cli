@@ -65,10 +65,10 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
 }
 
-const onClick = (smartPipe, body) => {
-  console.log(`Request to ${smartPipe.path} with body: ${JSON.stringify(body)}`)
-  fetch(`http://localhost:1337${smartPipe.path}`, {
-    method: smartPipe.method,    
+const onClick = (app, body) => {
+  console.log(`Request to ${app.path} with body: ${JSON.stringify(body)}`)
+  fetch(`http://localhost:1337${app.path}`, {
+    method: app.method,    
     headers: {
       'Content-Type': 'application/json'
     },
@@ -86,22 +86,22 @@ const statuses = {
   completed: 'text-green-800 bg-green-50 ring-green-600/20',  
 }
 
-const getCoprocessorEvent = (currentRequest, coprocessor) => {  
+const getTaskEvent = (currentRequest, task) => {  
   if(currentRequest === undefined) return undefined
 
-  const res = currentRequest.coprocessors.filter(co => co.id === coprocessor.id)
+  const res = currentRequest.tasks.filter(co => co.id === task.id)
   return res.length > 0 ? res[0] : undefined
 }
 
-export default function SmartPipe({currentRequest, smartPipe}) {
+export default function App({currentRequest, app}) {
   const [body, setBody] = useState(undefined)
 
   return (
     <div className="flow-root">
         
-      {smartPipe?.method === 'POST' ? (<div className='mb-4'>
+      {app?.method === 'POST' ? (<div className='mb-4'>
         <label htmlFor="comment" className="block text-sm font-medium leading-6 text-gray-900">
-          Make a request to {smartPipe.method} {smartPipe.path} 
+          Make a request to {app.method} {app.path} 
         </label>
         <div className="mt-2">
           <textarea
@@ -118,14 +118,14 @@ export default function SmartPipe({currentRequest, smartPipe}) {
       <div className="flex mb-10 justify-end">        
            
                   <a
-                        onClick={() => {onClick(smartPipe, body)}}
+                        onClick={() => {onClick(app, body)}}
                         className="hidden rounded-md bg-[#00bda5] px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 hover:text-black sm:block"
                       >
                         Make Request
                       </a>            
         </div>
       <ul role="list" className="-mb-8">
-      <li key={smartPipe.id}>
+      <li key={app.id}>
             <div className="relative pb-8">
               <span className="absolute left-4 top-4 -ml-px h-full w-0.5 bg-gray-200" aria-hidden="true" />
               <div className="relative flex space-x-3">
@@ -144,13 +144,13 @@ export default function SmartPipe({currentRequest, smartPipe}) {
                     <div className="flex items-start gap-x-3">                      
                         <p
                           className={classNames(
-                            statuses[smartPipe.method],
+                            statuses[app.method],
                             'rounded-md whitespace-nowrap mt-0.5 px-1.5 py-0.5 text-xs font-medium ring-1 ring-inset'
                           )}
                         >
-                          {smartPipe.method}
+                          {app.method}
                         </p>                        
-                        <p className="text-sm font-semibold leading-6 text-gray-900">{' '+ smartPipe.id }</p>
+                        <p className="text-sm font-semibold leading-6 text-gray-900">{' '+ app.id }</p>
                                                
                       </div>                      
                       {currentRequest !== undefined ? (
@@ -173,47 +173,47 @@ export default function SmartPipe({currentRequest, smartPipe}) {
               </div>
             </div>
           </li>
-        {smartPipe.coprocessors.map((coprocessor, eventIdx) => (
-          <li key={coprocessor.id}>
+        {app.tasks.map((task, eventIdx) => (
+          <li key={task.id}>
             <div className="relative pb-8">
-              {eventIdx !== smartPipe.coprocessors.length - 1 ? (
+              {eventIdx !== app.tasks.length - 1 ? (
                 <span className="absolute left-4 top-4 -ml-px h-full w-0.5 bg-gray-200" aria-hidden="true" />
               ) : null}
               <div className="relative flex space-x-3">
                 <div>
                   <span
                     className={classNames(
-                      icons(coprocessor.model).color,
+                      icons(task.model).color,
                       'h-8 w-8 rounded-full flex items-center justify-center ring-8 ring-white'
                     )}
                   >
-                    <Image src={icons(coprocessor.model).icon} width={24} height={24} alt="OpenAI logo" />
+                    <Image src={icons(task.model).icon} width={24} height={24} alt="OpenAI logo" />
                   </span>
                 </div>
                 <div className="flex min-w-0 flex-1 justify-between space-x-4 pt-1.5">                  
                   <div>                                                               
                     <p className="text-sm text-gray-500">
-                      {coprocessor.type === 'compute' ? 'Compute' : <span className='text-sm font-semibold'>{'Model: ' + coprocessor.model}</span> }{' '}<span className='text-sm font-semibold'>{'ID: ' + coprocessor.id} </span>
+                      {task.type === 'compute' ? 'Compute' : <span className='text-sm font-semibold'>{'Model: ' + task.model}</span> }{' '}<span className='text-sm font-semibold'>{'ID: ' + task.id} </span>
                     </p>                                                       
-                    {getCoprocessorEvent(currentRequest, coprocessor) !== undefined ? (
+                    {getTaskEvent(currentRequest, task) !== undefined ? (
                         <div>                          
                           <div className="my-5">
                             <p className="font-semibold">Input:</p>
                             <div className="bg-white border rounded-md p-4">
-                              <p className="">{getCoprocessorEvent(currentRequest, coprocessor).input}</p>
+                              <p className="">{getTaskEvent(currentRequest, task).input}</p>
                             </div>
                           </div>                           
-                          {getCoprocessorEvent(currentRequest, coprocessor).status !== 'error' ? (
+                          {getTaskEvent(currentRequest, task).status !== 'error' ? (
                             <div className="my-5">
                             <p className="font-semibold">Output:</p>
                             <div className="bg-white border rounded-md p-4">
-                              <p className="">{JSON.stringify(getCoprocessorEvent(currentRequest, coprocessor).output, null, 2)}</p>
+                              <p className="">{JSON.stringify(getTaskEvent(currentRequest, task).output, null, 2)}</p>
                             </div>
                           </div>                         
                           ): (<div className="my-5">
                           <p className="text-red-500 font-semibold">Error:</p>
                           <div className="bg-gray-300 border rounded-md p-4">
-                            <pre className="whitespace-pre-wrap break-word">{showError(getCoprocessorEvent(currentRequest, coprocessor).error)}</pre>
+                            <pre className="whitespace-pre-wrap break-word">{showError(getTaskEvent(currentRequest, task).error)}</pre>
                           </div>
                         </div>)}
                           
@@ -221,14 +221,14 @@ export default function SmartPipe({currentRequest, smartPipe}) {
                       ): null}    
                   </div>                  
                   <div className="whitespace-nowrap text-right text-sm text-gray-500">
-                    {getCoprocessorEvent(currentRequest, coprocessor) !== undefined ?  (<div className="whitespace-nowrap text-right text-sm text-gray-500">
+                    {getTaskEvent(currentRequest, task) !== undefined ?  (<div className="whitespace-nowrap text-right text-sm text-gray-500">
                           <p
                             className={classNames(
-                              statuses[getCoprocessorEvent(currentRequest, coprocessor).status],
+                              statuses[getTaskEvent(currentRequest, task).status],
                               'rounded-md whitespace-nowrap mt-0.5 px-1.5 py-0.5 text-xs font-medium ring-1 ring-inset'
                             )}
                           >
-                            {getCoprocessorEvent(currentRequest, coprocessor).status}
+                            {getTaskEvent(currentRequest, task).status}
                           </p>                                                  
                         </div>) : null} 
                   </div>

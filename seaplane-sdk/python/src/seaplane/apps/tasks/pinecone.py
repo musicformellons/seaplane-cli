@@ -95,7 +95,7 @@ class Store:
         return {"answer": result["answer"], "history": history}
 
 
-class PineconeCoprocessor:
+class PineconeTask:
     def __init__(self, func: Callable[[Any], Any], id: str, model: Optional[str]) -> None:
         self.func = func
         self.args: Optional[Tuple[Any, ...]] = None
@@ -109,7 +109,7 @@ class PineconeCoprocessor:
         self.kwargs = kwargs
 
         if self.type == "pinecone":
-            log.info("Accessing Vector DB coprocessor...")
+            log.info("Accessing Vector DB task...")
             self.args = self.args + (Store(),)
 
             return self.func(*self.args, **self.kwargs)

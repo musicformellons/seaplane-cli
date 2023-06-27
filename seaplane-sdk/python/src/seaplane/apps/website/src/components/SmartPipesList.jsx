@@ -1,5 +1,5 @@
 import Header from './Header'
-import SmartPipe from './SmartPipe'
+import App from './App'
 import { tutorial } from '../pages/tutorial';
 import ReactMarkdown from 'react-markdown'
 import {Prism as SyntaxHighlighter} from 'react-syntax-highlighter'
@@ -17,10 +17,10 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
 }
 
-const SList = ({smartPipes, setCurrentSmartPipe}) => {
+const SList = ({apps, setCurrentApp}) => {
   return (
     <ul role="list" className="divide-y divide-gray-100">
-                {smartPipes.map((project) => (
+                {apps.map((project) => (
                   <li key={project.id} className="flex items-center justify-between gap-x-6 py-5">
                     <div className="min-w-0">
                       <div className="flex items-start gap-x-3">                      
@@ -45,10 +45,10 @@ const SList = ({smartPipes, setCurrentSmartPipe}) => {
                     </div>
                     <div className="flex flex-none items-center gap-x-4">
                       <a
-                        onClick={() => {setCurrentSmartPipe(project)}}
+                        onClick={() => {setCurrentApp(project)}}
                         className="hidden rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:block"
                       >
-                        View SmartPipe<span className="sr-only">, {project.name}</span>
+                        View App<span className="sr-only">, {project.name}</span>
                       </a>                    
                     </div>
                   </li>
@@ -57,7 +57,7 @@ const SList = ({smartPipes, setCurrentSmartPipe}) => {
   )
 }
 
-export default function SmartPipeList({ smartPipes, currentRequest, currentSmartPipe, setCurrentSmartPipe }) {  
+export default function AppList({ apps, currentRequest, currentApp, setCurrentApp }) {  
 
   return (
     <div className="min-h-full">
@@ -65,14 +65,14 @@ export default function SmartPipeList({ smartPipes, currentRequest, currentSmart
 
         <header className="bg-gray-100 shadow-sm">
           <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
-            <h1 className="text-3xl font-semibold leading-10 text-gray-900">SmartPipes</h1>
+            <h1 className="text-3xl font-semibold leading-10 text-gray-900">Apps</h1>
           </div>
         </header>
         <main>
           <div className="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">            
             <div className="mx-auto max-w-3xl">
-              { smartPipes.length === 0 ?  <div className="prose lg:prose-xl"><ReactMarkdown
+              { apps.length === 0 ?  <div className="prose lg:prose-xl"><ReactMarkdown
     children={tutorial}
     components={{
       code({node, inline, className, children, ...props}) {
@@ -92,7 +92,7 @@ export default function SmartPipeList({ smartPipes, currentRequest, currentSmart
                 }
               }}
             /> </div>: null}        
-              { currentSmartPipe !== undefined ? <SmartPipe currentRequest={currentRequest} smartPipe={currentSmartPipe} /> : <SList smartPipes={smartPipes} setCurrentSmartPipe={setCurrentSmartPipe} />}
+              { currentApp !== undefined ? <App currentRequest={currentRequest} app={currentApp} /> : <SList apps={apps} setCurrentApp={setCurrentApp} />}
             </div>
           </div>            
           </div>

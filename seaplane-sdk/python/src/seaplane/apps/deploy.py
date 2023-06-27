@@ -13,18 +13,18 @@ from ..configuration import Configuration, config
 from ..logging import log
 from ..model.secrets import Secret
 from ..util import unwrap
+from .app import App
 from .build import build
-from .coprocessor import Coprocessor
 from .datasources import tenant_database
 from .decorators import context
-from .smartpipe import SmartPipe
+from .task import Task
 
 
-def create_coprocessor_docker_file(coprocessor: Coprocessor) -> None:
+def create_task_docker_file(task: Task) -> None:
     docker_file = f"""FROM python:3.10
 
-ENV SMARTPIPES_PRODUCTION True
-ENV COPROCESSOR_ID {coprocessor.id}
+ENV SEAPLANE_APPS_PRODUCTION True
+ENV TASK_ID {task.id}
 
 WORKDIR /app
 COPY . .
@@ -33,21 +33,21 @@ RUN pip install --no-cache-dir -r requirements.txt
 ENTRYPOINT ["python", "demo.py"]
     """
 
-    if not os.path.exists(f"build/{coprocessor.id}"):
-        os.makedirs(f"build/{coprocessor.id}")
+    if not os.path.exists(f"build/{task.id}"):
+        os.makedirs(f"build/{task.id}")
 
-    with open(f"build/{coprocessor.id}/Dockerfile", "w") as file:
+    with open(f"build/{task.id}/Dockerfile", "w") as file:
         file.write(docker_file)
 
     # os.system(
-    #    f"docker buildx build --platform linux/arm64,linux/amd64 -t us-central1-docker.pkg.dev/artifacts-356722/demo/coprocessors/{coprocessor.id}:latest  build/{coprocessor.id}  --push"  # noqa
+    #    f"docker buildx build --platform linux/arm64,linux/amd64 -t us-central1-docker.pkg.dev/artifacts-356722/demo/tasks/{task.id}:latest  build/{task.id}  --push"  # noqa
     # )
 
 
 def create_http_api_entry_point_docker_file() -> None:
     docker_file = """FROM python:3.10
 
-ENV SMARTPIPES_PRODUCTION True
+ENV SEAPLANE_APPS_PRODUCTION True
 ENV PORT 5000
 
 WORKDIR /app
@@ -71,54 +71,51 @@ CMD gunicorn --bind 0.0.0.0:${PORT} --workers 1 --timeout 300 demo:app
 
 def create_carrier_workload_file(
     tenant: str,
-    smart_pipe_id: str,
-    coprocessor: Coprocessor,
-    next_coprocessors: List[str],
+    app_id: str,
+    task: Task,
+    next_tasks: List[str],
     project_url: str,
 ) -> Dict[str, Any]:
     output: Optional[Dict[str, Any]] = None
 
-    if len(next_coprocessors) > 1:
+    if len(next_tasks) > 1:
         output = {
             "broker": {
-                "outputs": (
-                    {"carrier": {"subject": f"{smart_pipe_id}.{c_id}"}}
-                    for c_id in next_coprocessors
-                )
+                "outputs": ({"carrier": {"subject": f"{app_id}.{c_id}"}} for c_id in next_tasks)
             }
         }
-    elif len(next_coprocessors) == 1:
+    elif len(next_tasks) == 1:
         output = {
             "label": "carrier_out",
-            "carrier": {"subject": f"{smart_pipe_id}.{next_coprocessors[0]}"},
+            "carrier": {"subject": f"{app_id}.{next_tasks[0]}"},
         }
 
     workload = {
         "tenant": tenant,
-        "id": coprocessor.id,
+        "id": task.id,
         "input": {
             "label": "carrier_in",
             "carrier": {
-                "subject": f"{smart_pipe_id}.{coprocessor.id}",
+                "subject": f"{app_id}.{task.id}",
                 "deliver": "all",
-                "queue": coprocessor.id,
+                "queue": task.id,
             },
         },
         "processor": {
             "docker": {
-                "image": "us-central1-docker.pkg.dev/artifacts-356722/demo/smartpipe-executor:latest",  # noqa
+                "image": "us-central1-docker.pkg.dev/artifacts-356722/demo/app-executor:latest",  # noqa
                 "args": [project_url],
             }
         },
         "output": output,
     }
 
-    if not os.path.exists(f"build/{coprocessor.id}"):
-        os.makedirs(f"build/{coprocessor.id}")
+    if not os.path.exists(f"build/{task.id}"):
+        os.makedirs(f"build/{task.id}")
 
-    with open(f"build/{coprocessor.id}/workload.json", "w") as file:
+    with open(f"build/{task.id}/workload.json", "w") as file:
         json.dump(workload, file, indent=2)
-        log.debug(f"Created {coprocessor.id} workload")
+        log.debug(f"Created {task.id} workload")
 
     return workload
 
@@ -274,75 +271,67 @@ def upload_project(tenant: str) -> str:
     return result
 
 
-def deploy_coprocessor(
+def deploy_task(
     tenant: str,
-    smart_pipe: SmartPipe,
-    coprocessor: Coprocessor,
+    app: App,
+    task: Task,
     schema: Dict[str, Any],
     secrets: List[Secret],
     project_url: str,
 ) -> None:
-    delete_flow(coprocessor.id)
+    delete_flow(task.id)
 
-    save_result_coprocessor = (
-        schema["smartpipes"][smart_pipe.id]["io"].get("returns", None) == coprocessor.id
-    )
+    save_result_task = schema["apps"][app.id]["io"].get("returns", None) == task.id
 
-    save_result_coprocessor = (
-        schema["smartpipes"][smart_pipe.id]["io"].get("returns", None) == coprocessor.id
-    )
-    copy_project_into_resource(coprocessor.id)
-    create_coprocessor_docker_file(coprocessor)
-    next_coprocessors = schema["smartpipes"][smart_pipe.id]["io"].get(coprocessor.id, None)
+    save_result_task = schema["apps"][app.id]["io"].get("returns", None) == task.id
+    copy_project_into_resource(task.id)
+    create_task_docker_file(task)
+    next_tasks = schema["apps"][app.id]["io"].get(task.id, None)
 
-    if next_coprocessors is None:
-        next_coprocessors = []
+    if next_tasks is None:
+        next_tasks = []
 
-    workload = create_carrier_workload_file(
-        tenant, smart_pipe.id, coprocessor, next_coprocessors, project_url
-    )
+    workload = create_carrier_workload_file(tenant, app.id, task, next_tasks, project_url)
 
-    save_result_coprocessor = (
-        schema["smartpipes"][smart_pipe.id]["io"].get("returns", None) == coprocessor.id
-    )
+    save_result_task = schema["apps"][app.id]["io"].get("returns", None) == task.id
 
-    create_flow(coprocessor.id, workload)
-    secrets.append(Secret("COPROCESSOR_ID", coprocessor.id))
-    secrets.append(Secret("SAVE_RESULT_COPROCESSOR", str(save_result_coprocessor)))
-    add_secrets(coprocessor.id, secrets)
+    create_flow(task.id, workload)
+    secrets.append(Secret("TASK_ID", task.id))
+    secrets.append(Secret("SAVE_RESULT_TASK", str(save_result_task)))
+    add_secrets(task.id, secrets)
 
-    log.info(f"Deploy for coprocessor {coprocessor.id} done")
+    log.info(f"Deploy for task {task.id} done")
 
 
-def deploy(coprocessor_id: Optional[str] = None) -> None:
+def deploy(task_id: Optional[str] = None) -> None:
     schema = build()
     tenant = TokenAPI(config).get_tenant()
     tenant_db = tenant_database()
     secrets = get_secrets(config)
     project_url = upload_project(tenant)
 
-    secrets.append(Secret("SMARTPIPES_PRODUCTION", "true"))
+    secrets.append(Secret("SEAPLANE_APPS_PRODUCTION", "true"))
     secrets.append(Secret("SEAPLANE_TENANT_DB__DATABASE", tenant_db.name))
     secrets.append(Secret("SEAPLANE_TENANT_DB_USERNAME", tenant_db.username))
     secrets.append(Secret("SEAPLANE_TENANT_DB_PASSWORD", tenant_db.password))
 
-    if coprocessor_id is not None and coprocessor_id != "entry_point":
-        for sm in context.smart_pipes:
-            for c in sm.coprocessors:
-                if c.id == coprocessor_id:
-                    deploy_coprocessor(tenant, sm, c, schema, secrets[:], project_url)
-    elif coprocessor_id is not None and coprocessor_id == "entry_point":
+    if task_id is not None and task_id != "entry_point":
+        for sm in context.apps:
+            for c in sm.tasks:
+                if c.id == task_id:
+                    deploy_task(tenant, sm, c, schema, secrets[:], project_url)
+    elif task_id is not None and task_id == "entry_point":
         log.info("Deploying entry points...")
 
         copy_project_into_resource("http")
         create_http_api_entry_point_docker_file()
     else:  # deploy everything
-        for sm in context.smart_pipes:
+        for sm in context.apps:
             delete_stream(sm.id)
             create_stream(sm.id)
 
-            for c in sm.coprocessors:
-                deploy_coprocessor(tenant, sm, c, schema, secrets[:], project_url)
+            for c in sm.tasks:
+                deploy_task(tenant, sm, c, schema, secrets[:], project_url)
 
     log.info("Deployment complete")
 
@@ -350,8 +339,8 @@ def deploy(coprocessor_id: Optional[str] = None) -> None:
 def destroy() -> None:
     build()
 
-    for sm in context.smart_pipes:
+    for sm in context.apps:
         delete_stream(sm.id)
 
-        for c in sm.coprocessors:
+        for c in sm.tasks:
             delete_flow(c.id)

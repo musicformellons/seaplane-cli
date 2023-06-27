@@ -103,8 +103,8 @@ class OpenAI:
             return self.func(*self.args, **self.kwargs)
         else:
             raise SeaplaneError(
-                "OPENAI Coprocessor Not recognised , the model \
-                    doesn't match with any current OPEN AI coprocessor."
+                "OPENAI Task Not recognised , the model \
+                    doesn't match with any current OPEN AI task."
             )
 
     def print(self) -> None:

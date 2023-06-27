@@ -87,14 +87,14 @@ class Replicate:
         self.kwargs = kwargs
 
         if self.model == "stable-diffusion":
-            log.info("Accessing Replicate stable-diffusion coprocessor...")
+            log.info("Accessing Replicate stable-diffusion task...")
             self.args = self.args + (
                 inference("27b93a2413e7f36cd83da926f3656280b2931564ff050bf9575f1fdf9bcd7478"),
             )
 
             return self.func(*self.args, **self.kwargs)
         elif self.model:
-            log.info(f"Accessing Replicate {self.model} coprocessor...")
+            log.info(f"Accessing Replicate {self.model} task...")
             self.args = self.args + (inference(self.model),)
 
             return self.func(*self.args, **self.kwargs)

@@ -1,4 +1,4 @@
-from seaplane import Coprocessor, config, coprocessor, log, smartpipe, start
+from seaplane import Task, app, config, log, start, task
 from seaplane.logging import SeaLogger
 
 SEAPLANE_API_KEY = "..."
@@ -64,54 +64,54 @@ My first request is the following, please avoid showing screens, devices, or obj
 """
 
 
-@coprocessor(type="compute", id="string_to_int")
+@task(type="compute", id="string_to_int")
 def toInt(input):
 
     return int(input)
 
 
-@coprocessor(type="compute", id="multiply_by_1_8")
+@task(type="compute", id="multiply_by_1_8")
 def multiply_by_1_8(number):
 
     return number * 1.8
 
 
-@coprocessor(type="compute", id="add_32")
+@task(type="compute", id="add_32")
 def add_32(number):
 
     return number + 32
 
 
-@smartpipe(path="/celsius_to_fahrenheit", method="POST", id="celsius_to_fahrenheit")
+@app(path="/celsius_to_fahrenheit", method="POST", id="celsius_to_fahrenheit")
 def celsius_to_fahrenheit(input):
 
     number = toInt(input)
     temp_times_1_8 = multiply_by_1_8(number)
     temp_fahrenheit = add_32(temp_times_1_8)
-    return temp_fahrenheit
+    return str(temp_fahrenheit)
 
 
-@coprocessor(type="compute", id="convert-int")
+@task(type="compute", id="convert-int")
 def convert_string(data):
 
     return int(data)
 
 
-@coprocessor(type="compute", id="multiply-by-two")
+@task(type="compute", id="multiply-by-two")
 def double_a_number(data):
 
     return data * 2
 
 
-@smartpipe(path="/inference_number", method="POST", id="my-smart-pipe")
-def my_smartpipe(input_data=None):
+@app(path="/inference_number", method="POST", id="my-app")
+def my_app(input_data=None):
 
     seed = double_a_number(convert_string(input_data))
 
     return seed
 
 
-@coprocessor(type="inference", model="gpt-3.5", id="create_a_blog_post")
+@task(type="inference", model="gpt-3.5", id="create_a_blog_post")
 def create_a_blog_post(topic, model):
     prompt = f"Create a blog post of this topic: {topic}, not so long"
 
@@ -125,7 +125,7 @@ def create_a_blog_post(topic, model):
     return result["choices"][0]["message"]["content"]
 
 
-@coprocessor(type="inference", model="gpt-3.5", id="get_prompt")
+@task(type="inference", model="gpt-3.5", id="get_prompt")
 def get_prompt(blog_post, model):
     prompt = f"{stable_diffusion_prompt_contenxt} \n {blog_post}"
 
@@ -140,14 +140,14 @@ def get_prompt(blog_post, model):
     return result["choices"][0]["message"]["content"]
 
 
-@coprocessor(type="inference", model="stable-diffusion", id="text-to-image")
+@task(type="inference", model="stable-diffusion", id="text-to-image")
 def get_image_from_prompt(prompt, model):
 
     result = model(prompt)
     return result["output"]
 
 
-@smartpipe(path="/create_blog_post_with_images", method="POST", id="write-blog-post")
+@app(path="/create_blog_post_with_images", method="POST", id="write-blog-post")
 def blog_post_to_image(input):
 
     topic = input
@@ -158,7 +158,7 @@ def blog_post_to_image(input):
     return {"blog_post": blog_post, "images": images}
 
 
-@coprocessor(type="inference", model="bloom", id="bloom-call")
+@task(type="inference", model="bloom", id="bloom-call")
 def bloom(prompt, model):
 
     result = model(prompt)
@@ -166,21 +166,21 @@ def bloom(prompt, model):
     return result
 
 
-@smartpipe(path="/bloom", method="POST", id="my-bloom-smart-pipe")
-def bloom_smartpipe(input_data=None):
+@app(path="/bloom", method="POST", id="my-bloom-app")
+def bloom_app(input_data=None):
 
     return bloom(input_data)
 
 
-@coprocessor(type="inference", model="stable-diffusion", id="stable-diffusion-model")
+@task(type="inference", model="stable-diffusion", id="stable-diffusion-model")
 def stable_diffusion(prompt, model):
     result = model(prompt)
 
     return result
 
 
-@smartpipe(path="/stable_diffusion", method="POST", id="stable-diffusion-smartpipe")
-def stable_diffusion_smartpipe(input_data=None):
+@app(path="/stable_diffusion", method="POST", id="stable-diffusion-app")
+def stable_diffusion_app(input_data=None):
 
     return stable_diffusion(input_data)
 

@@ -1,38 +1,29 @@
-from seaplane import (
-    Coprocessor,
-    config,
-    context,
-    coprocessor,
-    import_coprocessor,
-    log,
-    smartpipe,
-    start,
-)
+from seaplane import Task, app, config, context, import_task, log, start, task
 from seaplane.logging import SeaLogger
 
 log.level(SeaLogger.DEBUG)
 config.set_production(True)
 
 
-@coprocessor(type="compute", id="string_to_int")
+@task(type="compute", id="string_to_int")
 def toInt(input):
 
     return int(input)
 
 
-@coprocessor(type="compute", id="multiply_by_1_8")
+@task(type="compute", id="multiply_by_1_8")
 def multiply_by_1_8(number):
 
     return number * 1.8
 
 
-@coprocessor(type="compute", id="add_32")
+@task(type="compute", id="add_32")
 def add_32(number):
 
     return number + 32
 
 
-@smartpipe(path="/celsius_to_fahrenheit", method="POST", id="celsius_to_fahrenheit")
+@app(path="/celsius_to_fahrenheit", method="POST", id="celsius_to_fahrenheit")
 def celsius_to_fahrenheit(input):
 
     number = toInt(input)
@@ -41,8 +32,8 @@ def celsius_to_fahrenheit(input):
     return temp_fahrenheit
 
 
-@smartpipe(path="/other_smart_pipe", method="POST", id="other_smart_pipe")
-def other_smart_pipe(input):
+@app(path="/other_app", method="POST", id="other_app")
+def other_app(input):
 
     number = toInt(input)
     temp_times_1_8 = multiply_by_1_8(number)

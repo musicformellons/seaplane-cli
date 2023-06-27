@@ -9,10 +9,10 @@ _SEAPLANE_COMPUTE_API_ENDPOINT = "https://compute.cplane.cloud/v2beta"
 _SEAPLANE_COORDINATION_API_ENDPOINT = "https://metadata.cplane.cloud/v1"
 _SEAPLANE_IDENTIFY_API_ENDPOINT = "https://flightdeck.cplane.cloud/v1"
 _SEAPLANE_GLOBAL_SQL_API_ENDPOINT = "https://sql.cplane.cloud/v1"
-_SEAPLANE_CARRIER_API_ENDPOINT = "https://carrier.staging.cplane.dev/v1"
+_SEAPLANE_CARRIER_API_ENDPOINT = "https://carrier.cplane.cloud/v1"
 _SEAPLANE_SUBSTATION_API_ENDPOINT = "https://substation.dev.cplane.cloud/v1"
 
-_SEAPLANE_ENV_VAR_PRODUCTION = "SMARTPIPES_PRODUCTION"
+_SEAPLANE_ENV_VAR_PRODUCTION = "SEAPLANE_APPS_PRODUCTION"
 
 api_key_names = [
     "SEAPLANE_API_KEY",
@@ -80,17 +80,17 @@ class Configuration:
         self._update_token_api()
 
     def set_api_keys(self, api_keys: Dict[str, str]) -> None:
-        """Set the Seaplane API Keys for SmartPipes.
+        """Set the Seaplane API Keys for Apps.
 
-        The API Keys is needed for some of the Coprocessors.
+        The API Keys is needed for some of the Tasks.
 
-        Supported Coprocessors API Keys:
+        Supported Tasks API Keys:
 
         Seaplane: SEAPLANE_API_KEY
         Open AI: OPENAI_API_KEY
         Replicate: REPLICATE_API_KEY
 
-        For example, for use an OpenAI Coprocessor,
+        For example, for use an OpenAI Task,
         you need to provide the Key - Value, of the API Key.
 
             $ from seaplane import sea

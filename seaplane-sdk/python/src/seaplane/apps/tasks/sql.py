@@ -27,7 +27,7 @@ class Sql:
         self.args = args
         self.kwargs = kwargs
 
-        log.info("Processing SQL Coprocessor...")
+        log.info("Processing SQL Task...")
 
         self.args = self.args + (self.executor,)
 
