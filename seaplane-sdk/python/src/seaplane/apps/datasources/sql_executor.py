@@ -2,6 +2,7 @@ from typing import Any, List, Optional
 from urllib.parse import urlparse
 
 import psycopg2
+from psycopg2 import OperationalError
 from psycopg2.extensions import connection
 
 from ...configuration import config
@@ -42,7 +43,11 @@ class SqlExecutor:
         self.conn.set_session(autocommit=True)
 
     def check_connection(self) -> None:
-        if self.conn.closed != 0:
+        try:
+            cursor = self.conn.cursor()
+            cursor.execute("SELECT current_database()")
+            cursor.close()
+        except OperationalError:
             self.connect()
 
     def execute(self, sql: str, parameters: Optional[List[Any]] = None) -> int:

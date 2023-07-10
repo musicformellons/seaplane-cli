@@ -14,10 +14,10 @@ class RequestDataSource:
     def save_request(self, id: str, batch_count: int) -> int:
         return self.executor.insert(
             """ INSERT INTO requests
-                        (id, status, batch_count)
+                        (id, batch_count)
                         VALUES
-                        (%s, %s, %s)""",
-            [id, "processing", batch_count],
+                        (%s, %s)""",
+            [id, batch_count],
         )
 
     def save_result(self, request_id: str, order: int, output: Any) -> int:
@@ -45,7 +45,7 @@ class RequestDataSource:
         return result
 
     def get_request_results(self, request_id: str) -> List[Dict[str, Any]]:
-        rows = self.executor.fetch_one(
+        rows = self.executor.fetch_all(
             """
           SELECT output
           FROM results

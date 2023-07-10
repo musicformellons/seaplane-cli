@@ -22,7 +22,7 @@ Apps automatically set up the infrastructure required for the data stream and ta
 ```python
 from seaplane import app
 
-@app(path='/my-api-endpoint', method="POST", id='my-app')
+@app(path='/my-api-endpoint', id='my-app')
 def my_app(body):  
   ...
 	# your models and tasks go here
@@ -45,7 +45,7 @@ def my_inference_model(input, model):
     # run your inference here
     return model(input)
 
-@app(path='/my-api-endpoint', method="POST", id='my-app')
+@app(path='/my-api-endpoint', id='my-app')
 def my_app(body):
 	    
     return my_inference_model(body) 
@@ -62,7 +62,7 @@ def my_function(input_data):
 		# convert string to int and sum two
     return int(input_data) + 2
 
-@app(path='/my-api-endpoint', method="POST", id='my-app')
+@app(path='/my-api-endpoint', id='my-app')
 def my_app(body):    
     
     return my_function(body)
@@ -125,7 +125,7 @@ def bloom_inference(input, model):
 		# run your inference here
 		return model(input)
 
-@app(path='/my-api-endpoint', method="POST", id='my-app')
+@app(path='/my-api-endpoint', id='my-app')
 def my_app(body):		      
 
     return bloom_inference(body)
@@ -148,7 +148,6 @@ from seaplane import sea
 api_keys = {
     "SEAPLANE_API_KEY": "...",  # Seaplane Tasks
     "OPENAI_API_KEY": "...", # OpenAI Task
-    "REPLICATE_API_KEY": "...",  # Replicate Task
 }
 
 config.set_api_keys(api_keys)
@@ -160,6 +159,11 @@ or If you only need to set up the Seaplane API Key, you can use `config.set_api_
 config.set_api_key("...")
 ```
 
+additionally, if you don't want to use API Keys in your code you can provide them using ENV variables like:
+
+- SEAPLANE_API_KEY
+- OPENAI_API_KEY
+
 ## Usage
 
 For writing your first App you have to import four elements from the Seaplane Python SDK, `config`, `app`, `task` and `start`
@@ -167,7 +171,7 @@ For writing your first App you have to import four elements from the Seaplane Py
 * `config` is the Configuration Object for setting the API Keys
 * `app` is the decorator for defining a Seaplane App
 * `task` is the decorator for defining a Seaplane Task
-* `start` is the function needed to run your Apps locally, It needs to locale it at the end of the Apps file.
+* `start` is the function needed to run your Apps, It needs to locale it at the end of the Apps file.
 
 You can run this App locally if you have a Seaplane API Key:
 
@@ -188,7 +192,7 @@ def bloom_inference(input, model):
   	# run your inference here
   	return model(input)
 
-@app(path='/my-api-endpoint', method="POST", id='my-app')
+@app(path='/my-api-endpoint', id='my-app')
 def my_app(body):
       
     return bloom_inference(body)
@@ -211,7 +215,49 @@ You'll able to call `my-app` with the following curl:
 curl -X POST -H "Content-Type: application/json" -d 'This is a test' http://127.0.0.1:1337/my-api-endpoint
 ```
 
-## Interactive Apps Website
+## Deploy and production usage
+
+Deploy: `python3 demo.py deploy`
+
+This will deploy your pipelines into Seaplane making them accessible throught the App's request.
+
+### Your first request to an App
+
+Apps endpoint are the entry point to your pipeline, which has to follow the next schema:
+
+```json
+{
+	"input": [ any_object ],
+	"params": {} //this params will be shared between each any_object calling to the first task
+}
+```
+
+When you define your HTTP `@app` you have to include the `/path` you want to use, that path is used in the App's request.
+
+```
+curl -X POST -H "Content-Type: application/json" -H "Authorization: Bearer ${TOKEN}" -d '{ "input": [{ ... }], "params": { ... } }' https://carrier.staging.cplane.dev/apps/request/<app_path>
+
+{"id":"3dc6ec03-6f2f-47f4-9a8e-e289972fb58a","status":"processing"}
+```
+
+App's request response will returns an Request ID, you have to use it in the App's request GET endpoint.
+
+```
+curl -H "Authorization: Bearer ${TOKEN}" https://carrier.staging.cplane.dev/apps/request/<request_id>
+
+{"id": "3dc6ec03-6f2f-47f4-9a8e-e289972fb58a", "output": [ .. output ordered ..], "status": "completed"}
+```
+
+You can know which endpoints you do have available using `GET /endpoints` or looking into your project the `@app` paths.
+
+```
+curl -X GET -H "Authorization: Bearer ${TOKEN}" https://carrier.staging.cplane.dev/apps/endpoints
+```
+
+
+
+
+## Interactive Apps Website (UNMAINTAINED NOT WORKING RIGHT NOW)
 
 ![Screenshot 2023-05-10 at 19 07 42](https://github.com/seaplane-io/seaplane/assets/5845622/c346c22b-4fca-4062-8207-38f61f315857)
 

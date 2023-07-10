@@ -18,3 +18,9 @@ def unwrap(result: Result[T, SeaplaneError]) -> T:
             raise SeaplaneError(str(error))
     else:
         raise result.failure()
+
+
+def remove_prefix(text: str, prefix: str) -> str:
+    if text.startswith(prefix):
+        return text[len(prefix) :]
+    return text

@@ -2,6 +2,7 @@ import json
 import os
 import shutil
 from typing import Any, Dict, List, Optional
+from urllib.parse import urlparse
 import zipfile
 
 import requests
@@ -12,7 +13,7 @@ from ..api.token_api import TokenAPI
 from ..configuration import Configuration, config
 from ..logging import log
 from ..model.secrets import Secret
-from ..util import unwrap
+from ..util import remove_prefix, unwrap
 from .app import App
 from .build import build
 from .datasources import tenant_database
@@ -69,6 +70,10 @@ CMD gunicorn --bind 0.0.0.0:${PORT} --workers 1 --timeout 300 demo:app
         file.write(docker_file)
 
 
+def create_subject(app_id: str, task_id: str) -> str:
+    return f"{app_id}.{task_id}"
+
+
 def create_carrier_workload_file(
     tenant: str,
     app_id: str,
@@ -81,13 +86,15 @@ def create_carrier_workload_file(
     if len(next_tasks) > 1:
         output = {
             "broker": {
-                "outputs": ({"carrier": {"subject": f"{app_id}.{c_id}"}} for c_id in next_tasks)
+                "outputs": (
+                    {"carrier": {"subject": create_subject(app_id, c_id)}} for c_id in next_tasks
+                )
             }
         }
     elif len(next_tasks) == 1:
         output = {
             "label": "carrier_out",
-            "carrier": {"subject": f"{app_id}.{next_tasks[0]}"},
+            "carrier": {"subject": create_subject(app_id, next_tasks[0])},
         }
 
     workload = {
@@ -96,7 +103,7 @@ def create_carrier_workload_file(
         "input": {
             "label": "carrier_in",
             "carrier": {
-                "subject": f"{app_id}.{task.id}",
+                "subject": create_subject(app_id, task.id),
                 "deliver": "all",
                 "queue": task.id,
             },
@@ -245,12 +252,12 @@ def zip_current_directory(tenant: str) -> str:
                 file_path = os.path.join(root, file)
                 zipf.write(file_path, os.path.relpath(file_path, current_directory))
 
-    print(f"Package project for upload: {zip_filename}")
+    log.debug(f"Package project for upload: {zip_filename}")
     return zip_filename
 
 
 def upload_project(tenant: str) -> str:
-    url = "http://localhost:5000/upload"
+    url = f"https://{urlparse(config.carrier_endpoint).netloc}/apps/upload"
     req = provision_req(config._token_api)
 
     project_file = zip_current_directory(tenant)
@@ -261,7 +268,7 @@ def upload_project(tenant: str) -> str:
             lambda access_token: requests.post(
                 url,
                 files=files,
-                headers=headers(access_token),
+                headers={"Authorization": f"Bearer {access_token}"},
             )
         )
     )
@@ -269,6 +276,45 @@ def upload_project(tenant: str) -> str:
     os.remove(project_file)
 
     return result
+
+
+def put_kv(tenant: str, key: str, value: Any) -> Any:
+    url = f"https://{urlparse(config.carrier_endpoint).netloc}/apps/kv"
+    req = provision_req(config._token_api)
+
+    payload: Dict[str, str] = {"tenant": tenant, "key": key, "value": json.dumps(value)}
+
+    return unwrap(
+        req(
+            lambda access_token: requests.put(
+                url,
+                json=payload,
+                headers=headers(access_token),
+            )
+        )
+    )
+
+
+def register_apps_info(tenant: str, schema: Dict[str, Any]) -> None:
+    apps = schema["apps"].keys()
+
+    tenant_api_paths: List[Dict[str, str]] = []
+
+    for app_id in apps:
+        entry_point_type = schema["apps"][app_id]["entry_point"]["type"]
+        if entry_point_type == "API":
+            path = schema["apps"][app_id]["entry_point"]["path"]
+            method = schema["apps"][app_id]["entry_point"]["method"]
+            first_tasks = schema["apps"][app_id]["io"]["entry_point"]
+
+            key = f"{remove_prefix(path, '/')}"
+            value = [create_subject(app_id, task_id) for task_id in first_tasks]
+
+            tenant_api_paths.append({"path": path, "method": method})
+
+            put_kv(tenant, key, value)
+
+    put_kv(tenant, "endpoints", tenant_api_paths)
 
 
 def deploy_task(
@@ -306,9 +352,10 @@ def deploy_task(
 def deploy(task_id: Optional[str] = None) -> None:
     schema = build()
     tenant = TokenAPI(config).get_tenant()
-    tenant_db = tenant_database()
+    tenant_db = tenant_database(tenant)
     secrets = get_secrets(config)
     project_url = upload_project(tenant)
+    register_apps_info(tenant, schema)
 
     secrets.append(Secret("SEAPLANE_APPS_PRODUCTION", "true"))
     secrets.append(Secret("SEAPLANE_TENANT_DB__DATABASE", tenant_db.name))

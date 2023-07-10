@@ -49,7 +49,8 @@ def build() -> Dict[str, Any]:
         schema["apps"][sm.id] = app
 
     persist_schema(schema)
-    log.debug("Created Apps configuration")
+
+    log.debug("Apps build configuration done")
 
     context.set_executor(RealTaskExecutor(context.event_handler))
 

@@ -227,32 +227,44 @@ def start_task(task_id: str, save_result: bool) -> None:
         requests_datasource = build_requests_datasource()
 
     while True:
-        log.info(f" Task {task.id}  waiting for getting data...")
-        message = json.loads(processor.read())
-        log.debug(f" Message recieved: {message}")
-
-        id = message["id"]
-        order = message["order"]
-
         try:
-            message["output"] = task.process(message["input"])
+            log.info(f" Task {task.id}  waiting for getting data...")
+            message = json.loads(processor.read())
+            log.debug(f" Message recieved: {message}")
 
-            log.debug(f" Task Result: {message}")
+            id = message["id"]
+            order = message["order"]
 
-            next_message = {"input": message["output"], "id": id, "order": order}
-            processor.write(str(json.dumps(next_message)).encode())
+            try:
+                message["output"] = task.process(message["input"])
 
-            if requests_datasource:
-                requests_datasource.save_result(id, order, message["output"])
+                log.debug(f" Task Result: {message}")
 
-        except Exception as e:
-            error_str = "\n".join(traceback.format_exception(type(e), e, e.__traceback__))
+                next_message = {"input": message["output"], "id": id, "order": order}
+                processor.write(str(json.dumps(next_message)).encode())
+                processor.flush()
+
+                if requests_datasource:
+                    requests_datasource.save_result(id, order, message["output"])
+
+            except Exception as e:
+                error_str = "\n".join(traceback.format_exception(type(e), e, e.__traceback__))
+                log.error(
+                    f"Error running Task:\
+                        \n {error_str}"
+                )
+                next_message = {"input": {"error": error_str}, "id": id, "order": order}
+                processor.write(str(json.dumps(next_message)).encode())
+                processor.flush()
+        except Exception as ex:
+            error_str = "\n".join(traceback.format_exception(type(ex), ex, ex.__traceback__))
             log.error(
                 f"Error running Task:\
-                      \n {error_str}"
+                    \n {error_str}"
             )
             next_message = {"input": {"error": error_str}, "id": id, "order": order}
             processor.write(str(json.dumps(next_message)).encode())
+            processor.flush()
 
 
 def start() -> Optional[Flask]:
