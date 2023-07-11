@@ -1,15 +1,4 @@
-# Seaplane Apps Python SDK
-[![PyPI](https://badge.fury.io/py/seaplane.svg)](https://badge.fury.io/py/seaplane)
-[![Python](https://img.shields.io/pypi/pyversions/seaplane.svg?style=plastic)](https://badge.fury.io/py/seaplane)
-
-Simple Python library to Develop, Test and Ship LLM applications fast.
-
-## What is Seaplane?
-
-Seaplane is the global platform for building and scaling your AI application stack
-without the complexity of managing cloud infrastructure.
-
-It serves as a reference application for how our APIs can be utilized.
+## Seaplane Apps project
 
 ## What are Apps?
 
@@ -106,59 +95,22 @@ def my_app(body):
 	return format_result(inferenced_result, body)  
 ```
 
-## Available LLM Models
-
-* Seaplane Bloom ID: `bloom`
-* OpenAI GPT-3 ID: `GPT-3`
-* OpenAI GPT-3.5 ID: `GPT-3.5`
-* Replicate Stable Diffusion 1.5 ID: `stable-diffusion`
-
-For using this models you have to indicate in the task of `type='inference'` which model you want to use for example **bloom** using `model='bloom'` :
-
-
-```python
-from seaplane import app, task
-
-@task(type='inference', model='bloom', id='my-bloom-task')
-def bloom_inference(input, model):
-
-		# run your inference here
-		return model(input)
-
-@app(path='/my-api-endpoint', id='my-app')
-def my_app(body):		      
-
-    return bloom_inference(body)
-```
-
 ## Installation
 
-We recommend you to create a virtual environment to install your dependencies.
+Prerequisites:
+
+* Python +3.10
+* Poetry
+
 
 ```shell
-pip install seaplane
+poetry install
 ```
 
-Create a empty project:
-
-```shell
-seaplane init my_project_name
-```
-
-This will create an empty poetry project, so you can add your dependencies, run your tests and work with your project as normal with `poetry install`, you can add nox, and any other linter, type checking, etc.
-
-Install your dependencies by using `poetry install`:
-
-```shell
-> cd my_project_name
-> poetry install 
-```
-
-## Project Structure
+## Project Structure
 
 As any other Poetry project you need to follow a simple structure where your source files are under the project name folder.
 
-```
 my_project_name
 ├── README.md
 ├── my_project_name
@@ -166,7 +118,6 @@ my_project_name
 ├── pyproject.toml
 └── tests
     └── __init__.py
-```
 
 ## Configure your API KEYS
 
@@ -233,15 +184,10 @@ start()
 
 ⚠️ Don't forget **start()** at the end of the file.
 
+
 ## Deploy and production usage
 
-If you have seaplane globally installed:
-
-Deploy: `seaplane deploy`
-
-you can use your project virtual environment dependency like:
-
-Deploy: `poetry run seaplane deploy`
+Deploy: `poetry run python3 seaplane deploy`
 
 This will deploy your pipelines into Seaplane making them accessible throught the App's request.
 

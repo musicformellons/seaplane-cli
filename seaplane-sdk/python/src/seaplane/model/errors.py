@@ -15,7 +15,10 @@ class HTTPError(SeaplaneError):
             Error message.
     """
 
-    def __init__(self, status: int, message: str = ""):
+    def __init__(self, status: int, message: str = "") -> None:
         self.status = status
         self.message = message
         super().__init__(self.message)
+
+    def __str__(self) -> str:
+        return f"status={self.status}, message='{self.message}'"

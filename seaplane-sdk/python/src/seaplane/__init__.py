@@ -1,3 +1,5 @@
+from importlib.metadata import version
+
 from .api.compute_api import ComputeAPI
 from .api.lock_api import LockAPI
 from .api.metadata_api import MetadataAPI
@@ -7,6 +9,8 @@ from .api.token_api import TokenAPI
 from .apps import App, Task, app, build, context, start, task
 from .configuration import Configuration, config
 from .logging import log
+
+__version__ = version(__name__)
 
 
 class Seaplane:

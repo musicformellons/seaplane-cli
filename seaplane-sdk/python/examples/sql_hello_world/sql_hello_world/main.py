@@ -2,21 +2,20 @@ from seaplane import app, config, log, start, task
 from seaplane.logging import SeaLogger
 
 log.level(SeaLogger.DEBUG)
-config.set_global_sql_endpoint("sql.staging.cplane.dev")
 
 sql_access = {"username": "...", "password": "...", "database": "...", "port": 2001}
 
 
 @task(type="sql", sql=sql_access)
-def query(sql):
+def insert(input, sql):
 
-    return sql.fetch_all(""" SELECT * FROM joe_results_draft""")
+    return sql.insert(""" INSERT INTO my_table VALUES (%s, %s)""", input.a, input.b)
 
 
-@app(path="/query_database", id="query_db")
-def query_database(input):
+@app(path="/insert", id="query_db")
+def insert(input):
 
-    return query()
+    return insert(input)
 
 
 app = start()

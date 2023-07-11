@@ -81,11 +81,11 @@ class Context:
             self.actual_app_index = len(self.apps)
             self.apps.append(app)
 
-        log.info(f"🧠 App: {app.id}, Path: {app.path}")
+        log.debug(f"🧠 App: {app.id}, Path: {app.path}")
         self.event_handler.on_change(apps_json(self.apps))
 
     def add_task(self, task: Task) -> None:
-        log.info(f"⌛️ Task {task.id} of type: {task.type}")
+        log.debug(f"⌛️ Task {task.id} of type: {task.type}")
         self.tasks.append(task)
 
     def get_task(self, id: str) -> Optional[Task]:
@@ -124,7 +124,7 @@ def app(
     def decorator_apps(func: Callable[[Any], Any]) -> Callable[[Any, Any], Any]:
         @functools.wraps(func)
         def wrapper(*args: Any, **kwargs: Any) -> Any:
-            log.info(f"App Path: {path}, Method: {method}, ID: {id}")
+            log.debug(f"App Path: {path}, Method: {method}, ID: {id}")
             context.active_app(id)
 
             args_str = tuple(arg.decode() if isinstance(arg, bytes) else arg for arg in args)

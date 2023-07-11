@@ -15,7 +15,7 @@ from ..logging import log
 from ..model.secrets import Secret
 from ..util import remove_prefix, unwrap
 from .app import App
-from .build import build
+from .build import PROJECT_TOML, build
 from .datasources import tenant_database
 from .decorators import context
 from .task import Task
@@ -240,27 +240,31 @@ def delete_flow(name: str) -> Any:
     )
 
 
-def zip_current_directory(tenant: str) -> str:
+def zip_current_directory(tenant: str, project_name: str) -> str:
     current_directory = os.getcwd()
     zip_filename = f"./build/{tenant}.zip"
 
     with zipfile.ZipFile(zip_filename, "w", zipfile.ZIP_DEFLATED) as zipf:
-        for root, _, files in os.walk(current_directory):
+        zipf.write(PROJECT_TOML, os.path.relpath(PROJECT_TOML, current_directory))
+
+        for root, _, files in os.walk(f"{current_directory}/{project_name}"):
             for file in files:
-                if file == "build":
+                if "__pycache__" in root:
                     continue
+
                 file_path = os.path.join(root, file)
                 zipf.write(file_path, os.path.relpath(file_path, current_directory))
 
-    log.debug(f"Package project for upload: {zip_filename}")
+    # log.debug(f"Package project for upload: {zip_filename}")
     return zip_filename
 
 
-def upload_project(tenant: str) -> str:
+def upload_project(project: Dict[str, Any], tenant: str) -> str:
     url = f"https://{urlparse(config.carrier_endpoint).netloc}/apps/upload"
     req = provision_req(config._token_api)
 
-    project_file = zip_current_directory(tenant)
+    project_name = project["tool"]["poetry"]["name"]
+    project_file = zip_current_directory(tenant, project_name)
     files = {"file": open(project_file, "rb")}
 
     result: str = unwrap(
@@ -350,11 +354,13 @@ def deploy_task(
 
 
 def deploy(task_id: Optional[str] = None) -> None:
-    schema = build()
+    project = build()
+    schema = project["schema"]
     tenant = TokenAPI(config).get_tenant()
     tenant_db = tenant_database(tenant)
     secrets = get_secrets(config)
-    project_url = upload_project(tenant)
+    project_url = upload_project(project["config"], tenant)
+
     register_apps_info(tenant, schema)
 
     secrets.append(Secret("SEAPLANE_APPS_PRODUCTION", "true"))

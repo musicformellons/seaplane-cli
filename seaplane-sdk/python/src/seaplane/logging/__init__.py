@@ -21,7 +21,7 @@ class SeaLogger:
     def __init__(self) -> None:
         logging.basicConfig(format=self.FORMAT)
         self.logger = logging.getLogger("Seaplane")
-        self.logger.setLevel(logging.WARNING)
+        self.logger.setLevel(logging.INFO)
 
     def debug(self, message: str) -> None:
         self.logger.debug(message)

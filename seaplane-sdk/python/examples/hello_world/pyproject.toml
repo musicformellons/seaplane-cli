@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "hello_world"
+version = "0.0.0"
+description = ""
+authors = []
+
+[tool.seaplane]
+main = "main.py"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+seaplane = "^0.3.65"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

@@ -1,4 +1,4 @@
-from seaplane import app, context, log, start, task
+from seaplane import app, log, start, task
 from seaplane.logging import SeaLogger
 
 log.level(SeaLogger.DEBUG)
