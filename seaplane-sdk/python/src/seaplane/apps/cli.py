@@ -67,6 +67,9 @@ def main() -> None:
     init_parser = subparsers.add_parser("init", help="Init command")
     init_parser.add_argument("app", help="Seaplane Apps name")
 
+    version_parser = subparsers.add_parser("version", help="Seaplane Apps SDK version")
+    version_parser.set_defaults(func=(lambda: print(f"Version {version('seaplane')}")))
+
     args = parser.parse_args()
 
     if args.command == "build":
@@ -81,6 +84,9 @@ def main() -> None:
 
     elif args.command == "init":
         init(args.app)
+
+    elif args.command == "version" and hasattr(args, "func"):
+        args.func()
 
     else:
         print("Invalid command, use -h or --help for more information.")

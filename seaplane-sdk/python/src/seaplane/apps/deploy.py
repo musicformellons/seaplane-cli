@@ -306,12 +306,13 @@ def register_apps_info(tenant: str, schema: Dict[str, Any]) -> None:
 
     for app_id in apps:
         entry_point_type = schema["apps"][app_id]["entry_point"]["type"]
+        version = "latest"  # right now we only support latest version
         if entry_point_type == "API":
             path = schema["apps"][app_id]["entry_point"]["path"]
             method = schema["apps"][app_id]["entry_point"]["method"]
             first_tasks = schema["apps"][app_id]["io"]["entry_point"]
 
-            key = f"{remove_prefix(path, '/')}"
+            key = f"{app_id}/{version}/{remove_prefix(path, '/')}"
             value = [create_subject(app_id, task_id) for task_id in first_tasks]
 
             tenant_api_paths.append({"path": path, "method": method})
@@ -361,8 +362,6 @@ def deploy(task_id: Optional[str] = None) -> None:
     secrets = get_secrets(config)
     project_url = upload_project(project["config"], tenant)
 
-    register_apps_info(tenant, schema)
-
     secrets.append(Secret("SEAPLANE_APPS_PRODUCTION", "true"))
     secrets.append(Secret("SEAPLANE_TENANT_DB__DATABASE", tenant_db.name))
     secrets.append(Secret("SEAPLANE_TENANT_DB_USERNAME", tenant_db.username))
@@ -386,7 +385,9 @@ def deploy(task_id: Optional[str] = None) -> None:
             for c in sm.tasks:
                 deploy_task(tenant, sm, c, schema, secrets[:], project_url)
 
-    log.info("Deployment complete")
+    register_apps_info(tenant, schema)
+
+    log.info("🚀 Deployment complete")
 
 
 def destroy() -> None:

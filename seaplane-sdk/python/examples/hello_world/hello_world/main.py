@@ -1,7 +1,10 @@
-from seaplane import app, log, start, task
+from seaplane import app, config, log, start, task
 from seaplane.logging import SeaLogger
 
-log.level(SeaLogger.DEBUG)
+config.set_global_sql_endpoint("https://sql.staging.cplane.dev/v1")
+config.set_carrier_endpoint("https://carrier.staging.cplane.dev/v1")
+
+config.set_api_key("<YOUR_SEAPLANE_KEY>")
 
 
 @task(type="compute", id="hello-world-task")

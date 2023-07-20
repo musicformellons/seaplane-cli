@@ -9,7 +9,7 @@ main = "main.py"
 
 [tool.poetry.dependencies]
 python = "^3.10"
-seaplane = "^0.3.65"
+seaplane = "^0.3.69"
 
 [build-system]
 requires = ["poetry-core"]
