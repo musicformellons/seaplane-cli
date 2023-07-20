@@ -236,7 +236,10 @@ def start_task(task_id: str, save_result: bool) -> None:
             order = message["order"]
 
             try:
-                message["output"] = task.process(message["input"])
+                task_data = message["input"]
+                task_data["_request_id"] = id
+
+                message["output"] = task.process(task_data)
 
                 log.debug(f" Task Result: {message}")
 
