@@ -23,6 +23,13 @@ def cli_deploy(task: str) -> None:
     os.system(f"poetry run python {project_name}/{main_script} deploy {task}")
 
 
+def cli_destroy() -> None:
+    project = get_project()
+    project_name = project["tool"]["poetry"]["name"]
+    main_script = project["tool"]["seaplane"]["main"]
+    os.system(f"poetry run python {project_name}/{main_script} destroy")
+
+
 def cli_build() -> None:
     project = get_project()
     project_name = project["tool"]["poetry"]["name"]
@@ -63,10 +70,14 @@ def main() -> None:
         help="seaplane deploy which can include a TASK_ID as a parameter to deploy an individual TASK",  # noqa
     )
 
+    # Destroy command
+    subparsers.add_parser("destroy", help="Remove your App and associated tasks")
+
     # Init command
     init_parser = subparsers.add_parser("init", help="Init command")
     init_parser.add_argument("app", help="Seaplane Apps name")
 
+    # Version command
     version_parser = subparsers.add_parser("version", help="Seaplane Apps SDK version")
     version_parser.set_defaults(func=(lambda: print(f"Version {version('seaplane')}")))
 
@@ -81,6 +92,9 @@ def main() -> None:
             task = args.task
 
         cli_deploy(task)
+
+    elif args.command == "destroy":
+        cli_destroy()
 
     elif args.command == "init":
         init(args.app)
